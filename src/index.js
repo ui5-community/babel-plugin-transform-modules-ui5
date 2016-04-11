@@ -51,31 +51,116 @@ export default function ({ types: t })
 
 
 
-        ExportDeclaration: {
-            enter: path => {
-                const state = path.state.ui5;
+        ExportDeclaration: path => {
+            const state = path.state.ui5;
 
-                if (path.node.declaration)
+            const defineCallArgs = [
+                t.arrayExpression(state.imports.map(i => t.stringLiteral(i.src))),
+                t.functionExpression(null, state.imports.map(i => t.identifier(i.name)), t.blockStatement([
+                    t.expressionStatement(t.stringLiteral("use strict")),
+                    t.returnStatement(transformClass(path.node.declaration, state))
+                ]))
+            ];
+            const defineCall = t.callExpression(t.identifier("sap.ui.define"), defineCallArgs);
+            if (state.leadingComments)
+            {
+                defineCall.leadingComments = state.leadingComments;
+            }
+            path.replaceWith(defineCall);
+        },
+
+
+
+
+        CallExpression(path)
+        {
+            const state = path.state.ui5;
+            const node = path.node;
+
+            if (node.callee.type === "Super")
+            {
+                if (!state.superClassName)
                 {
-
+                    this.errorWithNode("The keyword 'super' can only used in a derrived class.");
                 }
 
-                const defineCallArgs = [
-                    t.arrayExpression(state.imports.map(i => t.stringLiteral(i.src))),
-                    t.functionExpression(null, state.imports.map(i => t.identifier(i.name)), t.blockStatement([
-                        t.expressionStatement(t.stringLiteral("use strict")),
-                        t.returnStatement()
-                    ]))
-                ];
-                const defineCall = t.callExpression(t.identifier("sap.ui.define"), defineCallArgs);
-                if (state.leadingComments)
+                const identifier = t.identifier(state.superClassName + ".apply");
+                let args = t.arrayExpression(node.arguments);
+                if (node.arguments.length === 1 && node.arguments[0].type === "Identifier" && node.arguments[0].name === "arguments")
                 {
-                    defineCall.leadingComments = state.leadingComments;
+                    args = t.identifier("arguments");
                 }
-                path.replaceWith(defineCall);
+                path.replaceWith(
+                    t.callExpression(identifier, [
+                        t.identifier("this"),
+                        args
+                    ])
+                );
+            }
+            else if (node.callee.object && node.callee.object.type === "Super")
+            {
+                if (!state.superClassName)
+                {
+                    this.errorWithNode("The keyword 'super' can only used in a derrived class.");
+                }
+
+                const identifier = t.identifier(state.superClassName + ".prototype" + "." + node.callee.property.name + ".apply");
+                path.replaceWith(
+                    t.callExpression(identifier, [
+                        t.identifier("this"),
+                        t.arrayExpression(node.arguments)
+                    ])
+                );
             }
         }
     };
+
+
+
+    function transformClass(node, state)
+    {
+        if (node.type !== "ClassDeclaration")
+        {
+            return node;
+        }
+        else
+        {
+            resolveClass(node, state);
+
+            const props = [];
+            node.body.body.forEach(member => {
+                if (member.type === "ClassMethod")
+                {
+                    const func = t.functionExpression(null, member.params, member.body);
+                    props.push(t.objectProperty(member.key, func));
+                }
+                else if (member.type == "ClassProperty")
+                {
+                    props.push(t.objectProperty(member.key, member.value));
+                }
+            });
+
+            const bodyJSON = t.objectExpression(props);
+            const extendCallArgs = [
+                t.stringLiteral(state.fullClassName),
+                bodyJSON
+            ];
+            const extendCall = t.callExpression(t.identifier(state.superClassName + ".extend"), extendCallArgs);
+            return extendCall;
+        }
+    }
+
+
+
+
+
+
+    function resolveClass(node, state)
+    {
+        state.className = node.id.name;
+        state.superClassName = node.superClass.name;
+        state.fullClassName = state.className;
+    }
 
 
 
