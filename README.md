@@ -11,7 +11,8 @@ This plugin can automatically transform your ES6 codes to SAP UI5 based ES5 code
 + Most of ES6 features supported by Babel, like arrow functions, spreading, default value of parameters, etc.
 
 # Babel 5 support
-Please see [babel-ui5-plugin](https://github.com/MagicCube/babel-ui5-plugin).
+Currently this version only support Babel 6.
+If you still want to use Babel 5 in your project, please visit my previous project [babel-ui5-plugin](https://github.com/MagicCube/babel-ui5-plugin).
 
 # Example
 Please see [babel-plugin-ui5-example](https://github.com/MagicCube/babel-plugin-ui5-example)
