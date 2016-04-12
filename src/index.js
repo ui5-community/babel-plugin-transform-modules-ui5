@@ -1,13 +1,51 @@
+import Path from "path";
+
 export default function ({ types: t })
 {
     const ui5ModuleVisitor = {
         Program: {
             enter: path => {
+                const filePath = Path.resolve(path.hub.file.opts.filename);
+
+                let sourceRootPath = null;
+                if (path.hub.file.opts.sourceRoot)
+                {
+                    sourceRootPath = Path.resolve(path.hub.file.opts.sourceRoot);
+                }
+                else
+                {
+                    sourceRootPath = Path.resolve("./");
+                }
+
+                let relativeFilePath = null;
+                let relativeFilePathWithoutExtension = null;
+                let namespace = null;
+                if (filePath.startsWith(sourceRootPath))
+                {
+                    relativeFilePath = Path.relative(sourceRootPath, filePath);
+                    relativeFilePathWithoutExtension = Path.dirname(relativeFilePath) + "/" + Path.basename(relativeFilePath, Path.extname(relativeFilePath));
+
+                    const parts = relativeFilePath.split("/");
+                    if (parts.length <= 1)
+                    {
+                        namespace = relativeFilePath;
+                    }
+                    else
+                    {
+                        parts.pop();
+                        namespace = parts.join(".");
+                    }
+                }
+
                 if (!path.state)
                 {
                     path.state = {};
                 }
                 path.state.ui5 = {
+                    filePath,
+                    relativeFilePath,
+                    relativeFilePathWithoutExtension,
+                    namespace,
                     className: null,
                     superClassName: null,
                     imports: []
@@ -55,6 +93,7 @@ export default function ({ types: t })
             const state = path.state.ui5;
 
             const defineCallArgs = [
+                t.stringLiteral(state.relativeFilePathWithoutExtension),
                 t.arrayExpression(state.imports.map(i => t.stringLiteral(i.src))),
                 t.functionExpression(null, state.imports.map(i => t.identifier(i.name)), t.blockStatement([
                     t.expressionStatement(t.stringLiteral("use strict")),
@@ -159,7 +198,14 @@ export default function ({ types: t })
     {
         state.className = node.id.name;
         state.superClassName = node.superClass.name;
-        state.fullClassName = state.className;
+        if (state.namespace)
+        {
+            state.fullClassName = state.namespace + "." + state.className;
+        }
+        else
+        {
+            state.fullClassName = state.className;
+        }
     }
 
 
