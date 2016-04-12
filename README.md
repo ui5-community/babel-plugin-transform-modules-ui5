@@ -152,12 +152,12 @@ Now your project will look like this
 ```
 <your-ui5-project>
     ├── <assets>
-    │   ├── all-dbg.js
-    │   ├── all.js
     │   └── <your_module>
-    │       └── <sub_folder>
-    │           ├── ClassA.js
-    │           └── ClassB.js
+    │       ├── <sub_folder>
+    │       │   ├── ClassA.js
+    │       │   └── ClassB.js
+    │       ├── all-dbg.js
+    │       └── all.js
     ├── <src>
     │   └── <your_module>
     │       └── <sub_folder>
