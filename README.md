@@ -6,8 +6,8 @@ This plugin can automatically transform your ES6 codes to SAP UI5 based ES5 code
 # Features
 + Imports
 + Class, inheritance and 'super' keyword.
-+ Meta properties
-+ Static members
++ UI5's `metadata` field
++ Static methods and fields
 + Most of ES6 features supported by Babel, like arrow functions, spreading, default value of parameters, etc.
 
 # Babel 5 support

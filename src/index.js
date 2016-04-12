@@ -47,8 +47,10 @@ export default function ({ types: t })
                     relativeFilePathWithoutExtension,
                     namespace,
                     className: null,
+                    fullClassName: null,
                     superClassName: null,
-                    imports: []
+                    imports: [],
+                    staticMembers: []
                 };
             }
         },
@@ -91,13 +93,14 @@ export default function ({ types: t })
 
         ExportDeclaration: path => {
             const state = path.state.ui5;
+            const program = path.hub.file.ast.program;
 
             const defineCallArgs = [
                 t.stringLiteral(state.relativeFilePathWithoutExtension),
                 t.arrayExpression(state.imports.map(i => t.stringLiteral(i.src))),
                 t.functionExpression(null, state.imports.map(i => t.identifier(i.name)), t.blockStatement([
                     t.expressionStatement(t.stringLiteral("use strict")),
-                    t.returnStatement(transformClass(path.node.declaration, state))
+                    t.returnStatement(transformClass(path.node.declaration, program, state))
                 ]))
             ];
             const defineCall = t.callExpression(t.identifier("sap.ui.define"), defineCallArgs);
@@ -106,6 +109,14 @@ export default function ({ types: t })
                 defineCall.leadingComments = state.leadingComments;
             }
             path.replaceWith(defineCall);
+
+            // Add static members
+            for (let key in state.staticMembers)
+            {
+                const id = t.identifier(state.fullClassName + "." + key);
+                const statement = t.expressionStatement(t.assignmentExpression("=", id, state.staticMembers[key]));
+                path.insertAfter(statement);
+            }
         },
 
 
@@ -156,7 +167,7 @@ export default function ({ types: t })
 
 
 
-    function transformClass(node, state)
+    function transformClass(node, program, state)
     {
         if (node.type !== "ClassDeclaration")
         {
@@ -171,11 +182,26 @@ export default function ({ types: t })
                 if (member.type === "ClassMethod")
                 {
                     const func = t.functionExpression(null, member.params, member.body);
-                    props.push(t.objectProperty(member.key, func));
+                    if (!member.static)
+                    {
+                        props.push(t.objectProperty(member.key, func));
+                    }
+                    else
+                    {
+                        func.body.body.unshift(t.expressionStatement(t.stringLiteral("use strict")));
+                        state.staticMembers[member.key.name] = func;
+                    }
                 }
                 else if (member.type == "ClassProperty")
                 {
-                    props.push(t.objectProperty(member.key, member.value));
+                    if (!member.static)
+                    {
+                        props.push(t.objectProperty(member.key, member.value));
+                    }
+                    else
+                    {
+                        state.staticMembers[member.key.name] = member.value;
+                    }
                 }
             });
 
