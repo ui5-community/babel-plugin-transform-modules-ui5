@@ -175,10 +175,12 @@ Now your project will look like this
 
 
 
+# Modulization
+With this plugin you can implement modulization by yourself, just take a look at [babel-plugin-ui5-example](https://github.com/MagicCube/babel-plugin-ui5-example).
+
 
 
 # Example
-Please see [babel-plugin-ui5-example](https://github.com/MagicCube/babel-plugin-ui5-example)
 
 ## ES6 Codes
 ``` javascript
@@ -308,4 +310,5 @@ example.obj.Cat.createCat = function (nickName) {
 
 ```
 
-> To get the full project example, please visit [babel-plugin-ui5-example](https://github.com/MagicCube/babel-plugin-ui5-example).
+## Full example
+To get the full project example, please visit [babel-plugin-ui5-example](https://github.com/MagicCube/babel-plugin-ui5-example).
