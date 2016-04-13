@@ -35,6 +35,11 @@ Suppose that in your project, all the source codes are stored in `src` folder, a
 ```
 
 ## 1. Configure packages.json
+> `babel-plugin-ui5` require a bunch of plugins including `babel-preset-es2015` and `babel-plugin-syntax-class-properties`.
+
+> Although you can install `babel-plugin-ui5` and its dependencies directly,
+we strongly recommend to install via `babel-preset-ui5`.
+
 Make sure the `babel-preset-ui5` is in your own `package.json`.
 ```js
 {
