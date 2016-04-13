@@ -3,7 +3,7 @@ An UNOFFICIAL experimental Babel transformer plugin for SAP UI5.
 It allows you to develop SAP UI5 applications by using the latest [ES6](http://babeljs.io/docs/learn-es2015/), including new syntax and objective oriented programming technology.
 This plugin can automatically transform your ES6 codes to SAP UI5 based ES5 codes with [ESLINT](http://eslint.org/) proved.
 
-# Features
+## Features
 + Imports
 + Class, inheritance and `super` keyword
 + UI5's `metadata` field
@@ -11,13 +11,30 @@ This plugin can automatically transform your ES6 codes to SAP UI5 based ES5 code
 + Most of ES6 features supported by Babel, like arrow functions, spreading, default value of parameters, etc.
 + Packed up in a preset named `babel-preset-ui5` or `ui5` for short.
 
-# Babel 6 support
-Currently this version only support `Babel 6`.
+## Babel version
+Currently this version only supports `Babel 6`.
 
-# Babel 5 support
-If you still want to use Babel 5 in your project, please visit my previous project [babel-ui5-plugin](https://github.com/MagicCube/babel-ui5-plugin).
+If you still want to use Babel 5 in your project, please try my previous project [babel-ui5-plugin](https://github.com/MagicCube/babel-ui5-plugin).
 
-# Building environment with Gulp (RECOMMENDED)
+## Usage
+### 1. Install the preset
+```
+$ npm install --save-dev babel-preset-ui5
+```
+> `babel-plugin-ui5` require a bunch of plugins including `babel-preset-es2015` and `babel-plugin-syntax-class-properties`.
+
+> Although you can install `babel-plugin-ui5` and its dependencies directly,
+we strongly recommend to install via `babel-preset-ui5`.
+
+### 2. Configure .babelrc
+Add `ui5` to the `presets`.
+```json
+{
+  "presets": ["ui5"]
+}
+```
+
+## Usage with Gulp *(strongly recommended)*
 
 Suppose that in your project, all the source codes are stored in `src` folder, and all the compiled codes will later be put in `assets` folder.
 
@@ -34,12 +51,7 @@ Suppose that in your project, all the source codes are stored in `src` folder, a
     └── package.json
 ```
 
-## 1. Configure packages.json
-> `babel-plugin-ui5` require a bunch of plugins including `babel-preset-es2015` and `babel-plugin-syntax-class-properties`.
-
-> Although you can install `babel-plugin-ui5` and its dependencies directly,
-we strongly recommend to install via `babel-preset-ui5`.
-
+### 1. Configure packages.json
 Make sure the `babel-preset-ui5` is in your own `package.json`.
 ```js
 {
@@ -65,7 +77,7 @@ $ npm install --save-dev del gulp gulp-babel gulp-concat gulp-rename gulp-uglify
 $ npm install --save-dev babel-preset-ui5
 ```
 
-## 2. Configure .babelrc
+### 2. Configure .babelrc
 Add a `.babelrc` in your project root folder.
 ```js
 {
@@ -77,7 +89,7 @@ Add a `.babelrc` in your project root folder.
 ```
 > The `sourceRoot` property can helps the plugin to output the right namespace.
 
-## 3. Configure gulpfile.js
+### 3. Configure gulpfile.js
 Add a `gulpfile.js` in your project root folder.
 ```js
 const babel = require("gulp-babel");
@@ -132,7 +144,7 @@ gulp.task("uglify-js", () => {
 });
 ```
 
-## 4. Build with Gulp
+### 4. Build with Gulp
 Execute `gulp` command in your project root folder.
 Now your project will look like this
 ```
@@ -161,14 +173,14 @@ Now your project will look like this
 
 
 
-# Modulization
+## Modulization
 With this plugin you can implement modulization by yourself, just take a look at [babel-plugin-ui5-example](https://github.com/MagicCube/babel-plugin-ui5-example).
 
 
 
-# Example
+## Example
 
-## ES6 Codes
+### ES6 Codes
 ``` javascript
 /*---------------------------------*
  * File: src/example/obj/Animal.js *
@@ -296,5 +308,5 @@ example.obj.Cat.createCat = function (nickName) {
 
 ```
 
-## Full example
+### Full example
 To get the full project example, please visit [babel-plugin-ui5-example](https://github.com/MagicCube/babel-plugin-ui5-example).
