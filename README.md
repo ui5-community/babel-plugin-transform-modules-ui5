@@ -5,10 +5,11 @@ This plugin can automatically transform your ES6 codes to SAP UI5 based ES5 code
 
 # Features
 + Imports
-+ Class, inheritance and `super` keyword.
++ Class, inheritance and `super` keyword
 + UI5's `metadata` field
 + Static methods and fields
 + Most of ES6 features supported by Babel, like arrow functions, spreading, default value of parameters, etc.
++ Packed up in a preset named `babel-preset-ui5` or `ui5` for short.
 
 # Babel 6 support
 Currently this version only support `Babel 6`.
@@ -34,15 +35,13 @@ Suppose that in your project, all the source codes are stored in `src` folder, a
 ```
 
 ## 1. Configure packages.json
-Make sure the following packages are in your own `package.json`.
+Make sure the `babel-preset-ui5` is in your own `package.json`.
 ```js
 {
     ...
     "devDependencies": {
         "babel-cli": "^6.7.5",
-        "babel-plugin-syntax-class-properties": "^6.5.0",
-        "babel-plugin-ui5": "^6",
-        "babel-preset-es2015": "^6.6.0",
+        "babel-preset-ui5": "^6",
         "del": "^2.2.0",
         "gulp": "^3.9.1",
         "gulp-babel": "^6.1.2",
@@ -56,8 +55,9 @@ Make sure the following packages are in your own `package.json`.
 ```
 If you don't, please execute the following commands.
 ```
-$ npm install --save-dev babel-cli babel-plugin-syntax-class-properties babel-plugin-ui5 babel-preset-es2015
+$ npm install --save-dev babel-cli
 $ npm install --save-dev del gulp gulp-babel gulp-concat gulp-rename gulp-uglify run-sequence
+$ npm install --save-dev babel-preset-ui5
 ```
 
 ## 2. Configure .babelrc
@@ -65,28 +65,8 @@ Add a `.babelrc` in your project root folder.
 ```js
 {
     sourceRoot: "./src",
-    plugins: [
-        "babel-plugin-transform-es2015-template-literals",
-        "babel-plugin-transform-es2015-literals",
-        "babel-plugin-transform-es2015-function-name",
-        "babel-plugin-transform-es2015-arrow-functions",
-        "babel-plugin-transform-es2015-block-scoped-functions",
-        "babel-plugin-transform-es2015-shorthand-properties",
-        "babel-plugin-transform-es2015-computed-properties",
-        "babel-plugin-transform-es2015-duplicate-keys",
-        "babel-plugin-transform-es2015-for-of",
-        "babel-plugin-transform-es2015-sticky-regex",
-        "babel-plugin-transform-es2015-unicode-regex",
-        "babel-plugin-check-es2015-constants",
-        "babel-plugin-transform-es2015-spread",
-        "babel-plugin-transform-es2015-parameters",
-        "babel-plugin-transform-es2015-destructuring",
-        "babel-plugin-transform-es2015-block-scoping",
-        "babel-plugin-transform-es2015-typeof-symbol",
-        "babel-plugin-transform-regenerator",
-
-        "syntax-class-properties",
-        "babel-plugin-ui5"
+    presets: [
+        "ui5"
     ]
 }
 ```
