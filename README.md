@@ -185,6 +185,7 @@ you'll find the answer.
 
 
 ## Example
+To get the full project example, please visit [babel-plugin-ui5-example](https://github.com/MagicCube/babel-plugin-ui5-example).
 
 ### ES6 Codes
 ``` javascript
