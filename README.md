@@ -70,6 +70,7 @@ Add a `.babelrc` in your project root folder.
     ]
 }
 ```
+> The `sourceRoot` property can helps the plugin to output the right namespace.
 
 ## 3. Configure gulpfile.js
 Add a `gulpfile.js` in your project root folder.

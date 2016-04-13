@@ -1,6 +1,6 @@
 import Path from "path";
 
-export default function ({ types: t })
+exports.default = function ({ types: t })
 {
     const ui5ModuleVisitor = {
         Program: {
@@ -240,3 +240,4 @@ export default function ({ types: t })
         visitor: ui5ModuleVisitor
     };
 };
+module.exports = exports.default;
