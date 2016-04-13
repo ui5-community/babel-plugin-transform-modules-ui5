@@ -166,16 +166,23 @@ Now your project will look like this
     └── package.json
 ```
 + `all-dbg.js` contains all the JavaScript in the `src` folder.
-+ `all.js` is the uglified version of `all-dbg.js`. Please only include this in production mode.
++ `all.js` is the uglified version of `all-dbg.js`. Please only include this in
+  production mode.
 + Other `*.js` files are for debug purpose.
-+ If you're familiar with `gulp-watch` and `gulp-connect`, just use your own imaginations, you can use them in development mode.
++ If you're familiar with `gulp-watch` and `gulp-connect`, just use your own
+  imaginations, you can use them in development mode.
 
 
 
 
 ## Modulization
-With this plugin you can implement modulization by yourself, just take a look at [babel-plugin-ui5-example](https://github.com/MagicCube/babel-plugin-ui5-example).
+SAP UI5 supports Modulization through a mechanism called `library`. With my another
+Gulp plugin [gulp-ui5-lib](https://github.com/MagicCube/gulp-ui5-lib), you're
+now able to compile hundreds of JavaScript files into just one library preload
+JSON file.
 
+Please also take a look at [babel-plugin-ui5-example](https://github.com/MagicCube/babel-plugin-ui5-example),
+you'll find the answer.
 
 
 ## Example
