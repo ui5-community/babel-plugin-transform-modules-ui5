@@ -7,7 +7,7 @@ exports.default = function ({ types: t })
             enter: path => {
                 const filePath = Path.resolve(path.hub.file.opts.filename);
 
-                const sourceRootPath = getSourceRoot();
+                const sourceRootPath = getSourceRoot(path);
 
                 let relativeFilePath = null;
                 let relativeFilePathWithoutExtension = null;
@@ -59,7 +59,7 @@ exports.default = function ({ types: t })
             let src = node.source.value;
             if (src.startsWith("./") || src.startsWith("../"))
             {
-                const sourceRootPath = getSourceRoot();
+                const sourceRootPath = getSourceRoot(path);
                 src = Path.relative(sourceRootPath, Path.resolve(Path.dirname(path.hub.file.opts.filename), src));
             }
 
@@ -236,7 +236,7 @@ exports.default = function ({ types: t })
 
 
 
-    function getSourceRoot()
+    function getSourceRoot(path)
     {
         let sourceRootPath = null;
         if (path.hub.file.opts.sourceRoot)
