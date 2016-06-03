@@ -60,7 +60,7 @@ exports.default = function ({ types: t })
             if (src.startsWith("./") || src.startsWith("../"))
             {
                 const sourceRootPath = getSourceRoot();
-                src = Path.relative(sourceRootPath, _path.resolve(path.hub.file.opts.filename, src));
+                src = Path.relative(sourceRootPath, Path.resolve(Path.dirname(path.hub.file.opts.filename), src));
             }
 
 
