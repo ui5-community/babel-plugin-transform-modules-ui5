@@ -86,8 +86,6 @@ exports.default = function ({ types: t })
             };
             state.imports.push(imp);
 
-            console.log(imp)
-
             path.remove();
         },
 
