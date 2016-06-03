@@ -7,15 +7,7 @@ exports.default = function ({ types: t })
             enter: path => {
                 const filePath = Path.resolve(path.hub.file.opts.filename);
 
-                let sourceRootPath = null;
-                if (path.hub.file.opts.sourceRoot)
-                {
-                    sourceRootPath = Path.resolve(path.hub.file.opts.sourceRoot);
-                }
-                else
-                {
-                    sourceRootPath = Path.resolve("./");
-                }
+                const sourceRootPath = getSourceRoot();
 
                 let relativeFilePath = null;
                 let relativeFilePathWithoutExtension = null;
@@ -63,7 +55,15 @@ exports.default = function ({ types: t })
             const state = path.state.ui5;
             const node = path.node;
             let name = null;
-            const src = node.source.value;
+
+            let src = node.source.value;
+            if (src.startsWith("./") || src.startsWith("../"))
+            {
+                const sourceRootPath = getSourceRoot();
+                src = Path.relative(sourceRootPath, _path.resolve(path.hub.file.opts.filename, src));
+            }
+
+
             if (node.specifiers && node.specifiers.length === 1)
             {
                 name = node.specifiers[0].local.name;
@@ -232,6 +232,22 @@ exports.default = function ({ types: t })
         {
             state.fullClassName = state.className;
         }
+    }
+
+
+
+    function getSourceRoot()
+    {
+        let sourceRootPath = null;
+        if (path.hub.file.opts.sourceRoot)
+        {
+            sourceRootPath = Path.resolve(path.hub.file.opts.sourceRoot);
+        }
+        else
+        {
+            sourceRootPath = Path.resolve("./");
+        }
+        return sourceRootPath;
     }
 
 
