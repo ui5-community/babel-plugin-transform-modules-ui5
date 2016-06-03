@@ -143,35 +143,8 @@ gulp.task("uglify-js", () => {
 });
 ```
 
-### 4. Build with Gulp
-Execute `gulp` command in your project root folder.
-Now your project will look like this
-```
-<your-ui5-project>
-    ├── <assets>
-    │   └── <your_module>
-    │       ├── <sub_folder>
-    │       │   ├── ClassA.js
-    │       │   └── ClassB.js
-    │       ├── all-dbg.js
-    │       └── all.js
-    ├── <src>
-    │   └── <your_module>
-    │       └── <sub_folder>
-    │           ├── ClassA.js
-    │           └── ClassB.js
-    ├── .babelrc
-    ├── gulpfile.js
-    └── package.json
-```
-+ `all-dbg.js` contains all the JavaScript in the `src` folder.
-+ `all.js` is the uglified version of `all-dbg.js`. Please only include this in
-  production mode.
-+ Other `*.js` files are for debug purpose.
-+ If you're familiar with `gulp-watch` and `gulp-connect`, just use your own
-  imaginations, you can use them in development mode.
-
-
+### 4. Build with Webpack
+Please take a look at [ui5-loader](https://github.com/MagicCube/ui5-loader);
 
 
 ## Modulization
