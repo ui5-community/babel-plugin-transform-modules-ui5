@@ -15,9 +15,10 @@ exports.default = function ({ types: t })
                 if (filePath.startsWith(sourceRootPath))
                 {
                     relativeFilePath = Path.relative(sourceRootPath, filePath);
-                    relativeFilePathWithoutExtension = Path.dirname(relativeFilePath) + "/" + Path.basename(relativeFilePath, Path.extname(relativeFilePath));
+                    relativeFilePathWithoutExtension = Path.dirname(relativeFilePath) + Path.sep + Path.basename(relativeFilePath, Path.extname(relativeFilePath));
+                    relativeFilePathWithoutExtension = relativeFilePathWithoutExtension.replace(/\\/g, "/");
 
-                    const parts = relativeFilePath.split("/");
+                    const parts = relativeFilePath.split(Path.sep);
                     if (parts.length <= 1)
                     {
                         namespace = relativeFilePath;
@@ -62,7 +63,7 @@ exports.default = function ({ types: t })
                 const sourceRootPath = getSourceRoot(path);
                 src = Path.relative(sourceRootPath, Path.resolve(Path.dirname(path.hub.file.opts.filename), src));
             }
-
+            src = Path.normalize(src);
 
             if (node.specifiers && node.specifiers.length === 1)
             {
@@ -70,7 +71,7 @@ exports.default = function ({ types: t })
             }
             else
             {
-                const parts = src.split("/");
+                const parts = src.split(Path.sep);
                 name = parts[parts.length - 1];
             }
 
@@ -79,10 +80,13 @@ exports.default = function ({ types: t })
                 state.leadingComments = node.leadingComments;
             }
 
-            state.imports.push({
+            const imp = {
                 name,
-                src: src
-            });
+                src: src.replace(/\\/g, "/")
+            };
+            state.imports.push(imp);
+
+            console.log(imp)
 
             path.remove();
         },
@@ -245,7 +249,7 @@ exports.default = function ({ types: t })
         }
         else
         {
-            sourceRootPath = Path.resolve("./");
+            sourceRootPath = Path.resolve("." + Path.sep);
         }
         return sourceRootPath;
     }
