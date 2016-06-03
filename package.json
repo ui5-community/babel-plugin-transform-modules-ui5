@@ -1,6 +1,6 @@
 {
   "name": "babel-plugin-ui5",
-  "version": "6.0.2",
+  "version": "6.0.3",
   "description": "An UNOFFICIAL experimental Babel plugin for SAP UI5.",
   "main": "lib/index.js",
   "keywords": [
