@@ -186,6 +186,8 @@ exports.default = function ({ types: t })
                     const func = t.functionExpression(null, member.params, member.body);
                     if (!member.static)
                     {
+                        func.generator = member.generator;
+                        func.async = member.async;
                         props.push(t.objectProperty(member.key, func));
                     }
                     else
