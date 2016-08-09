@@ -1,4 +1,4 @@
-# To get the full project example, please visit babel-plugin-ui5-example.
+# To get the full project example, please visit [babel-plugin-ui5-example](https://github.com/MagicCube/babel-plugin-ui5-example).
 
 # babel-plugin-ui5 for Babel 6
 An UNOFFICIAL experimental Babel transformer plugin for SAP UI5.
