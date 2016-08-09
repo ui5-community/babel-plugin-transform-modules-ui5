@@ -1,3 +1,5 @@
+# To get the full project example, please visit babel-plugin-ui5-example.
+
 # babel-plugin-ui5 for Babel 6
 An UNOFFICIAL experimental Babel transformer plugin for SAP UI5.
 It allows you to develop SAP UI5 applications by using the latest [ES6](http://babeljs.io/docs/learn-es2015/), including new syntax and objective oriented programming technology.
