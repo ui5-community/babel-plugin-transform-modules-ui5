@@ -20,6 +20,11 @@ It allows you to develop SAP UI5 applications by using the latest [ES6](http://b
 + Allows for IIFE files that don't get wrapped
 + Decorator support to set extend name
 
+## Limitations / Not Supported
+
++ Named imports are not supported (let me know if this is needed and I'll see what I can do)
++ Named exports are not supported at the moment but I plan to support using either named or default.
+
 ### Plugin Scope
 
 This does transforms only the UI5 relevant things. It does not transform everything to ES5 (for example it does not transform const/let to var). This makes it easier to use `babel-preset-env` to determine how to transform everything else.
@@ -54,7 +59,7 @@ Babel 6
 npm install --save-dev git+https://git@github.com/r-murphy/babel-plugin-ui5.git
 ```
 
-or 
+or
 ```sh
 yarn add --dev git+https://git@github.com/r-murphy/babel-plugin-ui5.git
 ```
@@ -211,7 +216,7 @@ sap.ui.define(["./Animal"], function (Animal) {
             alert("Miao~");
         }
     });
-    
+
 	Cat.createCat = function (nickName) {
 	    const cat = new example.obj.Cat({
     	    nickName
@@ -233,9 +238,8 @@ sap.ui.define([], function () {
 			this.name = 'MyError'
 		}
 	}
-	
+
 	return MyError
 });
 
 ```
-
