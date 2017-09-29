@@ -1,6 +1,9 @@
 module.exports = {
     "extends": "standard",
     "rules": {
-      "brace-style": 0
+      "semi": ["warn", "never"],
+      "quotes": ["warn", "single"],
+      "brace-style": ["warn", "stroustrup", {"allowSingleLine": true}],
+      "space-before-function-paren": ["warn", "never"]
     }
 };
