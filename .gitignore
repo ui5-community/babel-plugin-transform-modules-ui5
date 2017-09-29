@@ -31,3 +31,5 @@ node_modules
 
 # Test Output
 /test/output
+
+package-lock.json
