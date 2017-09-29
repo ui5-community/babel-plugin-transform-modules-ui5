@@ -1,12 +1,12 @@
 
-function hello() {
-  return "hey"
+function hello () {
+  return 'hey'
 }
 
 export default class Thing {
-	constructor() {
-		console.log("constructor")
-	}
+  constructor () {
+    console.log('constructor')
+  }
 }
 
 Thing.foo = hello

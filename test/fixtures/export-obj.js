@@ -1,11 +1,11 @@
 
 // Hello World
 
-function getFoo() {
+function getFoo () {
   return 1
 }
 
-function bar() {
+function bar () {
   return 2
 }
 
