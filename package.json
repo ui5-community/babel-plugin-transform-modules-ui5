@@ -3,6 +3,7 @@
   "version": "6.2.0",
   "description": "An UNOFFICIAL babel plugin for SAP UI5.",
   "main": "lib/index.js",
+  "engines" : { "node" : ">=6" },
   "keywords": [
     "ui5",
     "sap",
