@@ -43,9 +43,8 @@ This does transforms only the UI5 relevant things. It does not transform everyth
 
 ## TODO
 
-+ Make name/namespace decorator optional
++ Add the sourceRoot logic back and make name/namespace decorator optional
 + @ui5(false) or @nonUI5) decorator for non-UI5 classes, even when extending an import
-
 
 ## Babel version
 
