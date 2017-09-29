@@ -4,11 +4,22 @@
   "description": "An UNOFFICIAL babel plugin for SAP UI5.",
   "main": "lib/index.js",
   "keywords": [
-    "ui5", "sap", "sapui5", "openui5",
-    "babel", "babeljs", "babel-plugin", "babelplugin",
-    "es6", "module", "import", "export"
+    "ui5",
+    "sap",
+    "sapui5",
+    "openui5",
+    "babel",
+    "babeljs",
+    "babel-plugin",
+    "babelplugin",
+    "es6",
+    "module",
+    "import",
+    "export"
   ],
-  "scripts": {},
+  "scripts": {
+    "test": "jest"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/r-murphy/babel-plugin-ui5.git"
@@ -18,5 +29,15 @@
   "bugs": {
     "url": "https://github.com/r-murphy/babel-plugin-ui5/issues"
   },
-  "homepage": "https://github.com/r-murphy/babel-plugin-ui5#readme"
+  "homepage": "https://github.com/r-murphy/babel-plugin-ui5#readme",
+  "dependencies": {
+    "babel-template": "^6.26.0"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-plugin-syntax-class-properties": "^6.13.0",
+    "babel-plugin-syntax-decorators": "^6.13.0",
+    "fs-extra": "^4.0.2",
+    "jest": "^21.2.1"
+  }
 }

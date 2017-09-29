@@ -1,0 +1,111 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`existing-sap.ui.define.js 1`] = `
+"sap.ui.define([\\"JSONModel\\"], JSONModel => {
+
+  const X = JSONModel.extend('X', {
+    constructor: function constructor(data) {
+      // This incorrect shorthand will get fixed
+      JSONModel.prototype.constructor.call(this, data);
+    }
+  });
+
+  return X;
+});"
+`;
+
+exports[`export-class.js 1`] = `
+"sap.ui.define([], function () {
+	function hello() {
+		return \\"hey\\";
+	}
+
+	class Thing {
+		constructor() {
+			console.log(\\"constructor\\");
+		}
+	}
+
+	Thing.foo = hello;
+	return Thing;
+});"
+`;
+
+exports[`export-class-extend-managed.js 1`] = `
+"sap.ui.define(['sap/ui/core/Controller', './Relative'], function (Controller, Relative) {
+	//eslint-disable-line
+
+	//import Parent from '../Parent'
+
+	const MyController = Controller.extend(\\"a.b.c.XYZ\\", {
+		constructor: function (arg) {
+			console.log(\\"constructor\\");
+			Controller.apply(this, [arg]);
+		},
+		shorthand_function: function (...args) {
+			Controller.prototype.foo.apply(this, [...args]);
+			this.name = Relative.name();
+		},
+		async_shorthand_function: async function (arg) {
+			return await 1;
+		},
+		property_value: 1,
+		property_arrow_function: () => 1
+	});
+
+	MyController.static_shorthand_function = function () {
+		return 1;
+	};
+
+	MyController.static_property_value = 1;
+
+	MyController.static_property_arrow = () => 1;
+
+	MyController.static_async_shorthand_function = async function () {
+		return await 1;
+	};
+
+	MyController.z = function () {
+		return \\"hey\\";
+	};
+	return MyController;
+});"
+`;
+
+exports[`export-class-extend-native.js 1`] = `
+"sap.ui.define([], function () {
+  class MyError extends Error {
+    constructor(m) {
+      super(m);
+      console.log(\\"constructor\\");
+      this.name = \\"MyError\\";
+    }
+  }
+  return MyError;
+});"
+`;
+
+exports[`export-obj.js 1`] = `
+"sap.ui.define([], function () {
+  // Hello World
+
+  function getFoo() {
+    return 1;
+  }
+
+  function bar() {
+    return 2;
+  }
+
+  return {
+    foo: getFoo(),
+    bar
+  };
+});"
+`;
+
+exports[`skip-iffe.js 1`] = `
+"(function () {
+  window.x = {};
+})();"
+`;
