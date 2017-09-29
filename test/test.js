@@ -15,7 +15,7 @@ fse
   .filter(item => item.endsWith('.js'))
   .forEach(filename => {
     it(filename, () => {
-      console.log(`Running ${filename}`);
+      console.log(`Running ${filename}`)
       const filepath = Path.join(fixtureDirPath, filename)
       const babelOpts = {
         plugins: [
