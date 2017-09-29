@@ -94,6 +94,17 @@ exports[`export-default-anon-function.js 1`] = `
 });"
 `;
 
+exports[`export-default-arrow-function.js 1`] = `
+"sap.ui.define([], function () {
+  let one = 1;
+
+  let two = 2;
+  return () => {
+    return one + two;
+  };
+});"
+`;
+
 exports[`export-default-identifier.js 1`] = `
 "sap.ui.define([], function () {
   const x = {};
