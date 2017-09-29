@@ -14,18 +14,19 @@ fse
   .readdirSync(fixtureDirPath)
   .filter(item => item.endsWith('.js'))
   .forEach(filename => {
-    const filepath = Path.join(fixtureDirPath, filename)
-    const babelOpts = {
-      plugins: [
-        'babel-plugin-syntax-decorators',
-        'babel-plugin-syntax-class-properties',
-        plugin
-      ]
-    }
-    const result = babel.transformFileSync(filepath, babelOpts).code
-    const resultFilepath = Path.join(resultsDir, filename)
-    fse.writeFileSync(resultFilepath, result)
     it(filename, () => {
+      console.log(`Running ${filename}`);
+      const filepath = Path.join(fixtureDirPath, filename)
+      const babelOpts = {
+        plugins: [
+          'babel-plugin-syntax-decorators',
+          'babel-plugin-syntax-class-properties',
+          plugin
+        ]
+      }
+      const result = babel.transformFileSync(filepath, babelOpts).code
+      const resultFilepath = Path.join(resultsDir, filename)
+      fse.writeFileSync(resultFilepath, result)
       expect(result).toMatchSnapshot()
     })
   })

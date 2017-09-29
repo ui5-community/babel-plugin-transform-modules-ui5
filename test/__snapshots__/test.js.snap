@@ -82,6 +82,42 @@ exports[`export-class-extend-native.js 1`] = `
 });"
 `;
 
+exports[`export-default-anon-function.js 1`] = `
+"sap.ui.define([], function () {
+  let one = 1;
+
+  let two = 2;
+  return async function () {
+    // Since it's anonymous, this can be safetly moved to the end
+    return (await one) + two;
+  };
+});"
+`;
+
+exports[`export-default-identifier.js 1`] = `
+"sap.ui.define([], function () {
+  const x = {};
+
+  x.a = 1;
+  return x;
+});"
+`;
+
+exports[`export-default-named-function.js 1`] = `
+"sap.ui.define([], function () {
+  let one = 1;
+
+  function add() {
+    return one + two + this.x;
+  }
+
+  add.x = 3;
+
+  let two = 2;
+  return add;
+});"
+`;
+
 exports[`export-obj.js 1`] = `
 "sap.ui.define([], function () {
   // Hello World
