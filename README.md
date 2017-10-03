@@ -57,27 +57,27 @@ This does transforms only the UI5 relevant things. It does not transform everyth
 ### Install the plugin
 
 ```sh
-npm install --save-dev git+https://git@github.com/r-murphy/babel-plugin-ui5.git
+npm install --save-dev babel-plugin-transform-modules-ui5
 ```
 
 or
 ```sh
-yarn add --dev git+https://git@github.com/r-murphy/babel-plugin-ui5.git
+yarn add --dev babel-plugin-transform-modules-ui5
 ```
 
 ### Configure .babelrc
 
-At a minimum, add `ui5` to the `plugins`.
+At a minimum, add `transform-modules-ui5` to the `plugins`.
 
 ```json
 {
-  "plugins": ["ui5"]
+  "plugins": ["transform-modules-ui5"]
 }
 ```
 
 Optionally, you can use decorators to override the namespace or name used when calling `.extend(name, {...})`. To do so, you will also need the plugin `babel-plugin-syntax-decorators`.
 
-At the time of writing, the babel version is 6.26.0, which does not support class property syntax. To use that syntax also add the plugin `babel-plugin-syntax-class-properties`.
+At the time of writing, the babel version is 6.26.0, which does not natively support class property syntax. To use that syntax also add the plugin `babel-plugin-syntax-class-properties`.
 
 It is also recommended to use `babel-preset-env` to control which ES version the the final code is transformed to.
 
