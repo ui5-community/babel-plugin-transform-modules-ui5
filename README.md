@@ -1,7 +1,13 @@
 
-# babel-plugin-ui5 for Babel 6
-An UNOFFICIAL experimental Babel transformer plugin for SAP UI5.
-It allows you to develop SAP UI5 applications by using the latest [ES6](http://babeljs.io/docs/learn-es2015/), including new syntax and objective oriented programming technology.
+# babel-plugin-transform-modules-ui5 for Babel 6
+
+An unofficial experimental Babel transformer plugin for SAP UI5.
+
+It allows you to develop SAP UI5 applications by using the latest [ES2015](http://babeljs.io/docs/learn-es2015/), including classes and modules.
+
+## Other Similar Plugins
+
+[sergiirocks babel-plugin-transform-ui5](https://github.com/sergiirocks/babel-plugin-transform-ui5) is a great choice if you use webpack. It allows you to configure which import paths to convert to sap.ui.define syntax and leaves the rest as ES2015 import statements, which  allows webpack to load them in.
 
 ## Example
 
@@ -45,10 +51,6 @@ This does transforms only the UI5 relevant things. It does not transform everyth
 
 + Add the sourceRoot logic back and make name/namespace decorator optional
 + @ui5(false) or @nonUI5) decorator for non-UI5 classes, even when extending an import
-
-## Babel version
-
-Babel 6
 
 ## Usage
 
