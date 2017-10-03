@@ -8,7 +8,6 @@ sap.ui.define(['JSONModel'], JSONModel => {
       // This incorrect shorthand will get fixed
       JSONModel.prototype.constructor.call(this, data);
     }
-
   });
 
   return X;

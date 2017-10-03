@@ -17,14 +17,13 @@ fse
     test(filename, () => {
       console.log(`Running ${filename}`)
       const filepath = Path.join(fixtureDirPath, filename)
-      const babelOpts = {
+      const result = babel.transformFileSync(filepath, {
         plugins: [
           'babel-plugin-syntax-decorators',
           'babel-plugin-syntax-class-properties',
           plugin
         ]
-      }
-      const result = babel.transformFileSync(filepath, babelOpts).code
+      }).code
       fse.writeFileSync(Path.join(resultsDir, filename), result) // For manual verification
       expect(result).toMatchSnapshot()
     })
