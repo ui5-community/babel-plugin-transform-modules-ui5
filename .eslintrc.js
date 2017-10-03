@@ -6,4 +6,4 @@ module.exports = {
       "brace-style": ["warn", "stroustrup", {"allowSingleLine": true}],
       "space-before-function-paren": ["warn", "never"]
     }
-};
+}

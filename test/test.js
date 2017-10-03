@@ -1,4 +1,4 @@
-/* global it, expect */
+/* global test, expect */
 const fse = require('fs-extra')
 const Path = require('path')
 const babel = require('babel-core')
@@ -14,7 +14,7 @@ fse
   .readdirSync(fixtureDirPath)
   .filter(item => item.endsWith('.js'))
   .forEach(filename => {
-    it(filename, () => {
+    test(filename, () => {
       console.log(`Running ${filename}`)
       const filepath = Path.join(fixtureDirPath, filename)
       const babelOpts = {
@@ -25,8 +25,7 @@ fse
         ]
       }
       const result = babel.transformFileSync(filepath, babelOpts).code
-      const resultFilepath = Path.join(resultsDir, filename)
-      fse.writeFileSync(resultFilepath, result)
+      fse.writeFileSync(Path.join(resultsDir, filename), result) // For manual verification
       expect(result).toMatchSnapshot()
     })
   })
