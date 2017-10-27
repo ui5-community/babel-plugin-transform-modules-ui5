@@ -5,9 +5,16 @@ An unofficial experimental Babel transformer plugin for SAP UI5.
 
 It allows you to develop SAP UI5 applications by using the latest [ES2015](http://babeljs.io/docs/learn-es2015/), including classes and modules.
 
+## Important Note
+
+Class property arrow functions are not transformed correctly. They should be relocated
+to the constructor so that 'this' is auto-bound correctly. But instead they're
+left in the class body and transformed to normal functions. So you'll still need
+to bind this if passing the function reference.
+
 ## Other Similar Plugins
 
-[sergiirocks babel-plugin-transform-ui5](https://github.com/sergiirocks/babel-plugin-transform-ui5) is a great choice if you use webpack. It allows you to configure which import paths to convert to sap.ui.define syntax and leaves the rest as ES2015 import statements, which  allows webpack to load them in.
+[sergiirocks babel-plugin-transform-ui5](https://github.com/sergiirocks/babel-plugin-transform-ui5) is a great choice if you use webpack. It allows you to configure which import paths to convert to sap.ui.define syntax and leaves the rest as ES2015 import statements, which allows webpack to load them in.
 
 ## Example
 
@@ -16,7 +23,7 @@ It allows you to develop SAP UI5 applications by using the latest [ES2015](http:
 ## Features
 
 + ES2015 Imports
-+ ES2015 Exports (currently default only)
++ ES2015 Exports (default and named)
 + Class, inheritance and `super` keyword
 + UI5's `metadata` field
 + Static methods and fields
@@ -28,8 +35,7 @@ It allows you to develop SAP UI5 applications by using the latest [ES2015](http:
 
 ## Limitations / Not Supported
 
-+ Named imports are not supported (let me know if this is needed and I'll see what I can do)
-+ Named exports are not supported at the moment but I plan to support using either named or default.
++ Named imports (In progress)
 
 ### Plugin Scope
 
@@ -46,6 +52,7 @@ This does transforms only the UI5 relevant things. It does not transform everyth
 + Supports non-UI5 classes (see `MyError.js` example).
 	+ The current logic is that if the class extends from one of the imports, it is assumed to be a UI5 class. Otherwise it is left as-is.
 + Supports overriding the name or namespace used when calling `extend(...)` (See `Cat.js` example)
++ Supports named exports.
 
 ## TODO
 
