@@ -12,6 +12,10 @@ to the constructor so that 'this' is auto-bound correctly. But instead they're
 left in the class body and transformed to normal functions. So you'll still need
 to bind this if passing the function reference.
 
+Additionally, the `import * as X from 'X'` handling is not per spec. It just assigns the
+required object directly, but it should actually clone it and remove the default export.
+That will be fixed shortly.
+
 ## Other Similar Plugins
 
 [sergiirocks babel-plugin-transform-ui5](https://github.com/sergiirocks/babel-plugin-transform-ui5) is a great choice if you use webpack. It allows you to configure which import paths to convert to sap.ui.define syntax and leaves the rest as ES2015 import statements, which allows webpack to load them in.
@@ -22,8 +26,9 @@ to bind this if passing the function reference.
 
 ## Features
 
-+ ES2015 Imports
++ ES2015 Imports (default and named)
 + ES2015 Exports (default and named)
++ Uses an interop to import either a module or a non-module
 + Class, inheritance and `super` keyword
 + UI5's `metadata` field
 + Static methods and fields
@@ -35,11 +40,12 @@ to bind this if passing the function reference.
 
 ## Limitations / Not Supported
 
-+ Named imports (In progress)
++ Correct auto-bind for class property functions (see note above)
++
 
 ### Plugin Scope
 
-This does transforms only the UI5 relevant things. It does not transform everything to ES5 (for example it does not transform const/let to var). This makes it easier to use `babel-preset-env` to determine how to transform everything else.
+This only transforms the UI5 relevant things. It does not transform everything to ES5 (for example it does not transform const/let to var). This makes it easier to use `babel-preset-env` to determine how to transform everything else.
 
 ### Comparison to upstream (MagicCube) plugin
 
@@ -57,7 +63,10 @@ This does transforms only the UI5 relevant things. It does not transform everyth
 ## TODO
 
 + Add the sourceRoot logic back and make name/namespace decorator optional
-+ @ui5(false) or @nonUI5) decorator for non-UI5 classes, even when extending an import
++ @ui5(false) or @nonUI5 decorator for non-UI5 classes, even when extending an import
++ Support JSDoc for getting the name
++ Use correct logic for `import * as`
++ Auto-bind the class property function
 
 ## Usage
 

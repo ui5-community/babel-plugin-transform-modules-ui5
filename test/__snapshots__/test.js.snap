@@ -2,12 +2,6 @@
 
 exports[`exports export-class.js 1`] = `
 "sap.ui.define([], function () {
-  function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj : {
-      default: obj
-    };
-  }
-
   function hello() {
     return 'hey';
   }
@@ -24,12 +18,14 @@ exports[`exports export-class.js 1`] = `
 `;
 
 exports[`exports export-class-extend-managed.js 1`] = `
-"sap.ui.define(['sap/ui/core/Controller', './Relative'], function (Controller, Relative) {
+"sap.ui.define(['sap/ui/core/Controller', './Relative'], function (__Controller, __Relative) {
   function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj : {
-      default: obj
-    };
+    return obj && obj.__esModule ? obj.default : obj;
   }
+
+  const Controller = _interopRequireDefault(__Controller);
+
+  const Relative = _interopRequireDefault(__Relative);
 
   const MyController = Controller.extend('a.b.c.XYZ', {
     constructor: function (arg) {
@@ -68,12 +64,6 @@ exports[`exports export-class-extend-managed.js 1`] = `
 
 exports[`exports export-class-extend-native.js 1`] = `
 "sap.ui.define([], function () {
-  function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj : {
-      default: obj
-    };
-  }
-
   class MyError extends Error {
     constructor(m) {
       super(m);
@@ -87,12 +77,6 @@ exports[`exports export-class-extend-native.js 1`] = `
 
 exports[`exports export-default-anon-function.js 1`] = `
 "sap.ui.define([], function () {
-  function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj : {
-      default: obj
-    };
-  }
-
   let one = 1;
 
   let two = 2;
@@ -105,12 +89,6 @@ exports[`exports export-default-anon-function.js 1`] = `
 
 exports[`exports export-default-arrow-function.js 1`] = `
 "sap.ui.define([], function () {
-  function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj : {
-      default: obj
-    };
-  }
-
   let one = 1;
 
   let two = 2;
@@ -122,12 +100,6 @@ exports[`exports export-default-arrow-function.js 1`] = `
 
 exports[`exports export-default-identifier.js 1`] = `
 "sap.ui.define([], function () {
-  function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj : {
-      default: obj
-    };
-  }
-
   const x = {};
 
   x.a = 1;
@@ -137,12 +109,6 @@ exports[`exports export-default-identifier.js 1`] = `
 
 exports[`exports export-default-named-function.js 1`] = `
 "sap.ui.define([], function () {
-  function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj : {
-      default: obj
-    };
-  }
-
   let one = 1;
 
   function add() {
@@ -158,12 +124,6 @@ exports[`exports export-default-named-function.js 1`] = `
 
 exports[`exports export-multiple.js 1`] = `
 "sap.ui.define([], function () {
-  function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj : {
-      default: obj
-    };
-  }
-
   const exports = {};
   Object.defineProperty(exports, \\"__esModule\\", {
     value: true
@@ -203,12 +163,6 @@ exports[`exports export-multiple.js 1`] = `
 
 exports[`exports export-obj.js 1`] = `
 "sap.ui.define([], function () {
-  function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj : {
-      default: obj
-    };
-  }
-
   // Hello World
 
   function getFoo() {
@@ -223,6 +177,36 @@ exports[`exports export-obj.js 1`] = `
     foo: getFoo(),
     bar
   };
+});"
+`;
+
+exports[`imports import-multiple.js 1`] = `
+"sap.ui.define(['./../a/b', 'A', 'BC', 'DEF', 'G', 'HI'], function (____a_b, __A, __BC, __D, __G, __H) {
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj.default : obj;
+  }
+
+  function _interopRequireNamed(obj, name) {
+    return obj && obj[name];
+  }
+
+  const A = _interopRequireDefault(__A);
+
+  const B = _interopRequireNamed(__BC, 'B');
+
+  const C = _interopRequireNamed(__BC, 'C');
+
+  const D = _interopRequireDefault(__D);
+
+  const E = _interopRequireNamed(__D, 'E');
+
+  const F = _interopRequireNamed(__D, 'F');
+
+  const G = __G;
+
+  const H = _interopRequireDefault(__H);
+
+  const I = __H;
 });"
 `;
 
