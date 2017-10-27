@@ -1,0 +1,247 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`exports export-class.js 1`] = `
+"sap.ui.define([], function () {
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj : {
+      default: obj
+    };
+  }
+
+  function hello() {
+    return 'hey';
+  }
+
+  class Thing {
+    constructor() {
+      console.log('constructor');
+    }
+  }
+
+  Thing.foo = hello;
+  return Thing;
+});"
+`;
+
+exports[`exports export-class-extend-managed.js 1`] = `
+"sap.ui.define(['sap/ui/core/Controller', './Relative'], function (Controller, Relative) {
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj : {
+      default: obj
+    };
+  }
+
+  const MyController = Controller.extend('a.b.c.XYZ', {
+    constructor: function (arg) {
+      console.log(\\"constructor\\");
+      Controller.apply(this, [arg]);
+    },
+    shorthand_function: function (...args) {
+      Controller.prototype.foo.apply(this, [...args]);
+      this.name = Relative.name();
+    },
+    async_shorthand_function: async function (arg) {
+      return await 1;
+    },
+    property_value: 1,
+    property_arrow_function: () => 1
+  });
+
+  MyController.static_shorthand_function = function () {
+    return 1;
+  };
+
+  MyController.static_property_value = 1;
+
+  MyController.static_property_arrow = () => 1;
+
+  MyController.static_async_shorthand_function = async function () {
+    return await 1;
+  };
+
+  MyController.z = function () {
+    return 'hey';
+  };
+  return MyController;
+});"
+`;
+
+exports[`exports export-class-extend-native.js 1`] = `
+"sap.ui.define([], function () {
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj : {
+      default: obj
+    };
+  }
+
+  class MyError extends Error {
+    constructor(m) {
+      super(m);
+      console.log('constructor');
+      this.name = 'MyError';
+    }
+  }
+  return MyError;
+});"
+`;
+
+exports[`exports export-default-anon-function.js 1`] = `
+"sap.ui.define([], function () {
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj : {
+      default: obj
+    };
+  }
+
+  let one = 1;
+
+  let two = 2;
+  return async function () {
+    // Since it's anonymous, this can be safetly moved to the end
+    return (await one) + two;
+  };
+});"
+`;
+
+exports[`exports export-default-arrow-function.js 1`] = `
+"sap.ui.define([], function () {
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj : {
+      default: obj
+    };
+  }
+
+  let one = 1;
+
+  let two = 2;
+  return () => {
+    return one + two;
+  };
+});"
+`;
+
+exports[`exports export-default-identifier.js 1`] = `
+"sap.ui.define([], function () {
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj : {
+      default: obj
+    };
+  }
+
+  const x = {};
+
+  x.a = 1;
+  return x;
+});"
+`;
+
+exports[`exports export-default-named-function.js 1`] = `
+"sap.ui.define([], function () {
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj : {
+      default: obj
+    };
+  }
+
+  let one = 1;
+
+  function add() {
+    return one + two + this.x;
+  }
+
+  add.x = 3;
+
+  let two = 2;
+  return add;
+});"
+`;
+
+exports[`exports export-multiple.js 1`] = `
+"sap.ui.define([], function () {
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj : {
+      default: obj
+    };
+  }
+
+  const exports = {};
+  Object.defineProperty(exports, \\"__esModule\\", {
+    value: true
+  });
+  function def() {
+    console.log(\\"I'm the default\\");
+  }
+
+  const thing1 = {};
+  const thing2 = 2;
+  const thingy3 = 3;
+
+  const c = 1;
+  var v = 1;
+  let l = 1;
+  function f() {}
+
+  let laterLet;
+  laterLet = \\"now\\";
+
+  var laterVar;
+  laterVar = \\"var\\";
+  exports.def = def;
+  exports.thing1 = thing1;
+  exports.thing2 = thing2;
+  exports.thing3 = thingy3;
+  exports.c = c;
+  exports.v = v;
+  exports.l = l;
+  exports.f = f;
+  exports.laterLet = laterLet;
+  exports.laterVar = laterVar;
+  exports.default = def;
+  return exports;
+});"
+`;
+
+exports[`exports export-obj.js 1`] = `
+"sap.ui.define([], function () {
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj : {
+      default: obj
+    };
+  }
+
+  // Hello World
+
+  function getFoo() {
+    return 1;
+  }
+
+  function bar() {
+    return 2;
+  }
+
+  return {
+    foo: getFoo(),
+    bar
+  };
+});"
+`;
+
+exports[`no-wrap existing-sap.ui.define.js 1`] = `
+"/* global sap */
+sap.ui.define(['JSONModel'], JSONModel => {
+  const X = JSONModel.extend('X', {
+    constructor: function constructor(data) {
+      // This incorrect shorthand will get fixed
+      JSONModel.prototype.constructor.call(this, data);
+    }
+  });
+
+  return X;
+});"
+`;
+
+exports[`no-wrap skip-iffe.js 1`] = `
+"(function () {
+  window.x = {};
+})();"
+`;
