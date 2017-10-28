@@ -15,9 +15,10 @@ sap.ui.define(['sap/SAPClass'], SAPClass => {
   const MyClass = SAPClass.extend('com.company.app.MyClass', {
     constructor: function (data) {
       SAPClass.constructor.apply(this, [data]);
-    },
-    property_func: () => {
-      return this.getProperty('/name');
+
+      this.property_func = () => {
+        return this.getProperty('/name');
+      };
     }
   });
   MyClass.renderer = {};
@@ -45,9 +46,10 @@ sap.ui.define(['sap/SAPClass'], SAPClass => {
   const MyClass = SAPClass.extend('com.app.MyClass', {
     constructor: function (data) {
       SAPClass.constructor.apply(this, [data]);
-    },
-    property_func: () => {
-      return this.getProperty('/name');
+
+      this.property_func = () => {
+        return this.getProperty('/name');
+      };
     }
   });
   MyClass.renderer = {};
@@ -111,6 +113,8 @@ exports[`exports export-class-extend-managed.js 1`] = `
     constructor: function (arg) {
       console.log(\\"constructor\\");
       Controller.constructor.apply(this, [arg]);
+
+      this.property_arrow_function = () => 1;
     },
     shorthand_function: function (...args) {
       Controller.prototype.foo.apply(this, [...args]);
@@ -119,8 +123,7 @@ exports[`exports export-class-extend-managed.js 1`] = `
     async_shorthand_function: async function (arg) {
       return await 1;
     },
-    property_value: 1,
-    property_arrow_function: () => 1
+    property_value: 1
   });
 
   MyController.static_shorthand_function = function () {

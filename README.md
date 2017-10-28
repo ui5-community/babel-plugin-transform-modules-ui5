@@ -5,17 +5,6 @@ An unofficial experimental Babel transformer plugin for SAP UI5.
 
 It allows you to develop SAP UI5 applications by using the latest [ES2015](http://babeljs.io/docs/learn-es2015/), including classes and modules.
 
-## Important Note
-
-Class property arrow functions are not transformed correctly. They should be relocated
-to the constructor so that 'this' is auto-bound correctly. But instead they're
-left in the class body and transformed to normal functions. So you'll still need
-to bind this if passing the function reference.
-
-Additionally, the `import * as X from 'X'` handling is not per spec. It just assigns the
-required object directly, but it should actually clone it and remove the default export.
-That will be fixed shortly.
-
 ## Other Similar Plugins
 
 [sergiirocks babel-plugin-transform-ui5](https://github.com/sergiirocks/babel-plugin-transform-ui5) is a great choice if you use webpack. It allows you to configure which import paths to convert to sap.ui.define syntax and leaves the rest as ES2015 import statements, which allows webpack to load them in.
@@ -40,8 +29,9 @@ That will be fixed shortly.
 
 ## Limitations / Not Supported
 
-+ Correct auto-bind for class property functions (see note above)
-+
++ The `import * as X from 'X'` handling is not per spec. It just assigns the required object directly, but it should actually clone it and remove the default export.
+That will be fixed shortly.
+
 
 ### Plugin Scope
 
@@ -63,10 +53,7 @@ This only transforms the UI5 relevant things. It does not transform everything t
 ## TODO
 
 + Add the sourceRoot logic back and make name/namespace decorator optional
-+ @ui5(false) or @nonUI5 decorator for non-UI5 classes, even when extending an import
-+ Support JSDoc for getting the name
 + Use correct logic for `import * as`
-+ Auto-bind the class property function
 + Configuration options
 
 ## Usage
