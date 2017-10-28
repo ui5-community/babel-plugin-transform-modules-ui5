@@ -1,5 +1,28 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`classes class-convert-no-constructor.js 1`] = `
+"/* global sap */
+/**
+ * Test notes: Even though there is an existing sp.ui.define,
+ * the class should be converted.
+ */
+sap.ui.define(['sap/SAPClass'], SAPClass => {
+  /**
+   * @name com.company.app.MyClass
+   */
+  const MyClass = SAPClass.extend('com.company.app.MyClass', {
+    constructor: function contructor() {
+      SAPClass.prototype.contructor.apply(this, arguments);
+
+      this.property_func = () => {
+        return this.getProperty('/name');
+      };
+    }
+  });
+  return MyClass;
+});"
+`;
+
 exports[`classes class-convert-with-existing-define-defer-return.js 1`] = `
 "/* global sap */
 /**
