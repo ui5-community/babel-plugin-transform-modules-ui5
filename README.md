@@ -67,6 +67,7 @@ This only transforms the UI5 relevant things. It does not transform everything t
 + Support JSDoc for getting the name
 + Use correct logic for `import * as`
 + Auto-bind the class property function
++ Configuration options
 
 ## Usage
 

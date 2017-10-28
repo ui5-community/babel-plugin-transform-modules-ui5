@@ -1,5 +1,85 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`classes class-convert-with-existing-define-defer-return.js 1`] = `
+"/* global sap */
+/**
+ * Test notes: Even though there is an existing sp.ui.define,
+ * the class should be converted.
+ */
+sap.ui.define(['sap/SAPClass'], SAPClass => {
+  /**
+   * @UI5
+   * @name com.company.app.MyClass
+   * @namespace com.company.app
+   */
+  const MyClass = SAPClass.extend('com.company.app.MyClass', {
+    constructor: function (data) {
+      SAPClass.constructor.apply(this, [data]);
+    },
+    property_func: () => {
+      return this.getProperty('/name');
+    }
+  });
+  MyClass.renderer = {};
+  MyClass.metadata = {
+    thing: \\"string\\"
+    // This incorrect shorthand will get fixed
+  };
+
+  return MyClass;
+});"
+`;
+
+exports[`classes class-convert-with-existing-define-immediate-return.js 1`] = `
+"/* global sap */
+/**
+ * Test notes: Even though there is an existing sp.ui.define,
+ * the class should be converted.
+ */
+sap.ui.define(['sap/SAPClass'], SAPClass => {
+  /**
+   * @UI5
+   * @name com.app.MyClass
+   * @namespace com.app
+   */
+  const MyClass = SAPClass.extend('com.app.MyClass', {
+    constructor: function (data) {
+      SAPClass.constructor.apply(this, [data]);
+    },
+    property_func: () => {
+      return this.getProperty('/name');
+    }
+  });
+  MyClass.renderer = {};
+  MyClass.metadata = {
+    thing: \\"string\\"
+    // This incorrect shorthand will get fixed
+  };
+  return MyClass;
+});"
+`;
+
+exports[`classes class-fix-with-existing-define.js 1`] = `
+"/* global sap */
+/**
+ * Test notes: Even though there is an existing sp.ui.define,
+ * and it uses .extend() syntax, the constructor function should be fixed.
+ */
+sap.ui.define(['sap/SAPClass'], SAPClass => {
+  const X = SAPClass.extend('X', {
+    // This incorrect shorthand will get fixed
+    constructor: function constructor(data) {
+      SAPClass.prototype.constructor.call(this, data);
+    },
+
+    method() {
+      return this.getProperty('/name');
+    }
+  });
+  return X;
+});"
+`;
+
 exports[`exports export-class.js 1`] = `
 "sap.ui.define([], function () {
   function hello() {
@@ -30,7 +110,7 @@ exports[`exports export-class-extend-managed.js 1`] = `
   const MyController = Controller.extend('a.b.c.XYZ', {
     constructor: function (arg) {
       console.log(\\"constructor\\");
-      Controller.apply(this, [arg]);
+      Controller.constructor.apply(this, [arg]);
     },
     shorthand_function: function (...args) {
       Controller.prototype.foo.apply(this, [...args]);
@@ -210,17 +290,10 @@ exports[`imports import-multiple.js 1`] = `
 });"
 `;
 
-exports[`no-wrap existing-sap.ui.define.js 1`] = `
+exports[`no-wrap nowrap-existing-sap.ui.define.js 1`] = `
 "/* global sap */
 sap.ui.define(['JSONModel'], JSONModel => {
-  const X = JSONModel.extend('X', {
-    constructor: function constructor(data) {
-      // This incorrect shorthand will get fixed
-      JSONModel.prototype.constructor.call(this, data);
-    }
-  });
-
-  return X;
+  return new JSONModel();
 });"
 `;
 
