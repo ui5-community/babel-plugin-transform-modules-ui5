@@ -54,6 +54,7 @@ This only transforms the UI5 relevant things. It does not transform everything t
 
 + Add the sourceRoot logic back and make name/namespace decorator optional
 + Use correct logic for `import * as`
++ Convert the super calls within convertClassToUI5Extend for better performance.
 + Configuration options
 
 ## Usage

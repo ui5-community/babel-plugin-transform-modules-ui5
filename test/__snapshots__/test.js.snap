@@ -84,6 +84,52 @@ sap.ui.define(['sap/SAPClass'], SAPClass => {
 });"
 `;
 
+exports[`classes class-extend-managed.js 1`] = `
+"sap.ui.define(['sap/ui/core/Controller', './Relative'], function (__Controller, __Relative) {
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj.default : obj;
+  }
+
+  const Controller = _interopRequireDefault(__Controller);
+
+  const Relative = _interopRequireDefault(__Relative);
+
+  const MyController = Controller.extend('MyController', {
+    constructor: function (arg) {
+      console.log(\\"constructor\\");
+      Controller.constructor.apply(this, [arg]);
+
+      this.property_arrow_function = () => 1;
+    },
+    shorthand_function: function (...args) {
+      Controller.prototype.foo.apply(this, [...args]);
+      this.name = Relative.name();
+    },
+    async_shorthand_function: async function (arg) {
+      return await 1;
+    },
+    property_value: 1
+  });
+
+  MyController.static_shorthand_function = function () {
+    return 1;
+  };
+
+  MyController.static_property_value = 1;
+
+  MyController.static_property_arrow = () => 1;
+
+  MyController.static_async_shorthand_function = async function () {
+    return await 1;
+  };
+
+  MyController.z = function () {
+    return 'hey';
+  };
+  return MyController;
+});"
+`;
+
 exports[`classes class-fix-with-existing-define.js 1`] = `
 "/* global sap */
 /**
@@ -119,52 +165,6 @@ exports[`exports export-class.js 1`] = `
 
   Thing.foo = hello;
   return Thing;
-});"
-`;
-
-exports[`exports export-class-extend-managed.js 1`] = `
-"sap.ui.define(['sap/ui/core/Controller', './Relative'], function (__Controller, __Relative) {
-  function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj.default : obj;
-  }
-
-  const Controller = _interopRequireDefault(__Controller);
-
-  const Relative = _interopRequireDefault(__Relative);
-
-  const MyController = Controller.extend('a.b.c.XYZ', {
-    constructor: function (arg) {
-      console.log(\\"constructor\\");
-      Controller.constructor.apply(this, [arg]);
-
-      this.property_arrow_function = () => 1;
-    },
-    shorthand_function: function (...args) {
-      Controller.prototype.foo.apply(this, [...args]);
-      this.name = Relative.name();
-    },
-    async_shorthand_function: async function (arg) {
-      return await 1;
-    },
-    property_value: 1
-  });
-
-  MyController.static_shorthand_function = function () {
-    return 1;
-  };
-
-  MyController.static_property_value = 1;
-
-  MyController.static_property_arrow = () => 1;
-
-  MyController.static_async_shorthand_function = async function () {
-    return await 1;
-  };
-
-  MyController.z = function () {
-    return 'hey';
-  };
-  return MyController;
 });"
 `;
 

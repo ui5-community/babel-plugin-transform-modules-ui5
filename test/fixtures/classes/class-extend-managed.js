@@ -1,10 +1,7 @@
 
 import Controller from 'sap/ui/core/Controller'
 import Relative from './Relative'
-//import Parent from '../Parent'
 
-@namespace('a.b.c')
-@name('a.b.c.XYZ')
 export default class MyController extends Controller {
   constructor(arg) {
     console.log("constructor")
