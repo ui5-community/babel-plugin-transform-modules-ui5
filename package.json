@@ -33,6 +33,9 @@
     "url": "https://github.com/r-murphy/babel-plugin-ui5/issues"
   },
   "homepage": "https://github.com/r-murphy/babel-plugin-ui5#readme",
+  "jest": {
+    "collectCoverage": true
+  },
   "dependencies": {
     "babel-plugin-transform-es2015-modules-commonjs": "6",
     "babel-template": "^6.26.0",

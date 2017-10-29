@@ -5,7 +5,7 @@
  */
 sap.ui.define(['sap/SAPClass'], (SAPClass) => {
   /**
-   * @name com.company.app.MyClass
+   * @name com.app.MyClass
    */
   return class MyClass extends SAPClass {
     property_func = () => {

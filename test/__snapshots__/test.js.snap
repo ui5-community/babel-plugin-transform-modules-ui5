@@ -1,5 +1,126 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`classes class-convert-dec-alias.js 1`] = `
+"sap.ui.define(['sap/SAPClass'], function (__SAPClass) {
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj.default : obj;
+  }
+
+  const SAPClass = _interopRequireDefault(__SAPClass);
+
+  const MyClass = SAPClass.extend('x.y.Z', {});
+  return MyClass;
+});"
+`;
+
+exports[`classes class-convert-dec-name.js 1`] = `
+"sap.ui.define(['sap/SAPClass'], function (__SAPClass) {
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj.default : obj;
+  }
+
+  const SAPClass = _interopRequireDefault(__SAPClass);
+
+  const MyClass = SAPClass.extend('x.y.Z', {});
+  return MyClass;
+});"
+`;
+
+exports[`classes class-convert-dec-namespace.js 1`] = `
+"sap.ui.define(['sap/SAPClass'], function (__SAPClass) {
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj.default : obj;
+  }
+
+  const SAPClass = _interopRequireDefault(__SAPClass);
+
+  const MyClass = SAPClass.extend('x.y.MyClass', {});
+  return MyClass;
+});"
+`;
+
+exports[`classes class-convert-dec-nonui5.js 1`] = `
+"sap.ui.define(['other/NotSAPClass'], function (__NotSAPClass) {
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj.default : obj;
+  }
+
+  const NotSAPClass = _interopRequireDefault(__NotSAPClass);
+
+  @NONUI5
+  class MyClass extends NotSAPClass {}
+  return MyClass;
+});"
+`;
+
+exports[`classes class-convert-jsdoc-alias.js 1`] = `
+"sap.ui.define(['sap/SAPClass'], function (__SAPClass) {
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj.default : obj;
+  }
+
+  const SAPClass = _interopRequireDefault(__SAPClass);
+
+  const MyClass = SAPClass.extend('x.y.Z', {});
+  return MyClass;
+});"
+`;
+
+exports[`classes class-convert-jsdoc-name.js 1`] = `
+"sap.ui.define(['sap/SAPClass'], function (__SAPClass) {
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj.default : obj;
+  }
+
+  const SAPClass = _interopRequireDefault(__SAPClass);
+
+  const MyClass = SAPClass.extend('x.y.Z', {});
+  return MyClass;
+});"
+`;
+
+exports[`classes class-convert-jsdoc-namespace.js 1`] = `
+"sap.ui.define(['sap/SAPClass'], function (__SAPClass) {
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj.default : obj;
+  }
+
+  const SAPClass = _interopRequireDefault(__SAPClass);
+
+  const MyClass = SAPClass.extend('x.y.MyClass', {});
+  return MyClass;
+});"
+`;
+
+exports[`classes class-convert-jsdoc-nonui5.js 1`] = `
+"sap.ui.define(['sap/SAPClass'], function (__SAPClass) {
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj.default : obj;
+  }
+
+  const SAPClass = _interopRequireDefault(__SAPClass);
+
+  /**
+   * @nonui5
+   */
+  class MyClass extends SAPClass {}
+  return MyClass;
+});"
+`;
+
+exports[`classes class-convert-jsdoc-type.js 1`] = `
+"sap.ui.define(['sap/SAPClass'], function (__SAPClass) {
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj.default : obj;
+  }
+
+  const SAPClass = _interopRequireDefault(__SAPClass);
+
+  const MyClass = SAPClass.extend('MyClass', {});
+  return MyClass;
+});"
+`;
+
 exports[`classes class-convert-no-constructor.js 1`] = `
 "/* global sap */
 /**
@@ -8,9 +129,9 @@ exports[`classes class-convert-no-constructor.js 1`] = `
  */
 sap.ui.define(['sap/SAPClass'], SAPClass => {
   /**
-   * @name com.company.app.MyClass
+   * @name com.app.MyClass
    */
-  const MyClass = SAPClass.extend('com.company.app.MyClass', {
+  const MyClass = SAPClass.extend('com.app.MyClass', {
     constructor: function contructor() {
       SAPClass.prototype.contructor.apply(this, arguments);
 
@@ -32,10 +153,10 @@ exports[`classes class-convert-with-existing-define-defer-return.js 1`] = `
 sap.ui.define(['sap/SAPClass'], SAPClass => {
   /**
    * @UI5
-   * @name com.company.app.MyClass
-   * @namespace com.company.app
+   * @name com.app.MyClass
+   * @namespace com.app
    */
-  const MyClass = SAPClass.extend('com.company.app.MyClass', {
+  const MyClass = SAPClass.extend('com.app.MyClass', {
     constructor: function (data) {
       SAPClass.constructor.apply(this, [data]);
 
@@ -84,6 +205,18 @@ sap.ui.define(['sap/SAPClass'], SAPClass => {
 });"
 `;
 
+exports[`classes class-covert-nonui5-return.js 1`] = `
+"/**
+ * This fixture tests a nonui5 scenario inside an sap.ui.define.
+ */
+sap.ui.define(['sap/SAPClass'], SAPClass => {
+  /**
+   * @nonui5
+   */
+  return class MyClass extends SAPClass {};
+});"
+`;
+
 exports[`classes class-extend-managed.js 1`] = `
 "sap.ui.define(['sap/ui/core/Controller', './Relative'], function (__Controller, __Relative) {
   function _interopRequireDefault(obj) {
@@ -95,6 +228,8 @@ exports[`classes class-extend-managed.js 1`] = `
   const Relative = _interopRequireDefault(__Relative);
 
   const MyController = Controller.extend('MyController', {
+    metadata: {},
+    renderer: {},
     constructor: function (arg) {
       console.log(\\"constructor\\");
       Controller.constructor.apply(this, [arg]);

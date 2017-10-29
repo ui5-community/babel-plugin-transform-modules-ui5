@@ -6,8 +6,8 @@
 sap.ui.define(['sap/SAPClass'], (SAPClass) => {
   /**
    * @UI5
-   * @name com.company.app.MyClass
-   * @namespace com.company.app
+   * @name com.app.MyClass
+   * @namespace com.app
    */
   class MyClass extends SAPClass {
     static renderer = {}

@@ -2,7 +2,12 @@
 import Controller from 'sap/ui/core/Controller'
 import Relative from './Relative'
 
+/**
+ * @hello
+ */
 export default class MyController extends Controller {
+  metadata = {}
+  renderer = {}
   constructor(arg) {
     console.log("constructor")
     super(arg)
