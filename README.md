@@ -54,7 +54,7 @@ This only transforms the UI5 relevant things. It does not transform everything t
 
 + Add the sourceRoot logic back and make name/namespace decorator optional
 + Use correct logic for `import * as`
-+ Convert the super calls within convertClassToUI5Extend for better performance.
++ Convert the super calls within convertClassToUI5Extend for better plugin performance.
 + Configuration options
 
 ## Usage
@@ -183,12 +183,12 @@ export default class MyError extends Error {
 sap.ui.define(["sap/ui/base/ManagedObject"], function (ManagedObject) {
     "use strict";
 
-    return ManagedObject.extend("example.obj.Animal", {
-        metadata: {
-            properties: {
-                type: { type: "string" },
-                nickName: { type: "string" }
-            }
+  return ManagedObject.extend("example.obj.Animal", {
+    metadata: {
+        properties: {
+            type: { type: "string" },
+            nickName: { type: "string" }
+        }
     },
     constructor: function constructor() {
         for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {

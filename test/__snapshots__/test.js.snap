@@ -402,6 +402,18 @@ exports[`exports export-multiple.js 1`] = `
 });"
 `;
 
+exports[`exports export-named-as-default.js 1`] = `
+"sap.ui.define([], function () {
+  const exports = {};
+  Object.defineProperty(exports, \\"__esModule\\", {
+    value: true
+  });
+  const one = 1;
+  exports.default = one;
+  return exports;
+});"
+`;
+
 exports[`exports export-obj.js 1`] = `
 "sap.ui.define([], function () {
   // Hello World
@@ -448,6 +460,23 @@ exports[`imports import-multiple.js 1`] = `
   const H = _interopRequireDefault(__H);
 
   const I = __H;
+});"
+`;
+
+exports[`mixed mixed-import-export.js 1`] = `
+"sap.ui.define(['2', '3', '4', '5'], function (__2, __3, __4, __5) {
+  const exports = {};
+  Object.defineProperty(exports, \\"__esModule\\", {
+    value: true
+  });
+
+  export * from '1';
+  exports.a = __2.a;
+  exports.b2 = __2.b;
+  exports.default = __3.default;
+  exports.default2 = __4.default;
+  exports.x = __5.v;
+  return exports;
 });"
 `;
 
