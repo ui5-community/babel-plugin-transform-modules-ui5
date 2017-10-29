@@ -464,13 +464,25 @@ exports[`imports import-multiple.js 1`] = `
 `;
 
 exports[`mixed mixed-import-export.js 1`] = `
-"sap.ui.define(['2', '3', '4', '5'], function (__2, __3, __4, __5) {
+"sap.ui.define(['1', '2', '3', '4', '5'], function (__1, __2, __3, __4, __5) {
   const exports = {};
   Object.defineProperty(exports, \\"__esModule\\", {
     value: true
   });
 
-  export * from '1';
+  function extendExports(exports, obj) {
+    Object.keys(obj).forEach(function (key) {
+      if (key === \\"default\\" || key === \\"__esModule\\") return;
+      Object.defineProperty(exports, key, {
+        enumerable: true,
+        get: function get() {
+          return obj[key];
+        }
+      });
+    });
+  }
+
+  extendExports(exports, __1);
   exports.a = __2.a;
   exports.b2 = __2.b;
   exports.default = __3.default;
