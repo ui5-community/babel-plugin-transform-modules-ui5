@@ -439,22 +439,15 @@ exports[`imports import-multiple.js 1`] = `
     return obj && obj.__esModule ? obj.default : obj;
   }
 
-  function _interopRequireNamed(obj, name) {
-    return obj && obj[name];
-  }
-
   const A = _interopRequireDefault(__A);
 
-  const B = _interopRequireNamed(__BC, 'B');
-
-  const C = _interopRequireNamed(__BC, 'C');
+  const B = __BC['B'];
+  const C = __BC['C'];
 
   const D = _interopRequireDefault(__D);
 
-  const E = _interopRequireNamed(__D, 'E');
-
-  const F = _interopRequireNamed(__D, 'F');
-
+  const E = __D['E'];
+  const F = __D['F'];
   const G = __G;
 
   const H = _interopRequireDefault(__H);
