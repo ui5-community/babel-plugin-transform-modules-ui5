@@ -7,6 +7,8 @@ const plugin = require('..')
 const outputDir = Path.join(__dirname, 'output')
 fse.emptyDirSync(outputDir)
 
+const sourceRootOverride = Path.join(process.cwd(), 'test', 'fixtures')
+
 function main() {
   const fixtureDirPath = Path.resolve(__dirname, 'fixtures')
   processDirectory(fixtureDirPath)
@@ -25,14 +27,19 @@ function processDirectory(dir) {
           plugins: [
             'babel-plugin-syntax-decorators',
             'babel-plugin-syntax-class-properties',
-            plugin
-          ]
+            [plugin, {
+              namespacePrefix: (filename.includes('prefixed') ? 'prefix' : undefined),
+              hello: 'world'
+            }]
+          ],
+          sourceRoot: (filename.includes('sourceroot') ? sourceRootOverride : undefined)
         }).code
         fse.writeFileSync(Path.join(outputDir, filename), result) // For manual verification
         expect(result).toMatchSnapshot()
       })
     })
-    // Recurse into directories
+
+  // Recurse into directories
   items
     .map(name => {
       const path = Path.join(dir, name)

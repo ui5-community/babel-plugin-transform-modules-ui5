@@ -53,6 +53,45 @@ exports[`classes class-convert-dec-nonui5.js 1`] = `
 });"
 `;
 
+exports[`classes class-convert-file-namespace.js 1`] = `
+"sap.ui.define(['sap/SAPClass'], function (__SAPClass) {
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj.default : obj;
+  }
+
+  const SAPClass = _interopRequireDefault(__SAPClass);
+
+  const MyClass = SAPClass.extend('test.fixtures.classes.MyClass', {});
+  return MyClass;
+});"
+`;
+
+exports[`classes class-convert-file-namespace-prefixed.js 1`] = `
+"sap.ui.define(['sap/SAPClass'], function (__SAPClass) {
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj.default : obj;
+  }
+
+  const SAPClass = _interopRequireDefault(__SAPClass);
+
+  const MyClass = SAPClass.extend('prefix.test.fixtures.classes.MyClass', {});
+  return MyClass;
+});"
+`;
+
+exports[`classes class-convert-file-namespace-sourceroot.js 1`] = `
+"sap.ui.define(['sap/SAPClass'], function (__SAPClass) {
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj.default : obj;
+  }
+
+  const SAPClass = _interopRequireDefault(__SAPClass);
+
+  const MyClass = SAPClass.extend('classes.MyClass', {});
+  return MyClass;
+});"
+`;
+
 exports[`classes class-convert-jsdoc-alias.js 1`] = `
 "sap.ui.define(['sap/SAPClass'], function (__SAPClass) {
   function _interopRequireDefault(obj) {
@@ -104,19 +143,6 @@ exports[`classes class-convert-jsdoc-nonui5.js 1`] = `
    * @nonui5
    */
   class MyClass extends SAPClass {}
-  return MyClass;
-});"
-`;
-
-exports[`classes class-convert-jsdoc-type.js 1`] = `
-"sap.ui.define(['sap/SAPClass'], function (__SAPClass) {
-  function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj.default : obj;
-  }
-
-  const SAPClass = _interopRequireDefault(__SAPClass);
-
-  const MyClass = SAPClass.extend('MyClass', {});
   return MyClass;
 });"
 `;
@@ -227,7 +253,7 @@ exports[`classes class-extend-managed.js 1`] = `
 
   const Relative = _interopRequireDefault(__Relative);
 
-  const MyController = Controller.extend('MyController', {
+  const MyController = Controller.extend('test.fixtures.classes.MyController', {
     metadata: {},
     renderer: {},
     constructor: function (arg) {
@@ -453,6 +479,21 @@ exports[`imports import-multiple.js 1`] = `
   const H = _interopRequireDefault(__H);
 
   const I = __H;
+});"
+`;
+
+exports[`libs libs-sap-imports.js 1`] = `
+"sap.ui.define(['sap/SAPClass'], function (__SAPClass) {
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj.default : obj;
+  }
+
+  const SAPClass = _interopRequireDefault(__SAPClass);
+
+  const Levels = __SAPClass['Levels'];
+  const MyClass = SAPClass.extend('test.fixtures.libs.MyClass', {});
+  MyClass.Levels = Levels;
+  return MyClass;
 });"
 `;
 
