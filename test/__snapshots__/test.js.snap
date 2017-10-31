@@ -147,6 +147,60 @@ exports[`classes class-convert-jsdoc-nonui5.js 1`] = `
 });"
 `;
 
+exports[`classes class-convert-metadata-jsdoc.js 1`] = `
+"sap.ui.define(['sap/SAPClass'], function (__SAPClass) {
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj.default : obj;
+  }
+
+  const SAPClass = _interopRequireDefault(__SAPClass);
+
+  const mdata = {};
+
+  /**
+   * @metadata mdata
+   */
+  const MyClass = SAPClass.extend('test.fixtures.classes.MyClass', {
+    metadata: mdata
+  });
+  return MyClass;
+});"
+`;
+
+exports[`classes class-convert-metadata-prop.js 1`] = `
+"sap.ui.define(['sap/SAPClass'], function (__SAPClass) {
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj.default : obj;
+  }
+
+  const SAPClass = _interopRequireDefault(__SAPClass);
+
+  const mdata = {};
+
+  const MyClass = SAPClass.extend('test.fixtures.classes.MyClass', {
+    metadata: mdata
+  });
+  return MyClass;
+});"
+`;
+
+exports[`classes class-convert-metadata-static.js 1`] = `
+"sap.ui.define(['sap/SAPClass'], function (__SAPClass) {
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj.default : obj;
+  }
+
+  const SAPClass = _interopRequireDefault(__SAPClass);
+
+  const mdata = {};
+
+  const MyClass = SAPClass.extend('test.fixtures.classes.MyClass', {
+    metadata: mdata
+  });
+  return MyClass;
+});"
+`;
+
 exports[`classes class-convert-no-constructor.js 1`] = `
 "/* global sap */
 /**
@@ -183,6 +237,11 @@ sap.ui.define(['sap/SAPClass'], SAPClass => {
    * @namespace com.app
    */
   const MyClass = SAPClass.extend('com.app.MyClass', {
+    metadata: {
+      thing: \\"string\\"
+      // This incorrect shorthand will get fixed
+    },
+    renderer: {},
     constructor: function (data) {
       SAPClass.constructor.apply(this, [data]);
 
@@ -191,11 +250,6 @@ sap.ui.define(['sap/SAPClass'], SAPClass => {
       };
     }
   });
-  MyClass.renderer = {};
-  MyClass.metadata = {
-    thing: \\"string\\"
-    // This incorrect shorthand will get fixed
-  };
 
   return MyClass;
 });"
@@ -214,6 +268,11 @@ sap.ui.define(['sap/SAPClass'], SAPClass => {
    * @namespace com.app
    */
   const MyClass = SAPClass.extend('com.app.MyClass', {
+    metadata: {
+      thing: \\"string\\"
+      // This incorrect shorthand will get fixed
+    },
+    renderer: {},
     constructor: function (data) {
       SAPClass.constructor.apply(this, [data]);
 
@@ -222,11 +281,6 @@ sap.ui.define(['sap/SAPClass'], SAPClass => {
       };
     }
   });
-  MyClass.renderer = {};
-  MyClass.metadata = {
-    thing: \\"string\\"
-    // This incorrect shorthand will get fixed
-  };
   return MyClass;
 });"
 `;
@@ -254,8 +308,8 @@ exports[`classes class-extend-managed.js 1`] = `
   const Relative = _interopRequireDefault(__Relative);
 
   const MyController = Controller.extend('test.fixtures.classes.MyController', {
-    metadata: {},
     renderer: {},
+    metadata: {},
     constructor: function (arg) {
       console.log(\\"constructor\\");
       Controller.constructor.apply(this, [arg]);
