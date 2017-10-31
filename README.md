@@ -151,6 +151,28 @@ In order to pass the namespace prefix, pass it as a plugin option, and not a top
 }
 ```
 
+### sap.ui.define export flag
+
+If you need the export flag on sap.ui.define, add `@export` to the JSDoc on the export default.
+
+```js
+const X = {}
+
+/**
+ * @export
+ */
+export default X;
+```
+
+Outputs:
+
+```js
+sap.ui.define([], function() {
+  const X = {};
+  return X;
+}, true);
+```
+
 ## Build with Webpack
 
 Please take a look at [ui5-loader](https://github.com/MagicCube/ui5-loader).

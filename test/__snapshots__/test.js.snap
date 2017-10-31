@@ -538,3 +538,20 @@ exports[`no-wrap skip-iffe.js 1`] = `
   window.x = {};
 })();"
 `;
+
+exports[`wrapping wrapping-export.js 1`] = `
+"sap.ui.define([], function () {
+  return {};
+}, true);"
+`;
+
+exports[`wrapping wrapping-export-const.js 1`] = `
+"sap.ui.define([], function () {
+  const X = {};
+
+  /**
+   * @export
+   */
+  return X;
+}, true);"
+`;
