@@ -128,7 +128,6 @@ const AController = SAPController.extend("my.app.AController", {
 });
 ```
 
-
 ##### File based namespace
 
 The default behaviour if no JSDoc or Decorator overrides are given is to use the file path to determine the namespace. 
@@ -172,6 +171,53 @@ sap.ui.define([], function() {
   return X;
 }, true);
 ```
+
+### Handling metadata and renderer
+
+Because ES6 classes are not plain objects, you can't have an object property like 'metadata'. 
+
+This plugin allows you to configure `metadata` and `renderer` as class properties (static or not) and the plugin will convert it to object properties. 
+
+**Aside** By default, transformed class properties get moved into the constructor (`this.prop = value;`) or outside the class in case of static props (`MyClass.prop = value;`).
+
+This:
+```js
+class MyControl extends SAPClass {
+  renderer = MyControlRenderer;
+  metadata = {
+     ...
+  }
+}
+```
+Becomes:
+```js
+const MyControl = SAPClass.extend('MyControl', {
+  renderer: MyControlRenderer,
+  metadata: {
+     ...
+  }
+});
+```
+
+#### Special handling for Typescript classes
+
+The typescript compiler currently moves the class properties into the constructor or outside the class, just like babel's class properties transform does. 
+
+This plugin does not currently (but will in the future) look for metadata or renderer properties in those places. So instead you can use JsDoc `@metadata` or `@renderer` to provide the values.
+
+```js
+import MyControlRenderer from 'myapp/controls/MyControlRenderer'
+const metadata = {...}
+
+/**
+ * @metadata metadata
+ * @renderer MyControlRenderer
+ */
+class MyControl extends SAPClass {
+  ...
+}
+```
+
 
 ## Build with Webpack
 
