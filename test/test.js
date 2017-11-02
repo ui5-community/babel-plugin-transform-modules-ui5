@@ -37,7 +37,7 @@ function processDirectory(dir) {
             babelrc: false
           }).code
           fse.writeFileSync(Path.join(outputDir, filename), result) // For manual verification
-          if (!filename.includes('_private_')) {
+          if (!filepath.includes('_private_')) {
             expect(result).toMatchSnapshot()
           }
         }
