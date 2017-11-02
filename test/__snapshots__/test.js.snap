@@ -443,6 +443,44 @@ exports[`exports export-default-named-function.js 1`] = `
 });"
 `;
 
+exports[`exports export-interop.js 1`] = `
+"sap.ui.define([], function () {
+  const exports = {};
+  Object.defineProperty(exports, \\"__esModule\\", {
+    value: true
+  });
+
+  // This tests the scenario when there is a mix of named and default exports.
+  // If the importing module has an interop, there's no issue with that.
+  // But if not, the importing module will get the 'exports' object and not the 'default' object.
+  // If the 'exports' doesn't have all the properties that 'default' has, the importing module will get an unexpected undefined.
+
+
+  function notExported() {}
+
+  function exported() {}
+
+  function bar() {}
+
+  exports.exported = exported;
+  exports.bar = bar;
+  exports.default = {
+    notExported,
+    exported,
+    baz: bar,
+    one: 1
+  };
+  exports.notExported = notExported;
+  exports.baz = bar;
+  exports.one = 1;
+  return exports;
+});"
+`;
+
+exports[`exports export-interop-error-obj-method.js 1`] = `": Can't build interop export since default export's key 'fn' conflicts with named export."`;
+
+exports[`exports export-interop-error-obj-prop.js 1`] = `": Can't build interop export since default export's key 'a' conflicts with named export."`;
+
 exports[`exports export-multiple.js 1`] = `
 "sap.ui.define([], function () {
   const exports = {};

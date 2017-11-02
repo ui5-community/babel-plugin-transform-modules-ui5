@@ -23,19 +23,31 @@ function processDirectory(dir) {
       test(filename, () => {
         console.log(`Running ${filename}`) // eslint-disable-line
         const filepath = Path.join(dir, filename)
-        const result = babel.transformFileSync(filepath, {
-          plugins: [
-            'babel-plugin-syntax-decorators',
-            'babel-plugin-syntax-class-properties',
-            [plugin, {
-              namespacePrefix: (filename.includes('prefixed') ? 'prefix' : undefined),
-              hello: 'world'
-            }]
-          ],
-          sourceRoot: (filename.includes('sourceroot') ? sourceRootOverride : undefined)
-        }).code
-        fse.writeFileSync(Path.join(outputDir, filename), result) // For manual verification
-        expect(result).toMatchSnapshot()
+        try  {
+          const result = babel.transformFileSync(filepath, {
+            plugins: [
+              'babel-plugin-syntax-decorators',
+              'babel-plugin-syntax-class-properties',
+              [plugin, {
+                namespacePrefix: (filename.includes('prefixed') ? 'prefix' : undefined),
+                hello: 'world'
+              }]
+            ],
+            sourceRoot: (filename.includes('sourceroot') ? sourceRootOverride : undefined)
+          }).code
+          fse.writeFileSync(Path.join(outputDir, filename), result) // For manual verification
+          expect(result).toMatchSnapshot()
+        }
+        catch (error) {
+          if (filename.includes('-error-')) {
+            const message = error.message.replace(filepath, '')
+            expect(message).toMatchSnapshot()
+            fse.writeFileSync(Path.join(outputDir, filename), message) // For manual verification
+          }
+          else {
+            throw error
+          }
+        }
       })
     })
 
