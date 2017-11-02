@@ -31,5 +31,8 @@ node_modules
 
 # Test Output
 /test/output
+/test/fixtures/_private_/*.js
 
 package-lock.json
+
+/dist/

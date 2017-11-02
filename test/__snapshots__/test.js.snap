@@ -1,5 +1,171 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`_private_ Alert.js 1`] = `
+"\\"use strict\\";
+/*!
+ * (c) Copyright 2015 British Columbia Hydro  & Power Authority
+ */
+
+sap.ui.define([\\"sap/ui/core/Control\\", \\"sap/ui/core/IconPool\\", \\"sap/m/Image\\", \\"sap/ui/base/Event\\"], function (__Control, __IconPool, __SAPImage, __SAPEvent) {
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj.default : obj;
+    }
+
+    const exports = {};
+    Object.defineProperty(exports, \\"__esModule\\", {
+        value: true
+    });
+
+    const Control = _interopRequireDefault(__Control);
+
+    const IconPool = _interopRequireDefault(__IconPool);
+
+    const SAPImage = _interopRequireDefault(__SAPImage);
+
+    const SAPEvent = _interopRequireDefault(__SAPEvent);
+
+    // import TextAlign from \\"sap/ui/core/TextAlign\\"
+    const TextAlign = sap.ui.core.TextAlign;
+    const AlertType = {
+        Info: \\"Info\\",
+        Error: \\"Error\\",
+        Warning: \\"Warning\\",
+        Success: \\"Success\\",
+        Abort: \\"Abort\\",
+        // BAPI message severity uses lower-case strings (info, error, etc.)
+        info: \\"Info\\",
+        error: \\"Error\\",
+        warning: \\"Warning\\",
+        success: \\"Success\\",
+        abort: \\"Abort\\"
+    };
+    (() => {
+        const win = window;
+        if (!win.bch) win.bch = {};
+        if (!win.bch.m) win.bch.m = {};
+        win.bch.m.AlertType = AlertType;
+    })();
+    (() => {
+        // TODO see if we still need this
+        const TA = TextAlign;
+        if (!TA.Inherit) TA.Inherit = \\"Inherit\\";
+        if (!TA.Initial) TA.Initial = \\"Initial\\";
+    })();
+    const CLOSE_ICON_SRC = 'sap-icon://decline';
+    const metadata = {
+        // ---- control specific ----
+        library: \\"bch.m\\",
+        properties: {
+            text: {
+                type: \\"string\\",
+                group: \\"\\",
+                defaultValue: '',
+                bindable: \\"bindable\\"
+            },
+            closeable: {
+                type: \\"boolean\\",
+                group: \\"Appearance\\",
+                defaultValue: false
+            },
+            type: {
+                type: \\"bch.m.AlertType\\",
+                group: \\"Appearance\\",
+                defaultValue: bch.m.AlertType.Info,
+                bindable: \\"bindable\\"
+            },
+            visible: {
+                type: \\"boolean\\",
+                group: \\"Appearance\\",
+                defaultValue: true
+            },
+            textAlign: {
+                type: \\"sap.ui.core.TextAlign\\",
+                group: \\"Appearance\\",
+                defaultValue: TextAlign.Center
+            },
+            width: {
+                type: \\"string\\",
+                group: \\"Dimension\\",
+                defaultValue: \\"initial\\" // sap.ui.core.CSSSize doesn't support 'initial'...
+            } },
+        events: {
+            afterClose: {}
+        },
+        aggregations: {
+            /**
+             * The content inside the dialog.
+             */
+            content: {
+                type: \\"sap.ui.core.Control\\",
+                multiple: true,
+                singularName: \\"content\\"
+            }
+        }
+    };
+    /**
+     * @export
+     * @name bch.m.Alert
+     * @metadata metadata
+     * @renderer AlertRenderer
+     */
+    const Alert = Control.extend(\\"bch.m.Alert\\", {
+        metadata: metadata,
+        renderer: AlertRenderer,
+        getText: function (bNormalize) {
+            const sText = this.getProperty(\\"text\\");
+            // handle line ending characters for renderer
+            if (bNormalize) {
+                return sText.replace(/\\\\r\\\\n/g, \\"\\\\n\\");
+            }
+            return sText;
+        },
+        setText: function (text) {
+            this.setProperty(\\"text\\", text);
+        },
+        setType: function (type) {
+            type = capitalize(type);
+            this.setProperty(\\"type\\", type);
+        },
+        close: function () {
+            this.setVisible(false);
+            this.fireEvent(\\"afterClose\\", new SAPEvent(\\"afterClose\\", this, {}));
+        },
+        _getCloseIconImage: function (sImgId) {
+            // update or create image control
+            if (this._image) return this._image;
+            const bIconDensityAware = true;
+            const oImage = IconPool.createControlByURI({
+                id: sImgId,
+                src: CLOSE_ICON_SRC,
+                //activeSrc : sActiveSrc,
+                densityAware: bIconDensityAware,
+                press: [this.close, this]
+            }, SAPImage);
+            oImage.setParent(this, null, true);
+            // add style classes to the object
+            oImage.addStyleClass(\\"bchMAlertCloseIcon\\");
+            this._image = oImage;
+            return oImage;
+        },
+        exit: function () {
+            // destroy image controls if initialized
+            if (this._image) {
+                this._image.destroy();
+            }
+        }
+    });
+
+    Alert.AlertType = AlertType;
+    function capitalize(s) {
+        // Returns the first letter capitalized + the string from index 1 and out aka. the rest of the string
+        return s[0].toUpperCase() + s.substr(1);
+    }
+    exports.AlertType = AlertType;
+    exports.default = Alert;
+    return exports;
+}, true);"
+`;
+
 exports[`classes class-convert-dec-alias.js 1`] = `
 "sap.ui.define(['sap/SAPClass'], function (__SAPClass) {
   function _interopRequireDefault(obj) {

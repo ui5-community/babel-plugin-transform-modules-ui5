@@ -2,7 +2,7 @@
 const fse = require('fs-extra')
 const Path = require('path')
 const babel = require('babel-core')
-const plugin = require('..')
+const plugin = require('..').default
 
 const outputDir = Path.join(__dirname, 'output')
 fse.emptyDirSync(outputDir)
@@ -33,10 +33,13 @@ function processDirectory(dir) {
                 hello: 'world'
               }]
             ],
-            sourceRoot: (filename.includes('sourceroot') ? sourceRootOverride : undefined)
+            sourceRoot: (filename.includes('sourceroot') ? sourceRootOverride : undefined),
+            babelrc: false
           }).code
           fse.writeFileSync(Path.join(outputDir, filename), result) // For manual verification
-          expect(result).toMatchSnapshot()
+          if (!filename.includes('_private_')) {
+            expect(result).toMatchSnapshot()
+          }
         }
         catch (error) {
           if (filename.includes('-error-')) {

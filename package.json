@@ -2,7 +2,7 @@
   "name": "babel-plugin-transform-modules-ui5",
   "version": "6.6.0",
   "description": "An unoffical babel plugin for SAP UI5.",
-  "main": "lib/index.js",
+  "main": "dist/index.js",
   "engines": {
     "node": ">=6"
   },
@@ -21,7 +21,13 @@
     "export"
   ],
   "scripts": {
-    "test": "jest"
+    "clean": "rimraf dist",
+    "build": "babel lib -d dist",
+    "lint": "eslint lib test",
+    "lint:fix": "npm run lint -- --fix",
+    "test": "jest test",
+    "test:dev": "npm run test -- --watch",
+    "prepublish": "npm run clean & npm run build"
   },
   "repository": {
     "type": "git",
@@ -37,6 +43,8 @@
     "collectCoverage": true
   },
   "dependencies": {
+    "array-flatten": "^2.1.1",
+    "babel-jest": "^21.2.0",
     "babel-plugin-transform-es2015-modules-commonjs": "6",
     "babel-template": "^6.26.0",
     "doctrine": "^2.0.0",
@@ -44,10 +52,13 @@
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
+    "babel-eslint": "^8.0.1",
     "babel-plugin-syntax-class-properties": "^6.13.0",
     "babel-plugin-syntax-decorators": "^6.13.0",
     "babel-plugin-transform-es2015-duplicate-keys": "^6.24.1",
-    "babel-preset-env": "^1.6.0",
+    "babel-plugin-transform-flow-strip-types": "^6.22.0",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
     "eslint": "^4.8.0",
     "eslint-config-standard": "^10.2.1",
     "eslint-plugin-import": "^2.7.0",
@@ -55,6 +66,7 @@
     "eslint-plugin-promise": "^3.5.0",
     "eslint-plugin-standard": "^3.0.1",
     "fs-extra": "^4.0.2",
-    "jest": "^21.2.1"
+    "jest": "^21.2.1",
+    "rimraf": "^2.6.2"
   }
 }
