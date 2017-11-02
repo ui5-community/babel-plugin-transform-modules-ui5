@@ -33,6 +33,122 @@ It allows you to develop SAP UI5 applications by using the latest [ES2015](http:
 
 This only transforms the UI5 relevant things. It does not transform everything to ES5 (for example it does not transform const/let to var). This makes it easier to use `babel-preset-env` to determine how to transform everything else.
 
+### Import / Export Interops
+
+The plugin does its best to make generated code work well with typical code using sap.ui.define, by taking a few extra steps and potentially adding a helper method.
+
+#### Import Interop
+
+In the case of imports, it uses a temporary name for the initial variable, and then extracts the properties from it as needed.
+
+This:
+
+```js
+import Default, { Name1, Name2 } from 'app/File'
+```
+
+Becomes:
+
+```js
+sap.ui.define(['app/file'], function(__File) {
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj.default : obj;
+  }
+  const Default = _interopRequireDefault(__File);
+  const Name1 = __File.Name1;
+  const Name2 = __File.Name2;
+}
+```
+
+The above code will work if File is an ES Module or not. In both cases, it gets Name1 and Name2 from properties on the object or module.
+For Default, it either uses the object itself if it's not an ES module, or the 'default' export from the module if it is.
+
+
+#### Export Interop
+
+Export interop is a bit trickier. Mixing default and named exports is tricky if the code importing them does not have an interop and expects a non-ES module.
+
+If your generated code will only be imported by code having an import interop, then you don't have anything to worry about it. But if the code may by used by standard UI5 code without an interop, then there are some gotchas when mixing default and named exports.
+
+The plugin will try to assist, but is a bit limited in what it can detect and do.
+
+As long as the default export is an object literal, the plugin will iterate over it's properties and methods and try to add them as a named export. That way, when the module is imported by code not using an interop, the module will have the same properties as the default export.
+
+If there is a naming conflict, the plugin tries to determine if they're referencing the same object, in which case no action is needed. But if the plugin determines they's referencing different objects (i.e. different behaviour), it will raise an error.
+
+The plugin is also limited where it can't detect properties and methods of a variable.
+
+**Example solvable intro issue**
+```js
+export function one() {
+	return 1
+}
+function two {
+	return 2
+}
+export default {
+	one, two
+}
+
+----------Output-------
+{
+   __esModule: true,
+   one: one,
+   default: {
+      one: one,
+      two: two
+   },
+   two: two
+}
+```
+
+Property `two` did not have a conflict, so it was added to the export.
+Property `one` had a conflict, but it was just referencing the named function, so it was ignored.
+
+
+**Example non-solvable issues**
+The following are not solvable by the plugin, and result in an error.
+```js
+export function one() {
+	return 1
+}
+
+export function two() {
+	return 2
+}
+
+function one_string() {
+	return "one"
+}
+
+export default {
+   // The plugin can't assign these to `exports` since the definition is not just a reference to the named export.
+   one: one_string,
+   two: () => "two"
+}
+
+```
+
+**Potential silent issues**
+
+```js
+export function two_plus_two() {
+   return 4
+}
+
+function function five() {
+   return 5
+}
+
+const Utils = {
+	two_plus_two: five
+}
+
+export default Utils // The plugin currently does not attempt to assign these properties to `exports`
+```
+
+
+
 ## Usage
 
 ### Install the plugin
@@ -247,7 +363,7 @@ import ManagedObject from "sap/ui/base/ManagedObject";
 
 export default class Animal extends ManagedObject {
 
-    metadata: {
+    metadata = {
         properties: {
             type: { type: "string" },
             nickName: { type: "string" }
@@ -256,12 +372,10 @@ export default class Animal extends ManagedObject {
 
     constructor(...args) {
         super(...args);
-        // TODO: Add your own construction code here.
     }
 
     init() {
     	super.init();
-        // TODO: Add your own initialization code here.
 	}
 
     callMe() {
@@ -274,9 +388,12 @@ export default class Animal extends ManagedObject {
 /*---------------------------------*
  * File: src/example/obj/Cat.js *
  *---------------------------------*/
+
 import Animal from "./Animal";
 
-@name("othernamespace.Cat")
+/**
+ * @name othernamespace.Cat
+ */
 export default class Cat extends Animal {
 
     init() {
@@ -308,6 +425,22 @@ export default class MyError extends Error {
 	}
 }
 
+/*-----------------------------------*
+ * File: src/example/util/Utils.js   *
+ *-----------------------------------*/
+
+export function multiply(a, b) {
+  return a * b
+}
+
+function add(a, b) { // Not a named export but gets added for sap.ui.define() interop.
+  return a + b
+}
+
+export default {
+  multiply, add
+}
+
 ```
 
 ## Compiled Codes
@@ -316,55 +449,66 @@ export default class MyError extends Error {
 /*------------------------------------*
  * File: assets/example/obj/Animal.js *
  *------------------------------------*/
-sap.ui.define(["sap/ui/base/ManagedObject"], function (ManagedObject) {
-    "use strict";
-
-  return ManagedObject.extend("example.obj.Animal", {
-    metadata: {
-        properties: {
-            type: { type: "string" },
-            nickName: { type: "string" }
-        }
-    },
-    constructor: function constructor() {
-        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-            args[_key] = arguments[_key];
-        }
-
-        ManagedObject.apply(this, [].concat(args));
-        // TODO: Add your own construction code here.
-    },
-    init: function init() {
-        // TODO: Add your own initialization code here.
-    },
-    callMe: function callMe() {
-        alert("I'm a " + this.getType() + ". Call me " + this.getNickName() + ".");
+ 
+sap.ui.define(["sap/ui/base/ManagedObject"], function (__ManagedObject) {
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj.default : obj;
     }
-  });
+
+    const ManagedObject = _interopRequireDefault(__ManagedObject);
+
+    const Animal = ManagedObject.extend("test.fixtures.examples.Animal", {
+        metadata: {
+            properties: {
+                type: { type: "string" },
+                nickName: { type: "string" }
+            }
+        },
+        constructor: function (...args) {
+            ManagedObject.constructor.apply(this, [...args]);
+        },
+        init: function () {
+            ManagedObject.prototype.init.apply(this, []);
+        },
+        callMe: function () {
+            alert(`I'm a ${this.getType()}.
+        Call me ${this.getNickName()}.`);
+        }
+    });
+    return Animal;
 });
 
 
 /*---------------------------------*
  * File: assets/example/obj/Cat.js *
  *---------------------------------*/
-sap.ui.define(["./Animal"], function (Animal) {
+
+sap.ui.define(["./Animal"], function (__Animal) {
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj.default : obj;
+    }
+
+    const Animal = _interopRequireDefault(__Animal);
+
     const Cat = Animal.extend("othernamespace.Cat", {
-        init: function init() {
+        init: function () {
             Animal.prototype.init.apply(this, []);
             this.setType("Cat");
         },
-        callMe: function callMe() {
+        callMe: function () {
             Animal.prototype.callMe.apply(this, []);
             alert("Miao~");
         }
     });
 
-	Cat.createCat = function (nickName) {
-	    const cat = new example.obj.Cat({
-    	    nickName
-	    });
-    	return cat;
-	};
+    Cat.createCat = function (nickName) {
+        const cat = new example.obj.Cat({
+            nickName
+        });
+        return cat;
+    };
+
+    return Cat;
 });
 
 
@@ -373,15 +517,39 @@ sap.ui.define(["./Animal"], function (Animal) {
  *--------------------------------------*/
 
 sap.ui.define([], function () {
+  class MyError extends Error {
+    constructor(msg) {
+      super(msg);
+      this.name = 'MyError';
+    }
+  }
+  return MyError;
+});
 
-	class MyError extends Error {
-		constructor(msg) {
-			super(msg);
-			this.name = 'MyError'
-		}
-	}
+/*--------------------------------------*
+ * File: assets/example/util/Utils.js   *
+ *--------------------------------------*/
 
-	return MyError
+sap.ui.define([], function () {
+  const exports = {};
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  function multiply(a, b) {
+    return a * b;
+  }
+
+  function add(a, b) {
+    // Not a named export but gets added for sap.ui.define() interop.
+    return a + b;
+  }
+
+  exports.multiply = multiply;
+  exports.default = {
+    multiply, add
+  };
+  exports.add = add;
+  return exports;
 });
 
 ```
@@ -394,3 +562,6 @@ sap.ui.define([], function () {
 ## TODO
 
 + libs support, like sergiirocks'
++ Configuration options
+	+ Export intern control
+	+ Others..

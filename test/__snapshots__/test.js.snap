@@ -366,6 +366,102 @@ sap.ui.define(['sap/SAPClass'], SAPClass => {
 });"
 `;
 
+exports[`examples Animal.js 1`] = `
+"sap.ui.define([\\"sap/ui/base/ManagedObject\\"], function (__ManagedObject) {
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj.default : obj;
+    }
+
+    const ManagedObject = _interopRequireDefault(__ManagedObject);
+
+    const Animal = ManagedObject.extend(\\"test.fixtures.examples.Animal\\", {
+        metadata: {
+            properties: {
+                type: { type: \\"string\\" },
+                nickName: { type: \\"string\\" }
+            }
+        },
+        constructor: function (...args) {
+            ManagedObject.constructor.apply(this, [...args]);
+        },
+        init: function () {
+            ManagedObject.prototype.init.apply(this, []);
+        },
+        callMe: function () {
+            alert(\`I'm a \${this.getType()}.
+        Call me \${this.getNickName()}.\`);
+        }
+    });
+    return Animal;
+});"
+`;
+
+exports[`examples Cat.js 1`] = `
+"sap.ui.define([\\"./Animal\\"], function (__Animal) {
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj.default : obj;
+    }
+
+    const Animal = _interopRequireDefault(__Animal);
+
+    const Cat = Animal.extend(\\"othernamespace.Cat\\", {
+        init: function () {
+            Animal.prototype.init.apply(this, []);
+            this.setType(\\"Cat\\");
+        },
+        callMe: function () {
+            Animal.prototype.callMe.apply(this, []);
+            alert(\\"Miao~\\");
+        }
+    });
+
+    Cat.createCat = function (nickName) {
+        const cat = new example.obj.Cat({
+            nickName
+        });
+        return cat;
+    };
+
+    return Cat;
+});"
+`;
+
+exports[`examples MyError.js 1`] = `
+"sap.ui.define([], function () {
+  class MyError extends Error {
+    constructor(msg) {
+      super(msg);
+      this.name = 'MyError';
+    }
+  }
+  return MyError;
+});"
+`;
+
+exports[`examples Utils.js 1`] = `
+"sap.ui.define([], function () {
+  const exports = {};
+  Object.defineProperty(exports, \\"__esModule\\", {
+    value: true
+  });
+  function multiply(a, b) {
+    return a * b;
+  }
+
+  function add(a, b) {
+    // Not a named export but gets added for sap.ui.define() interop.
+    return a + b;
+  }
+
+  exports.multiply = multiply;
+  exports.default = {
+    multiply, add
+  };
+  exports.add = add;
+  return exports;
+});"
+`;
+
 exports[`exports export-class.js 1`] = `
 "sap.ui.define([], function () {
   function hello() {
