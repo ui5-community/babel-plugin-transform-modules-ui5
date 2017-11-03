@@ -47,6 +47,7 @@
     "babel-jest": "^21.2.0",
     "babel-plugin-transform-es2015-modules-commonjs": "6",
     "babel-template": "^6.26.0",
+    "babel-types": "^6.26.0",
     "doctrine": "^2.0.0",
     "object-assign-defined": "^1.0.2"
   },

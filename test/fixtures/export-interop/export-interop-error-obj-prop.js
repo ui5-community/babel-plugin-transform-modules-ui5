@@ -4,7 +4,6 @@
 // But if not, the importing module will get the 'exports' object and not the 'default' object.
 // If the 'exports' doesn't have all the properties that 'default' has, the importing module will get an unexpected undefined.
 
-
 export function a() {
   return "a"
 }

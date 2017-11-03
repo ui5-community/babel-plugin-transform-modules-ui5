@@ -2,7 +2,7 @@
 const fse = require('fs-extra')
 const Path = require('path')
 const babel = require('babel-core')
-const plugin = require('..').default
+const plugin = require('..')
 
 const outputDir = Path.join(__dirname, 'output')
 fse.emptyDirSync(outputDir)
@@ -26,10 +26,15 @@ function processDirectory(dir) {
         try  {
           const result = babel.transformFileSync(filepath, {
             plugins: [
-              'babel-plugin-syntax-decorators',
-              'babel-plugin-syntax-class-properties',
+              'syntax-decorators',
+              'transform-object-rest-spread',
+              'syntax-class-properties',
               [plugin, {
                 namespacePrefix: (filename.includes('prefixed') ? 'prefix' : undefined),
+                allowUnsafeMixedExports: false,
+                noExportCollapse: false,
+                noExportExtend: false,
+                noImportInteroptPrefixes: ['sap/'],
                 hello: 'world'
               }]
             ],

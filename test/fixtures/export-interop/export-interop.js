@@ -11,9 +11,18 @@ export function exported() {}
 
 export function bar() {}
 
-export default {
+export function foo() {}
+
+const DEF = {
   notExported,
   exported,
+  foz: foo,
   baz: bar,
   one: 1,
+}
+
+export default DEF
+
+export {
+  bar as baz
 }

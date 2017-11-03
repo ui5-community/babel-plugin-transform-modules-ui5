@@ -380,6 +380,166 @@ exports[`examples Utils.js 1`] = `
 });"
 `;
 
+exports[`export-interop export-interop.js 1`] = `
+"sap.ui.define([], function () {
+  // This tests the scenario when there is a mix of named and default exports.
+  // If the importing module has an interop, there's no issue with that.
+  // But if not, the importing module will get the 'exports' object and not the 'default' object.
+  // If the 'exports' doesn't have all the properties that 'default' has, the importing module will get an unexpected undefined.
+
+
+  function notExported() {}
+
+  function exported() {}
+
+  function bar() {}
+
+  function foo() {}
+
+  const DEF = {
+    notExported,
+    exported,
+    foz: foo,
+    baz: bar,
+    one: 1
+  };
+
+  DEF.bar = bar;
+  DEF.foo = foo;
+  return DEF;
+});"
+`;
+
+exports[`export-interop export-interop-_extends-literal.js 1`] = `
+"sap.ui.define(['x'], function (__X) {
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj.default : obj;
+  }
+
+  const X = _interopRequireDefault(__X);
+
+  const one = 1;
+  function two() {}
+
+  return _extends({}, X, {
+    one,
+    two
+  });
+});"
+`;
+
+exports[`export-interop export-interop-_extends-variable.js 1`] = `
+"sap.ui.define(['x'], function (__X) {
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj.default : obj;
+  }
+
+  const X = _interopRequireDefault(__X);
+
+  const one = 1;
+  function two() {}
+  function three() {}
+
+  let D;
+
+  D = _extends({}, X, {
+    one,
+    two
+  });
+
+  D.three = threee;
+
+  D.one = one;
+  D.two = two;
+  D.three = three;
+  return D;
+});"
+`;
+
+exports[`export-interop export-interop-assign-literal.js 1`] = `
+"sap.ui.define(['x'], function (__X) {
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj.default : obj;
+  }
+
+  const X = _interopRequireDefault(__X);
+
+  const one = 1;
+  function two() {}
+
+  return Object.assign({}, X, {
+    one,
+    two
+  });
+});"
+`;
+
+exports[`export-interop export-interop-assign-variable.js 1`] = `
+"sap.ui.define(['x'], function (__X) {
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj.default : obj;
+  }
+
+  const X = _interopRequireDefault(__X);
+
+  const one = 1;
+  function two() {}
+  const three = 3;
+  function four() {}
+  function five() {}
+  function six() {}
+
+  const Other = {
+    six
+  };
+
+  const Utils = Object.assign({}, X, {
+    one,
+    two
+  }, {
+    five
+  }, OTHER // recursion test
+  );
+
+  Utils.three = 3;
+  Utils.four = 4;
+
+  Utils.three = three;
+  Utils.four = four;
+  Utils.six = six;
+  return Utils;
+});"
+`;
+
+exports[`export-interop export-interop-error-obj-method.js 1`] = `
+": Unsafe mixing of default and named exports. The following named exports can't be collapsed or ignored: 
+(fn)."
+`;
+
+exports[`export-interop export-interop-error-obj-prop.js 1`] = `
+": Unsafe mixing of default and named exports. The following named exports can't be collapsed or ignored: 
+(a)."
+`;
+
+exports[`export-interop export-interop-extend.js 1`] = `
+"sap.ui.define([], function () {
+  /**
+   * Named export 'one' can be ignored since it's on X and as the same literal.
+   * Named export 'two' gets assigned to 'X'
+   */
+
+  function one() {}
+  function two() {}
+
+  const X = {
+    one
+  };
+
+  X.two = two;
+  return X;
+});"
+`;
+
 exports[`exports export-class.js 1`] = `
 "sap.ui.define([], function () {
   function hello() {

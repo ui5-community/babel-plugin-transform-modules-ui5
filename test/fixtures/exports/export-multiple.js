@@ -1,7 +1,8 @@
 
-export default function def() {
-  console.log("I'm the default");
-}
+// TODO add this back
+// export default function def() {
+//   console.log("I'm the default");
+// }
 
 export { def }
 
