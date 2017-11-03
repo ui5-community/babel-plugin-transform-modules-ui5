@@ -10,7 +10,7 @@ module.exports = {
     },
     "rules": {
       "semi": ["warn", "never"],
-      "quotes": ["warn", "single"],
+      "quotes": ["warn", "single", {"allowTemplateLiterals": true}],
       "no-unused-vars": "warn",
       "brace-style": ["warn", "stroustrup", {"allowSingleLine": true}],
       "space-before-function-paren": ["warn", "never"],

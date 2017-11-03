@@ -1,56 +1,58 @@
 /* global test, expect, describe */
-const fse = require('fs-extra')
-const Path = require('path')
-const babel = require('babel-core')
-const plugin = require('..')
+import { writeFileSync, statSync, readdirSync, emptyDirSync, ensureDirSync } from 'fs-extra'
+import { join, resolve } from 'path'
+import { transformFileSync } from 'babel-core'
+import { get as getOpts } from './options'
+import plugin from '..'
 
-const outputDir = Path.join(__dirname, 'output')
-fse.emptyDirSync(outputDir)
+const FXTR_DIR_NAME = 'fixtures'
+const OUT_DIR_NAME = 'output'
 
-const sourceRootOverride = Path.join(process.cwd(), 'test', 'fixtures')
+const rootFixtureDirPath = resolve(__dirname, FXTR_DIR_NAME)
 
-function main() {
-  const fixtureDirPath = Path.resolve(__dirname, 'fixtures')
-  processDirectory(fixtureDirPath)
-}
+emptyDirSync(join(__dirname, OUT_DIR_NAME))
 
 function processDirectory(dir) {
-  const items = fse.readdirSync(dir)
+  const items = readdirSync(dir)
   // Process Files first
   items
     .filter(item => item.endsWith('.js'))
     .forEach(filename => {
       test(filename, () => {
-        console.log(`Running ${filename}`) // eslint-disable-line
-        const filepath = Path.join(dir, filename)
+        // console.log(`Running ${filename}`) // eslint-disable-line
+        const filepath = join(dir, filename)
+        const outputPath = filepath.replace(FXTR_DIR_NAME, OUT_DIR_NAME)
         try  {
-          const result = babel.transformFileSync(filepath, {
+          const opts = getOpts(filepath)
+          const result: string = transformFileSync(filepath, {
             plugins: [
               'syntax-decorators',
               'transform-object-rest-spread',
               'syntax-class-properties',
-              [plugin, {
-                namespacePrefix: (filename.includes('prefixed') ? 'prefix' : undefined),
-                allowUnsafeMixedExports: false,
-                noExportCollapse: false,
-                noExportExtend: false,
-                noImportInteroptPrefixes: ['sap/'],
-                hello: 'world'
-              }]
+              [plugin, opts]
             ],
-            sourceRoot: (filename.includes('sourceroot') ? sourceRootOverride : undefined),
+            sourceRoot: (filename.includes('sourceroot') ? rootFixtureDirPath : undefined),
             babelrc: false
           }).code
-          fse.writeFileSync(Path.join(outputDir, filename), result) // For manual verification
+
+          ensureDirSync(dir.replace(FXTR_DIR_NAME, OUT_DIR_NAME)) // This is delayed for when we run with a filter.
+          writeFileSync(outputPath, result) // For manual verification
+
+          if (filepath.includes('-error-')) {
+            throw new Error(`Expected ${filename} to throw error`)
+          }
+          // if (!opts.allowMixedExports && result.includes(`"__esModule"`)) {
+          //   throw new Error(`Unexpected __esModule declaration in ${filename}`)
+          // }
           if (!filepath.includes('_private_')) {
             expect(result).toMatchSnapshot()
           }
         }
         catch (error) {
-          if (filename.includes('-error-')) {
+          if (filename.includes('error-')) {
             const message = error.message.replace(filepath, '')
             expect(message).toMatchSnapshot()
-            fse.writeFileSync(Path.join(outputDir, filename), message) // For manual verification
+            writeFileSync(outputPath, message) // For manual verification
           }
           else {
             throw error
@@ -61,20 +63,15 @@ function processDirectory(dir) {
 
   // Recurse into directories
   items
-    .map(name => {
-      const path = Path.join(dir, name)
-      return {
-        name,
-        path,
-        stat: fse.statSync(path)
-      }
-    })
-    .filter(item => item.stat.isDirectory())
-    .forEach((item) => {
+    .map(name => ({ name, path: join(dir, name) }))
+    .filter(item => statSync(item.path).isDirectory())
+    .forEach(item => {
       describe(item.name, () => {
         processDirectory(item.path)
       })
     })
 }
 
-main()
+(() => {
+  processDirectory(rootFixtureDirPath)
+})()
