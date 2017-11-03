@@ -27,8 +27,8 @@ function processDirectory(dir) {
           const result: string = transformFileSync(filepath, {
             plugins: [
               'syntax-decorators',
-              'transform-object-rest-spread',
-              'syntax-class-properties',
+              'syntax-object-rest-spread',
+              ['syntax-class-properties', { useBuiltIns: true} ],
               [plugin, opts]
             ],
             sourceRoot: (filename.includes('sourceroot') ? rootFixtureDirPath : undefined),

@@ -517,6 +517,26 @@ exports[`export-collapse object.assign-variable.js 1`] = `
 });"
 `;
 
+exports[`export-collapse spread-literal.js 1`] = `
+"//
+// import X from 'x'
+//
+// export const one = 1
+// export function two() {}
+// export function three() {}
+//
+// const O2 = {
+//   three
+// }
+//
+// export default {
+//   ...O2,
+//   one,
+//   two
+// }
+sap.ui.define([], function () {});"
+`;
+
 exports[`exports export-class.js 1`] = `
 "sap.ui.define([], function () {
   function hello() {
