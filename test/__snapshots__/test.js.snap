@@ -429,25 +429,6 @@ exports[`export-collapse _extends-variable.js 1`] = `
 });"
 `;
 
-exports[`export-collapse add-props.js 1`] = `
-"sap.ui.define([], function () {
-  /**
-   * Named export 'one' can be ignored since it's on X and as the same literal.
-   * Named export 'two' gets assigned to 'X'
-   */
-
-  function one() {}
-  function two() {}
-
-  const X = {
-    one
-  };
-
-  X.two = two;
-  return X;
-});"
-`;
-
 exports[`export-collapse add-props-obj.js 1`] = `
 "sap.ui.define([], function () {
   /**
@@ -480,36 +461,6 @@ exports[`export-collapse error-obj-method.js 1`] = `
 exports[`export-collapse error-obj-prop.js 1`] = `
 ": Unsafe mixing of default and named exports. The following named exports can't be collapsed or ignored: 
 (a)."
-`;
-
-exports[`export-collapse literal.js 1`] = `
-"sap.ui.define([], function () {
-  // This tests the scenario when there is a mix of named and default exports.
-  // If the importing module has an interop, there's no issue with that.
-  // But if not, the importing module will get the 'exports' object and not the 'default' object.
-  // If the 'exports' doesn't have all the properties that 'default' has, the importing module will get an unexpected undefined.
-
-
-  function notExported() {}
-
-  function exported() {}
-
-  function bar() {}
-
-  function foo() {}
-
-  const DEF = {
-    notExported,
-    exported,
-    foz: foo,
-    baz: bar,
-    one: 1
-  };
-
-  DEF.bar = bar;
-  DEF.foo = foo;
-  return DEF;
-});"
 `;
 
 exports[`export-collapse object.assign-literal.js 1`] = `
@@ -545,7 +496,7 @@ exports[`export-collapse object.assign-variable.js 1`] = `
   function five() {}
   function six() {}
 
-  const Other = {
+  const O2 = {
     six
   };
 
@@ -554,7 +505,7 @@ exports[`export-collapse object.assign-variable.js 1`] = `
     two
   }, {
     five
-  }, OTHER // recursion test
+  }, O2 // recursion test
   );
 
   Utils.three = 3;
@@ -562,7 +513,6 @@ exports[`export-collapse object.assign-variable.js 1`] = `
 
   Utils.three = three;
   Utils.four = four;
-  Utils.six = six;
   return Utils;
 });"
 `;
@@ -804,22 +754,5 @@ exports[`wrapping export-const.js 1`] = `
 exports[`wrapping export-literal.js 1`] = `
 "sap.ui.define([], function () {
   return {};
-}, true);"
-`;
-
-exports[`wrapping wrapping-export.js 1`] = `
-"sap.ui.define([], function () {
-  return {};
-}, true);"
-`;
-
-exports[`wrapping wrapping-export-const.js 1`] = `
-"sap.ui.define([], function () {
-  const X = {};
-
-  /**
-   * @export
-   */
-  return X;
 }, true);"
 `;

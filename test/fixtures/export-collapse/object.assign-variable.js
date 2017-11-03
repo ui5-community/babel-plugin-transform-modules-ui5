@@ -8,7 +8,7 @@ export function four() {}
 export function five() {}
 export function six() {}
 
-const Other = {
+const O2 = {
   six
 }
 
@@ -20,7 +20,7 @@ const Utils = Object.assign({},
   }, {
     five
   },
-  OTHER // recursion test
+  O2 // recursion test
 )
 
 Utils.three = 3
