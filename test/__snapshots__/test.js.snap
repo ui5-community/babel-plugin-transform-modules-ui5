@@ -11,7 +11,7 @@ sap.ui.define(['sap/SAPClass'], SAPClass => {
    * @name com.app.MyClass
    */
   const MyClass = SAPClass.extend('com.app.MyClass', {
-    constructor: function () {
+    constructor: function constructor() {
       SAPClass.prototype.constructor.call(this);
     }
   });
@@ -30,7 +30,7 @@ sap.ui.define(['sap/SAPClass'], SAPClass => {
    * @name com.app.MyClass
    */
   const MyClass = SAPClass.extend('com.app.MyClass', {
-    constructor: function (...args) {
+    constructor: function constructor(...args) {
       SAPClass.prototype.constructor.call(this, ...args);
     }
   });
@@ -193,19 +193,18 @@ exports[`classes class-convert-options-namedonly.js 1`] = `
  * This test uses config options to only convert if there is a name provided.
  */
 sap.ui.define(['other/OtherClass', 'sap/SAPClass'], (OtherClass, SAPClass) => {
-  const MyClass = OtherClass.extend('test.fixtures.classes.MyClass', {
-    constructor: function () {
-      OtherClass.prototype.constructor.call(this);
+
+  return class MyClass extends OtherClass {
+    constructor() {
+      super();
     }
-  });
-  return MyClass;
+  };
 
   /**
    * @name my.app.MyUI5Class
    */
-
   const MyUI5Class = SAPClass.extend('my.app.MyUI5Class', {
-    constructor: function () {
+    constructor: function constructor() {
       SAPClass.prototype.constructor.call(this);
     }
   });
@@ -244,7 +243,7 @@ sap.ui.define(['sap/SAPClass'], SAPClass => {
       // This incorrect shorthand will get fixed
     },
     renderer: {},
-    constructor: function (data) {
+    constructor: function constructor(data) {
       SAPClass.prototype.constructor.call(this, data);
 
       this.property_func = () => {
@@ -275,7 +274,7 @@ sap.ui.define(['sap/SAPClass'], SAPClass => {
       // This incorrect shorthand will get fixed
     },
     renderer: {},
-    constructor: function (data) {
+    constructor: function constructor(data) {
       SAPClass.prototype.constructor.call(this, data);
 
       this.property_func = () => {
@@ -310,23 +309,23 @@ exports[`classes class-extend-managed.js 1`] = `
   const MyController = Controller.extend('test.fixtures.classes.MyController', {
     renderer: {},
     metadata: {},
-    constructor: function (arg) {
+    constructor: function constructor(arg) {
       console.log(\\"constructor\\");
       Controller.prototype.constructor.call(this, arg);
 
       this.property_arrow_function = () => 1;
     },
-    shorthand_function: function (...args) {
+    shorthand_function: function shorthand_function(...args) {
       Controller.prototype.foo.call(this, ...args);
       this.name = Relative.name();
     },
-    async_shorthand_function: async function (arg) {
+    async_shorthand_function: async function async_shorthand_function(arg) {
       return await 1;
     },
     property_value: 1
   });
 
-  MyController.static_shorthand_function = function () {
+  MyController.static_shorthand_function = function static_shorthand_function() {
     return 1;
   };
 
@@ -334,7 +333,7 @@ exports[`classes class-extend-managed.js 1`] = `
 
   MyController.static_property_arrow = () => 1;
 
-  MyController.static_async_shorthand_function = async function () {
+  MyController.static_async_shorthand_function = async function static_async_shorthand_function() {
     return await 1;
   };
 
@@ -375,13 +374,13 @@ exports[`examples Animal.js 1`] = `
                 nickName: { type: \\"string\\" }
             }
         },
-        constructor: function (...args) {
+        constructor: function constructor(...args) {
             ManagedObject.prototype.constructor.call(this, ...args);
         },
-        init: function () {
+        init: function init() {
             ManagedObject.prototype.init.call(this);
         },
-        callMe: function () {
+        callMe: function callMe() {
             alert(\`I'm a \${this.getType()}.
         Call me \${this.getNickName()}.\`);
         }
@@ -399,17 +398,17 @@ exports[`examples Cat.js 1`] = `
     const Animal = _interopRequireDefault(__Animal);
 
     const Cat = Animal.extend(\\"othernamespace.Cat\\", {
-        init: function () {
+        init: function init() {
             Animal.prototype.init.call(this);
             this.setType(\\"Cat\\");
         },
-        callMe: function () {
+        callMe: function callMe() {
             Animal.prototype.callMe.call(this);
             alert(\\"Miao~\\");
         }
     });
 
-    Cat.createCat = function (nickName) {
+    Cat.createCat = function createCat(nickName) {
         const cat = new example.obj.Cat({
             nickName
         });
