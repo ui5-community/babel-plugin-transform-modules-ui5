@@ -1,5 +1,2 @@
 
-/**
- * @export
- */
 export default {}

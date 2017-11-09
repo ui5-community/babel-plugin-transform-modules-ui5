@@ -839,15 +839,18 @@ exports[`wrapping export-const.js 1`] = `
 "sap.ui.define([], function () {
   const X = {};
 
-  /**
-   * @export
-   */
   return X;
+});"
+`;
+
+exports[`wrapping export-global.js 1`] = `
+"sap.ui.define([], function () {
+  return {};
 }, true);"
 `;
 
 exports[`wrapping export-literal.js 1`] = `
 "sap.ui.define([], function () {
   return {};
-}, true);"
+});"
 `;
