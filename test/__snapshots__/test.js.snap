@@ -843,7 +843,7 @@ exports[`wrapping export-const.js 1`] = `
 });"
 `;
 
-exports[`wrapping export-global.js 1`] = `
+exports[`wrapping export-jsdoc-global.js 1`] = `
 "sap.ui.define([], function () {
   return {};
 }, true);"
@@ -853,4 +853,10 @@ exports[`wrapping export-literal.js 1`] = `
 "sap.ui.define([], function () {
   return {};
 });"
+`;
+
+exports[`wrapping export-options-global.js 1`] = `
+"sap.ui.define([], function () {
+  return {};
+}, true);"
 `;

@@ -15,6 +15,9 @@ const Options = {
     },
     'class-convert-options-namedonly': {
       onlyConvertNamedClass: true
+    },
+    'export-options-global': {
+      exportAllGlobal: true
     }
   }
 }
