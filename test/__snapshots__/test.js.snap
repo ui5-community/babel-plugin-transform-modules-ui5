@@ -169,7 +169,7 @@ sap.ui.define(['sap/SAPClass'], SAPClass => {
     },
     renderer: {},
     constructor: function (data) {
-      SAPClass.constructor.apply(this, [data]);
+      SAPClass.prototype.constructor.apply(this, [data]);
 
       this.property_func = () => {
         return this.getProperty('/name');
@@ -200,7 +200,7 @@ sap.ui.define(['sap/SAPClass'], SAPClass => {
     },
     renderer: {},
     constructor: function (data) {
-      SAPClass.constructor.apply(this, [data]);
+      SAPClass.prototype.constructor.apply(this, [data]);
 
       this.property_func = () => {
         return this.getProperty('/name');
@@ -236,7 +236,7 @@ exports[`classes class-extend-managed.js 1`] = `
     metadata: {},
     constructor: function (arg) {
       console.log(\\"constructor\\");
-      Controller.constructor.apply(this, [arg]);
+      Controller.prototype.constructor.apply(this, [arg]);
 
       this.property_arrow_function = () => 1;
     },
@@ -300,7 +300,7 @@ exports[`examples Animal.js 1`] = `
             }
         },
         constructor: function (...args) {
-            ManagedObject.constructor.apply(this, [...args]);
+            ManagedObject.prototype.constructor.apply(this, [...args]);
         },
         init: function () {
             ManagedObject.prototype.init.apply(this, []);
