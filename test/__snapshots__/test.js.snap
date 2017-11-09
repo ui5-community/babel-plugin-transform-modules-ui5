@@ -188,6 +188,44 @@ sap.ui.define(['sap/SAPClass'], SAPClass => {
 });"
 `;
 
+exports[`classes class-convert-options-namedonly.js 1`] = `
+"/**
+ * This test uses config options to only convert if there is a name provided.
+ */
+sap.ui.define(['other/OtherClass', 'sap/SAPClass'], (OtherClass, SAPClass) => {
+  const MyClass = OtherClass.extend('test.fixtures.classes.MyClass', {
+    constructor: function () {
+      OtherClass.prototype.constructor.call(this);
+    }
+  });
+  return MyClass;
+
+  /**
+   * @name my.app.MyUI5Class
+   */
+
+  const MyUI5Class = SAPClass.extend('my.app.MyUI5Class', {
+    constructor: function () {
+      SAPClass.prototype.constructor.call(this);
+    }
+  });
+  return MyUI5Class;
+});"
+`;
+
+exports[`classes class-convert-options-never.js 1`] = `
+"/**
+ * This test uses config options to never convert.
+ */
+sap.ui.define(['other/OtherClass'], OtherClass => {
+  return class MyClass extends OtherClass {
+    constructor() {
+      super();
+    }
+  };
+});"
+`;
+
 exports[`classes class-convert-with-existing-define-defer-return.js 1`] = `
 "/* global sap */
 /**

@@ -184,10 +184,10 @@ The plugin provides a few ways to set the class name or namespace used in the `S
 
 The simplest way to control the names is to use JSDoc. This approach will also work well with classes output from TypeScript if you configure TypeScript to generate ES6 or higher, and don't enable removeComments.
 
-You can set the `@name`/`@alias` directly or just the `@namespace` and have the name derived from the ES6 class name. 
+You can set the `@name`/`@alias` directly or just the `@namespace` and have the name derived from the ES6 class name.
 
 `@name` and `@alias` behave the same. `@name` was used originally but the `@alias` JSDoc property is used in UI5 source code, so support for that was added.
-		
+
 ```js
 /**
  * @alias my.app.AController
@@ -202,7 +202,7 @@ class AController extends SAPController {
 class AController extends SAPController {
 	...
 }
- 
+
 /**
  * @namespace my.app
  */
@@ -246,9 +246,9 @@ const AController = SAPController.extend("my.app.AController", {
 
 ##### File based namespace
 
-The default behaviour if no JSDoc or Decorator overrides are given is to use the file path to determine the namespace. 
+The default behaviour if no JSDoc or Decorator overrides are given is to use the file path to determine the namespace.
 
-This is based on the relative path from either the babelrc `sourceRoot` property or the current working directory. 
+This is based on the relative path from either the babelrc `sourceRoot` property or the current working directory.
 
 The plugin also supports supplying a namespace prefix in this mode, in case the desired namespace root is not a directory in the filesystem.
 
@@ -290,9 +290,9 @@ sap.ui.define([], function() {
 
 ### Handling metadata and renderer
 
-Because ES6 classes are not plain objects, you can't have an object property like 'metadata'. 
+Because ES6 classes are not plain objects, you can't have an object property like 'metadata'.
 
-This plugin allows you to configure `metadata` and `renderer` as class properties (static or not) and the plugin will convert it to object properties. 
+This plugin allows you to configure `metadata` and `renderer` as class properties (static or not) and the plugin will convert it to object properties.
 
 **Aside** By default, transformed class properties get moved into the constructor (`this.prop = value;`) or outside the class in case of static props (`MyClass.prop = value;`).
 
@@ -317,7 +317,7 @@ const MyControl = SAPClass.extend('MyControl', {
 
 #### Special handling for Typescript classes
 
-The typescript compiler currently moves the class properties into the constructor or outside the class, just like babel's class properties transform does. 
+The typescript compiler currently moves the class properties into the constructor or outside the class, just like babel's class properties transform does.
 
 This plugin does not currently (but will in the future) look for metadata or renderer properties in those places. So instead you can use JsDoc `@metadata` or `@renderer` to provide the values.
 
@@ -449,7 +449,7 @@ export default {
 /*------------------------------------*
  * File: assets/example/obj/Animal.js *
  *------------------------------------*/
- 
+
 sap.ui.define(["sap/ui/base/ManagedObject"], function (__ManagedObject) {
     function _interopRequireDefault(obj) {
         return obj && obj.__esModule ? obj.default : obj;
@@ -563,5 +563,6 @@ sap.ui.define([], function () {
 
 + libs support, like sergiirocks'
 + Configuration options
+  + Support collapsing on an anonymous default export by using a temp var.
 	+ Export intern control
 	+ Others..
