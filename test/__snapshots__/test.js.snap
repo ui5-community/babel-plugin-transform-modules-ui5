@@ -1,5 +1,43 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`classes class-convert-constructor-noargs.js 1`] = `
+"/* global sap */
+/**
+ * Test notes: Even though there is an existing sp.ui.define,
+ * the class should be converted.
+ */
+sap.ui.define(['sap/SAPClass'], SAPClass => {
+  /**
+   * @name com.app.MyClass
+   */
+  const MyClass = SAPClass.extend('com.app.MyClass', {
+    constructor: function () {
+      SAPClass.prototype.constructor.call(this);
+    }
+  });
+  return MyClass;
+});"
+`;
+
+exports[`classes class-convert-constructor-spread.js 1`] = `
+"/* global sap */
+/**
+ * Test notes: Even though there is an existing sp.ui.define,
+ * the class should be converted.
+ */
+sap.ui.define(['sap/SAPClass'], SAPClass => {
+  /**
+   * @name com.app.MyClass
+   */
+  const MyClass = SAPClass.extend('com.app.MyClass', {
+    constructor: function (...args) {
+      SAPClass.prototype.constructor.call(this, ...args);
+    }
+  });
+  return MyClass;
+});"
+`;
+
 exports[`classes class-convert-dec-alias.js 1`] = `
 "sap.ui.define(['sap/SAPClass'], function (SAPClass) {
   const MyClass = SAPClass.extend('x.y.Z', {});
@@ -169,7 +207,7 @@ sap.ui.define(['sap/SAPClass'], SAPClass => {
     },
     renderer: {},
     constructor: function (data) {
-      SAPClass.prototype.constructor.apply(this, [data]);
+      SAPClass.prototype.constructor.call(this, data);
 
       this.property_func = () => {
         return this.getProperty('/name');
@@ -200,7 +238,7 @@ sap.ui.define(['sap/SAPClass'], SAPClass => {
     },
     renderer: {},
     constructor: function (data) {
-      SAPClass.prototype.constructor.apply(this, [data]);
+      SAPClass.prototype.constructor.call(this, data);
 
       this.property_func = () => {
         return this.getProperty('/name');
@@ -236,12 +274,12 @@ exports[`classes class-extend-managed.js 1`] = `
     metadata: {},
     constructor: function (arg) {
       console.log(\\"constructor\\");
-      Controller.prototype.constructor.apply(this, [arg]);
+      Controller.prototype.constructor.call(this, arg);
 
       this.property_arrow_function = () => 1;
     },
     shorthand_function: function (...args) {
-      Controller.prototype.foo.apply(this, [...args]);
+      Controller.prototype.foo.call(this, ...args);
       this.name = Relative.name();
     },
     async_shorthand_function: async function (arg) {
@@ -300,10 +338,10 @@ exports[`examples Animal.js 1`] = `
             }
         },
         constructor: function (...args) {
-            ManagedObject.prototype.constructor.apply(this, [...args]);
+            ManagedObject.prototype.constructor.call(this, ...args);
         },
         init: function () {
-            ManagedObject.prototype.init.apply(this, []);
+            ManagedObject.prototype.init.call(this);
         },
         callMe: function () {
             alert(\`I'm a \${this.getType()}.
@@ -324,11 +362,11 @@ exports[`examples Cat.js 1`] = `
 
     const Cat = Animal.extend(\\"othernamespace.Cat\\", {
         init: function () {
-            Animal.prototype.init.apply(this, []);
+            Animal.prototype.init.call(this);
             this.setType(\\"Cat\\");
         },
         callMe: function () {
-            Animal.prototype.callMe.apply(this, []);
+            Animal.prototype.callMe.call(this);
             alert(\\"Miao~\\");
         }
     });
