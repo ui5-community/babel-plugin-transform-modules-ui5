@@ -144,6 +144,24 @@ exports[`classes class-convert-metadata-assign.js 1`] = `
 });"
 `;
 
+exports[`classes class-convert-metadata-assign-nested.js 1`] = `
+"
+sap.ui.define(['sap/SAPClass'], SAPClass => {
+  const meta = {};
+  /**
+   * @name x.y.MyClass
+   */
+  const MyClass = SAPClass.extend('x.y.MyClass', {
+    metadata: meta,
+    renderer: {}
+  });
+
+  MyClass.metadata = meta;
+  MyClass.renderer = {};
+  return MyClass;
+});"
+`;
+
 exports[`classes class-convert-metadata-jsdoc.js 1`] = `
 "sap.ui.define(['sap/SAPClass'], function (SAPClass) {
 
@@ -258,10 +276,10 @@ sap.ui.define(['sap/SAPClass'], SAPClass => {
   const MyClass = SAPClass.extend('com.app.MyClass', {
     metadata: {
       thing: \\"string\\"
-      // This incorrect shorthand will get fixed
     },
     renderer: {},
     constructor: function constructor(data) {
+      // This incorrect shorthand gets fixed
       SAPClass.prototype.constructor.call(this, data);
 
       this.property_func = () => {
@@ -289,10 +307,10 @@ sap.ui.define(['sap/SAPClass'], SAPClass => {
   const MyClass = SAPClass.extend('com.app.MyClass', {
     metadata: {
       thing: \\"string\\"
-      // This incorrect shorthand will get fixed
     },
     renderer: {},
     constructor: function constructor(data) {
+      // This incorrect shorthand gets fixed
       SAPClass.prototype.constructor.call(this, data);
 
       this.property_func = () => {

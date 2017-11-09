@@ -14,11 +14,10 @@ sap.ui.define(['sap/SAPClass'], (SAPClass) => {
     static metadata = {
       thing: "string"
     }
-    // This incorrect shorthand will get fixed
-    constructor (data) {
+    constructor(data) {
+      // This incorrect shorthand gets fixed
       super(data)
     }
-    // TODO this should be converted to a bound function
     property_func = () => {
       return this.getProperty('/name')
     }
