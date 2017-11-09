@@ -162,21 +162,6 @@ sap.ui.define(['sap/SAPClass'], SAPClass => {
 });"
 `;
 
-exports[`classes class-convert-metadata-jsdoc.js 1`] = `
-"sap.ui.define(['sap/SAPClass'], function (SAPClass) {
-
-  const mdata = {};
-
-  /**
-   * @metadata mdata
-   */
-  const MyClass = SAPClass.extend('test.fixtures.classes.MyClass', {
-    metadata: mdata
-  });
-  return MyClass;
-});"
-`;
-
 exports[`classes class-convert-metadata-prop.js 1`] = `
 "sap.ui.define(['sap/SAPClass'], function (SAPClass) {
 
@@ -648,6 +633,19 @@ exports[`export-collapse spread-literal.js 1`] = `
 sap.ui.define([], function () {});"
 `;
 
+exports[`export-mixed export-mixed-func.js 1`] = `
+"sap.ui.define([], function () {
+  function def() {
+    console.log(\\"I'm the default\\");
+  }
+  // TODO detect the self reference and don't extend
+  const named = {};
+  def.def = def;
+  def.named = named;
+  return def;
+});"
+`;
+
 exports[`exports export-class.js 1`] = `
 "sap.ui.define([], function () {
   function hello() {
@@ -732,13 +730,7 @@ exports[`exports export-multiple.js 1`] = `
     value: true
   });
 
-
   const thing1 = {};
-  // TODO add this back
-  // export default function def() {
-  //   console.log(\\"I'm the default\\");
-  // }
-
   const thing2 = 2;
   const thingy3 = 3;
 
@@ -752,7 +744,6 @@ exports[`exports export-multiple.js 1`] = `
 
   var laterVar;
   laterVar = \\"var\\";
-  exports.def = def;
   exports.thing1 = thing1;
   exports.thing2 = thing2;
   exports.thing3 = thingy3;
