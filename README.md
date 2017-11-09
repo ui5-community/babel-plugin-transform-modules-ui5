@@ -146,11 +146,11 @@ Which might create an exported module that looks like:
 }
 ```
 
-The export inter-op features do their best to only return the default export rather than returning an ES module. To do this, it determines if all the named exports already exist on the default export (with the same value reference), or whether they can be added to it if there is not a naming conflict.
-
-This plugin's terminology for that is 'collapsing'.
+The export inter-op features do their best to only return the default export rather than returning an ES module. To do this, it determines if all the named exports already exist on the default export (with the same value reference), or whether they can be added to it if there is not a naming conflict. This plugin's terminology for that is 'collapsing'.
 
 If there is a naming conflict or other reason why the named export cannot be added to the default export, the plugin will throw an error by default.
+
+**Note** The plugin currently doesn't support assigning named exports as properties on an anonymous statement such as an arrow function or an object literal without a variable. This will be supported in the future.
 
 In order to determine which properties the default export already has, the plugin checks a few locations, if applicable.
 
