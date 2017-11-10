@@ -1,10 +1,33 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`classes class-controller.js 1`] = `
+exports[`classes class-controller-keep-constructor.js 1`] = `
+"sap.ui.define([\\"sap/ui/core/Controller\\"], function (Controller) {
+  const MyController = Controller.extend(\\"test.fixtures.classes.MyController\\", {
+    constructor: function constructor(arg) {
+      console.log(\\"constructor\\");
+      Controller.prototype.constructor.call(this, arg);
+      this.x = 1;
+    },
+    other: 1,
+
+    get getter() {
+      return 1;
+    }
+
+  });
+  return MyController;
+});"
+`;
+
+exports[`classes class-controller-w-oninit.js 1`] = `
 "sap.ui.define([\\"sap/ui/core/Controller\\"], function (Controller) {
   const MyController = Controller.extend(\\"test.fixtures.classes.MyController\\", {
     onInit: function onInit() {
-      Controller.prototype.onInit.apply(this, arguments);
+      console.log(\\"constructor\\");
+
+      this.x = 1;
+
+      this.y = 2;
 
       this.prop_func = () => true;
     },
@@ -19,15 +42,21 @@ exports[`classes class-controller.js 1`] = `
 });"
 `;
 
-exports[`classes class-controller-keep-constructor.js 1`] = `
+exports[`classes class-controller-wo-oninit.js 1`] = `
 "sap.ui.define([\\"sap/ui/core/Controller\\"], function (Controller) {
   const MyController = Controller.extend(\\"test.fixtures.classes.MyController\\", {
-    constructor: function constructor(arg) {
+    onInit: function onInit() {
       console.log(\\"constructor\\");
-      Controller.prototype.constructor.call(this, arg);
+
       this.x = 1;
+
+      if (typeof Controller.prototype.onInit === 'function') {
+        Controller.prototype.onInit.apply(this, arguments);
+      }
+
+      this.prop_func = () => true;
     },
-    other: 1,
+    prop: 1,
 
     get getter() {
       return 1;
@@ -236,7 +265,9 @@ sap.ui.define(['sap/SAPClass'], SAPClass => {
    */
   const MyClass = SAPClass.extend('com.app.MyClass', {
     constructor: function constructor() {
-      SAPClass.prototype.constructor.apply(this, arguments);
+      if (typeof SAPClass.prototype.constructor === 'function') {
+        SAPClass.prototype.constructor.apply(this, arguments);
+      }
 
       this.property_func = () => {
         return this.getProperty('/name');
