@@ -1,16 +1,20 @@
 
-import Controller from 'sap/ui/core/Controller'
+import SAPClass from 'sap/ui/core/SAPClass'
 import Relative from './Relative'
 
-/**
- * @hello
- */
-export default class MyController extends Controller {
+export default class MyClass extends SAPClass {
   metadata = {}
   renderer = {}
   constructor(arg) {
     console.log("constructor")
     super(arg)
+    this.x = 1
+  }
+  get prop() {
+    return 1
+  }
+  set prop(val) {
+    this.x = val
   }
   shorthand_function(...args) {
     super.foo(...args)
@@ -31,6 +35,6 @@ export default class MyController extends Controller {
   }
 }
 
-MyController.z = function() {
+MyClass.z = function() {
   return 'hey'
 }

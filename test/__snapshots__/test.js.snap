@@ -1,5 +1,43 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`classes class-controller.js 1`] = `
+"sap.ui.define([\\"sap/ui/core/Controller\\"], function (Controller) {
+  const MyController = Controller.extend(\\"test.fixtures.classes.MyController\\", {
+    onInit: function onInit() {
+      Controller.prototype.onInit.apply(this, arguments);
+
+      this.prop_func = () => true;
+    },
+    prop: 1,
+
+    get getter() {
+      return 1;
+    }
+
+  });
+  return MyController;
+});"
+`;
+
+exports[`classes class-controller-keep-constructor.js 1`] = `
+"sap.ui.define([\\"sap/ui/core/Controller\\"], function (Controller) {
+  const MyController = Controller.extend(\\"test.fixtures.classes.MyController\\", {
+    constructor: function constructor(arg) {
+      console.log(\\"constructor\\");
+      Controller.prototype.constructor.call(this, arg);
+      this.x = 1;
+    },
+    other: 1,
+
+    get getter() {
+      return 1;
+    }
+
+  });
+  return MyController;
+});"
+`;
+
 exports[`classes class-convert-constructor-noargs.js 1`] = `
 "/* global sap */
 /**
@@ -197,8 +235,8 @@ sap.ui.define(['sap/SAPClass'], SAPClass => {
    * @name com.app.MyClass
    */
   const MyClass = SAPClass.extend('com.app.MyClass', {
-    constructor: function contructor() {
-      SAPClass.prototype.contructor.apply(this, arguments);
+    constructor: function constructor() {
+      SAPClass.prototype.constructor.apply(this, arguments);
 
       this.property_func = () => {
         return this.getProperty('/name');
@@ -320,24 +358,34 @@ sap.ui.define(['sap/SAPClass'], SAPClass => {
 `;
 
 exports[`classes class-extend-managed.js 1`] = `
-"sap.ui.define(['sap/ui/core/Controller', './Relative'], function (Controller, __Relative) {
+"sap.ui.define(['sap/ui/core/SAPClass', './Relative'], function (SAPClass, __Relative) {
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj.default : obj;
   }
 
   const Relative = _interopRequireDefault(__Relative);
 
-  const MyController = Controller.extend('test.fixtures.classes.MyController', {
+  const MyClass = SAPClass.extend('test.fixtures.classes.MyClass', {
     renderer: {},
     metadata: {},
     constructor: function constructor(arg) {
       console.log(\\"constructor\\");
-      Controller.prototype.constructor.call(this, arg);
+      SAPClass.prototype.constructor.call(this, arg);
+      this.x = 1;
 
       this.property_arrow_function = () => 1;
     },
+
+    get prop() {
+      return 1;
+    },
+
+    set prop(val) {
+      this.x = val;
+    },
+
     shorthand_function: function shorthand_function(...args) {
-      Controller.prototype.foo.call(this, ...args);
+      SAPClass.prototype.foo.call(this, ...args);
       this.name = Relative.name();
     },
     async_shorthand_function: async function async_shorthand_function(arg) {
@@ -346,22 +394,22 @@ exports[`classes class-extend-managed.js 1`] = `
     property_value: 1
   });
 
-  MyController.static_shorthand_function = function static_shorthand_function() {
+  MyClass.static_shorthand_function = function static_shorthand_function() {
     return 1;
   };
 
-  MyController.static_property_value = 1;
+  MyClass.static_property_value = 1;
 
-  MyController.static_property_arrow = () => 1;
+  MyClass.static_property_arrow = () => 1;
 
-  MyController.static_async_shorthand_function = async function static_async_shorthand_function() {
+  MyClass.static_async_shorthand_function = async function static_async_shorthand_function() {
     return await 1;
   };
 
-  MyController.z = function () {
+  MyClass.z = function () {
     return 'hey';
   };
-  return MyController;
+  return MyClass;
 });"
 `;
 
