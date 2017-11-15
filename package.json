@@ -23,6 +23,7 @@
   "scripts": {
     "clean": "rimraf dist",
     "build": "babel lib -d dist",
+    "build:watch": "babel lib -d dist -w",
     "build:test": "babel --plugins source-map-support lib -d dist",
     "lint": "eslint lib test",
     "lint:fix": "npm run lint -- --fix",

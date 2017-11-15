@@ -74,6 +74,8 @@ A more detailed list includes:
 
 ### Converting ES modules (import/export) into sap.ui.define
 
+The plugin will wrap any code having import/export statements in an sap.ui.define. If there is no import/export, it won't wrap.
+
 #### Import
 
 The plugin supports all of the ES6 import statements, and will convert them into sap.ui.define arguments.
