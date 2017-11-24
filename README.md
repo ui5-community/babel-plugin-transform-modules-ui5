@@ -22,21 +22,21 @@ yarn add babel-plugin-transform-modules-ui5 --dev
 
 At a minimum, add `transform-modules-ui5` to the `plugins`.
 
-```json
+```js
 {
-  "plugins": ["transform-modules-ui5"]
+	"plugins": ["transform-modules-ui5"]
 }
 ```
 
 Or if you want to supply plugin options, use the array syntax.
 
-```json
+```js
 {
-  "plugins": [
-    ["transform-modules-ui5", {
-       ...pluginOpts
-    }]
-  ]
+	"plugins": [
+		["transform-modules-ui5", {
+			...pluginOpts
+		}]
+	]
 }
 ```
 
@@ -100,12 +100,12 @@ Becomes:
 
 ```js
 sap.ui.define(['app/file'], function(__File) {
-  function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj.default : obj;
-  }
-  const Default = _interopRequireDefault(__File);
-  const Name1 = __File.Name1;
-  const Name2 = __File.Name2;
+	function _interopRequireDefault(obj) {
+		return obj && obj.__esModule ? obj.default : obj;
+	}
+	const Default = _interopRequireDefault(__File);
+	const Name1 = __File.Name1;
+	const Name2 = __File.Name2;
 }
 ```
 
@@ -141,19 +141,19 @@ Imagine a file like this:
 ```js
 export function two() { return 2; }
 export default {
-  one() { return 1;}
+	one() { return 1;}
 }
 ```
 
 Which might create an exported module that looks like:
 
-```json
+```js
 {
-   __esModule: true,
-   default: {
-      one() { return 1; }
-   },
-   two() { return 2; }
+	__esModule: true,
+	 default: {
+			one() { return 1; }
+	 },
+	two() { return 2; }
 }
 ```
 
@@ -169,7 +169,7 @@ In order to determine which properties the default export already has, the plugi
 
 ```js
 export default {
-   prop: val
+	prop: val
 }; 
 // plugin knows about prop
 ```
@@ -178,7 +178,7 @@ export default {
 
 ```js
 const Module = {
-  prop1: val
+	prop1: val
 };
 Module.prop2 = val2;
 export default Module; 
@@ -191,10 +191,10 @@ export default Module;
 
 ```js
 const object1 = {
-  prop1: val
+	prop1: val
 };
 const object2 = Object.assign({}, object1, {
-  prop2: val
+	prop2: val
 });
 export default object2; 
 // plugin knows about prop1 and prop2
@@ -222,9 +222,8 @@ function one_string() {
 
 const MyUtil = {
 	// The plugin can't assign these to `exports` since the definition is not just a reference to the named export.
-   one: one_string,
-   two: () => "two"
-
+	one: one_string,
+	two: () => "two"
 }
 export default MyUtil;
 ```
@@ -246,11 +245,10 @@ Outputs:
 
 ```js
 sap.ui.define([], function() {
-  const X = {};
-  return X;
+	const X = {};
+	return X;
 }, true);
 ```
-
 
 ### Converting ES classes into Control.extend(..) syntax
 
@@ -275,9 +273,9 @@ The plugin also supports supplying a namespace prefix in this mode, in case the 
 
 In order to pass the namespace prefix, pass it as a plugin option, and not a top-level babel option. Passing plugin options requires the array format for the plugin itself (within the outer plugins array).
 
-```json
+```js
 {
-   "sourceRoot" "src/",
+	"sourceRoot" "src/",
 	"plugins": [
 		["transform-modules-ui5", {
 			"namespacePrefix": "my.app"
@@ -362,19 +360,19 @@ This plugin allows you to configure `metadata` and `renderer` as class propertie
 This:
 ```js
 class MyControl extends SAPClass {
-  static renderer = MyControlRenderer;
-  static metadata = {
-     ...
-  }
+	static renderer = MyControlRenderer;
+	static metadata = {
+		...
+	}
 }
 ```
 Becomes:
 ```js
 const MyControl = SAPClass.extend('MyControl', {
-  renderer: MyControlRenderer,
-  metadata: {
-     ...
-  }
+	renderer: MyControlRenderer,
+	metadata: {
+		...
+	}
 });
 ```
 
@@ -387,25 +385,25 @@ To support this, the plugin will also search for static properties outside the c
 ```ts
 /** Typescript **/
 class MyControl extends SAPClass {
-  static renderer: any = MyControlRenderer;
-  static metadata: any = {
-     ...
-  };
+	static renderer: any = MyControlRenderer;
+	static metadata: any = {
+		...
+	};
 }
 
 /** Typescript Output **/
 class MyControl extends SAPClass {}
 MyControl.renderer = MyControlRenderer;
 MyControl.metadata = {
-   ...
+	...
 };
 
 /** Final Output **/
 const MyControl = SAPClass.extend('MyControl', {
-  renderer: MyControlRenderer,
-  metadata: {
-     ...
-  }
+	renderer: MyControlRenderer,
+	metadata: {
+		...
+	}
 });
 ```
 
@@ -475,7 +473,7 @@ Some preload plugins:
 + libs support, like sergiirocks'
 + See if we can export a live binding (getter?)
 + Configuration options
-  + Support collapsing on an anonymous default export by using a temp var.
+	+ Support collapsing on an anonymous default export by using a temp var.
 	+ Export intern control
 	+ Others..
 
