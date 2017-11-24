@@ -5,10 +5,10 @@ import { transformFileSync } from 'babel-core'
 import { get as getOpts } from './options'
 import plugin from '..'
 
-const FXTR_DIR_NAME = 'fixtures'
+const FIXTURE_DIR_NAME = 'fixtures'
 const OUT_DIR_NAME = 'output'
 
-const rootFixtureDirPath = resolve(__dirname, FXTR_DIR_NAME)
+const rootFixtureDirPath = resolve(__dirname, FIXTURE_DIR_NAME)
 
 emptyDirSync(join(__dirname, OUT_DIR_NAME))
 
@@ -20,12 +20,13 @@ function processDirectory(dir) {
     .forEach(filename => {
       test(filename, () => {
         // console.log(`Running ${filename}`) // eslint-disable-line
-        const filepath = join(dir, filename)
-        const outputPath = filepath.replace(FXTR_DIR_NAME, OUT_DIR_NAME)
+        const filePath = join(dir, filename)
+        const outputPath = filePath.replace(FIXTURE_DIR_NAME, OUT_DIR_NAME)
         try  {
-          const opts = getOpts(filepath)
-          const result: string = transformFileSync(filepath, {
+          const opts = getOpts(filePath)
+          const result: string = transformFileSync(filePath, {
             plugins: [
+              'syntax-dynamic-import',
               'syntax-decorators',
               'syntax-object-rest-spread',
               ['syntax-class-properties', { useBuiltIns: true} ],
@@ -35,22 +36,22 @@ function processDirectory(dir) {
             babelrc: false
           }).code
 
-          ensureDirSync(dir.replace(FXTR_DIR_NAME, OUT_DIR_NAME)) // This is delayed for when we run with a filter.
+          ensureDirSync(dir.replace(FIXTURE_DIR_NAME, OUT_DIR_NAME)) // This is delayed for when we run with a filter.
           writeFileSync(outputPath, result) // For manual verification
 
-          if (filepath.includes('-error-')) {
+          if (filePath.includes('-error-')) {
             throw new Error(`Expected ${filename} to throw error`)
           }
           // if (!opts.allowMixedExports && result.includes(`"__esModule"`)) {
           //   throw new Error(`Unexpected __esModule declaration in ${filename}`)
           // }
-          if (!filepath.includes('_private_')) {
+          if (!filePath.includes('_private_')) {
             expect(result).toMatchSnapshot()
           }
         }
         catch (error) {
           if (filename.includes('error-')) {
-            const message = error.message.replace(filepath, '')
+            const message = error.message.replace(filePath, '')
             expect(message).toMatchSnapshot()
             writeFileSync(outputPath, message) // For manual verification
           }

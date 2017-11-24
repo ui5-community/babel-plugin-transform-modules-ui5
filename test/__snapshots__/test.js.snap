@@ -847,6 +847,31 @@ exports[`exports export-obj.js 1`] = `
 });"
 `;
 
+exports[`imports import-dynamic.js 1`] = `
+"sap.ui.define([], function () {
+  function __ui5_require_async(path) {
+    return new Promise((resolve, reject) => {
+      sap.ui.require([path], module => {
+        if (!module) return reject('Unable to load ' + path);
+        if (!module.__esModule) module.default = Object.assign({}, module);
+        resolve(module);
+      });
+    });
+  }
+
+  async function getItAA() {
+    const SAPModule = await __ui5_require_async(\\"sap/SAPModule\\");
+    return SAPModule.default;
+  }
+
+  function getItThen() {
+    return __ui5_require_async(\\"my/Module\\").then(MyModule => {
+      return MyModule.default;
+    });
+  }
+});"
+`;
+
 exports[`imports import-multiple.js 1`] = `
 "sap.ui.define(['./../a/b', 'A', 'BC', 'DEF', 'G', 'HI'], function (____a_b, __A, __BC, __D, __G, __H) {
   function _interopRequireDefault(obj) {

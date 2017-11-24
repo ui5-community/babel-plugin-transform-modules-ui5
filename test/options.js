@@ -7,7 +7,7 @@ const Options = {
     allowUnsafeMixedExports: false,
     noExportCollapse: false,
     noExportExtend: false,
-    noImportInteroptPrefixes: ['sap/'],
+    noImportInteropPrefixes: ['sap/'],
   },
   files: {
     'class-convert-options-never': {

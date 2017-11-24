@@ -1,0 +1,9 @@
+{
+  "javascript.validate.enable": false,
+  "flow.enabled": true,
+  "cSpell.words": [
+    "interop",
+    "sapui",
+    "sourceroot"
+  ]
+}

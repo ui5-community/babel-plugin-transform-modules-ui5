@@ -50,14 +50,14 @@ It is also recommended to use `babel-preset-env` to control which ES version the
 
 There are 2 main feature categories of the plugin, and you can use both or one without the other.: 
 
-1. Converting ES modules (import/export) into sap.ui.define
+1. Converting ES modules (import/export) into sap.ui.define or sap.ui.require.
 2. Converting ES classes into Control.extend(..) syntax.
 
 This only transforms the UI5 relevant things. It does not transform everything to ES5 (for example it does not transform const/let to var). This makes it easier to use `babel-preset-env` to determine how to transform everything else.
 
 A more detailed list includes:
 
-+ ES2015 Imports (default and named)
++ ES2015 Imports (default, named, and dynamic)
 + ES2015 Exports (default and named)
 + Class, using inheritance and `super` keyword
 	+ Static methods and fields
@@ -72,11 +72,11 @@ A more detailed list includes:
 	+ File path based namespace, including setting a prefix.
 
 
-### Converting ES modules (import/export) into sap.ui.define
+### Converting ES modules (import/export) into sap.ui.define or sap.ui.require
 
 The plugin will wrap any code having import/export statements in an sap.ui.define. If there is no import/export, it won't wrap.
 
-#### Import
+#### Static Import
 
 The plugin supports all of the ES6 import statements, and will convert them into sap.ui.define arguments.
 
@@ -108,6 +108,15 @@ sap.ui.define(['app/file'], function(__File) {
   const Name2 = __File.Name2;
 }
 ```
+
+#### Dynamic Import
+
+ECMAScript allows for dynamic imports calls like `import(path)` that return a Promise which resolves with an ES Module.
+
+This plugin will convert that to an async `sap.ui.require` wrapped in a Promise. 
+The resolved object will be a ES module or pseudo ES module having a 'default' property on it to reference the module by, to match the format used by `import()`. If the module is not a real ES module and already has a default property, the promise will be rejected with an error.
+
+For JavaScript projects, this syntax doesn't provide much advantage over a small utility function and has the downside of not working if your module has a 'default' property. The main advantage of this syntax is with TypeScript projects, where the TypeScript compiler will know the type of the imported module, so there his no need to define a separate interface for it.
 
 
 #### Export
@@ -410,7 +419,7 @@ If you have a class which extends from an import that you don't want to convert 
 ## Options
 
 **Imports**
-+ `noImportInteroptPrefixes` (Default `['sap/']`) A list of import path prefixes which never need an import inter-opt.
++ `noImportInteropPrefixes` (Default `['sap/']`) A list of import path prefixes which never need an import inter-opt.
 
 **Exports**
 + `allowUnsafeMixedExports` (Default: false) No errors for unsafe mixed exports (mix of named and default export where named cannot be collapsed*)
