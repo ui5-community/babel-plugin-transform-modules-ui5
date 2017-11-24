@@ -18,7 +18,9 @@
     "es6",
     "module",
     "import",
-    "export"
+    "export",
+    "typescript",
+    "ts"
   ],
   "scripts": {
     "clean": "rimraf dist",
