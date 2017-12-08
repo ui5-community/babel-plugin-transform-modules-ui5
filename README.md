@@ -250,6 +250,34 @@ sap.ui.define([], function() {
 }, true);
 ```
 
+#### Minimal Wrapping
+
+By default, the plugin will wrap everything in the file into the `sap.ui.define` factory function, if there is an import or an export. 
+
+However sometimes you may want to have some code run prior to the generated  `sap.ui.define` call. In that case, set the property `minimalWrapping` to true and the plugin will minimize what gets wrapped.
+
+The current implementation is to no wrap everything before the first `import`. If there are no imports everything will still be wrapped. This may be enhanced in the future to only wrap the return with `sap.ui.define` if there are no imports.
+
+Example:
+
+```
+const X = 1;
+import A from './a';
+export default {
+	A, X
+};
+
+//////// Generates
+"use strict";
+const X = 1;
+sap.ui.define(["./a"], (A) => {
+	return {
+		A, X	
+	};
+});
+```
+
+
 ### Converting ES classes into Control.extend(..) syntax
 
 By default, the plugin converts ES classes to Control.extend(..) syntax if the class extends from a class which has been imported. 
@@ -476,6 +504,11 @@ class MyController extends Controller {
 + `noExportCollapse` (Default: false) Skip collapsing* named exports to the default export.
 + `noExportExtend` (Default: false) Skips assigning named exports to the default export.
 + `exportAllGlobal` (Default: false) Adds the export flag to all sap.ui.define files.
+
+
+**Wrapping**
++ `minimalWrapping` (Default: false) Minimizes what code gets wrapped with sap.ui.define(). 
+
 
 **Class Conversion**
 + `namespacePrefix` (Default: '') Prefix to apply to namespace derived from directory.

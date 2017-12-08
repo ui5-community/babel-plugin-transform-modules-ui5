@@ -911,6 +911,28 @@ exports[`libs libs-sap-imports.js 1`] = `
 });"
 `;
 
+exports[`min-wrap min-wrap-no-import.js 1`] = `
+"sap.ui.define([], function () {
+  const x = 1; // This should not be part of sap-ui-define
+
+  return x;
+});"
+`;
+
+exports[`min-wrap min-wrap-simple.js 1`] = `
+"function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj.default : obj;
+}
+
+const x = 1; // This should not be part of sap-ui-define
+
+sap.ui.define(['./foo'], function (__Foo) {
+  const Foo = _interopRequireDefault(__Foo);
+
+  return x;
+});"
+`;
+
 exports[`mixed mixed-import-export.js 1`] = `
 "sap.ui.define(['1', '2', '3', '4', '5'], function (__1, __2, __3, __4, __5) {
   const exports = {};

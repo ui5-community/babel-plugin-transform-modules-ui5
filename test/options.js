@@ -19,13 +19,17 @@ const Options = {
     'export-options-global': {
       exportAllGlobal: true
     }
+  },
+  dirs: {
+    'min-wrap': {
+      minimalWrapping: true
+    }
   }
 }
 
 export function get(filepath: string) {
-  const { name } = parse(filepath)
-  // const { name, dir: dirpath } = parse(filepath)
-  // const { base: dir } = parse(dirpath)
+  const { name, dir: dirpath } = parse(filepath)
+  const { base: dir } = parse(dirpath)
   let options = {...Options.default}
   if (filepath.includes('prefix')) {
     options.namespacePrefix = 'prefix'
@@ -35,6 +39,13 @@ export function get(filepath: string) {
     options = {
       ...options,
       ...fileOverrides
+    }
+  }
+  const dirOverrride = Options.dirs[dir]
+  if (dirOverrride) {
+    options = {
+      ...options,
+      ...dirOverrride
     }
   }
   return options
