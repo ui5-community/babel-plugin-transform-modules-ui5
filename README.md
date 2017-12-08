@@ -413,6 +413,58 @@ const MyControl = SAPClass.extend('MyControl', {
 
 If you have a class which extends from an import that you don't want to convert to .extend(..) syntax, you can add the `@nonui5` (case insensitive) jsdoc or decorator to it. Also see Options below for overriding the default behaviour.
 
+### Special Class Property Handling for Controllers
+
+The default class property behaviour of babel is to move the property into the constructor. This plugin has a `moveControllerPropsToOnInit` option that moves them to the `onInit` function rather than the `constructor`. This is useful since the `onInit` method is called after the view's controls have been created (but not yet rendered).
+
+When that property is enabled, any class with 'Controller' in the name or namespace, or having the JSDoc `@controller` will be treated as a controller.
+
+This is mostly beneficial for TypeScript projects that want easy access to controls without always casting them. In typescript, the `byId(..)` method of a controller returns a `Control` instance. Rather than continually casting that to the controller type such as `sap.m.Input`, it can be useful to use a class property. 
+
+```ts
+/**
+ * @name app.MyController
+ * @controller
+ */
+class MyController extends Controller {
+	input: SAPInput = this.byId("input") as SAPInput;
+   
+	constructor() {
+		super();
+	}
+	
+	onInit(evt: sap.ui.base.Event) {
+	}
+}
+```
+
+Results in:
+```ts
+const MyController = Controller.extend("app.MyController", {
+	onInit(evt) {
+		this.input = this.byId("input");
+	}
+});
+```
+
+
+Of course, the alternative would be to define and instantiate the property separately. Or to cast the control whenever it's used.
+
+```ts
+/**
+ * @name app.MyController
+ * @controller
+ */
+class MyController extends Controller {
+	input: SAPInput;
+   
+	onInit(evt: sap.ui.base.Event) {
+		this.input = this.byId("input") as SAPInput;
+	}
+}
+```
+
+
 
 ## Options
 
@@ -427,9 +479,9 @@ If you have a class which extends from an import that you don't want to convert 
 
 **Class Conversion**
 + `namespacePrefix` (Default: '') Prefix to apply to namespace derived from directory.
-+ `neverConvertClass` (Default false) Never convert classes to SAPClass.extend() syntax.
++ `neverConvertClass` (Default: false) Never convert classes to SAPClass.extend() syntax.
 + `onlyConvertNamedClass` (Default false) Instead of converting any class which extends from an import, only convert if there is a `@name`.
-
++ `moveControllerPropsToOnInit` (Default: false) Moves class props in a controller to the onInit method instead of constructor.
 
 
 \* 'collapsing' named exports is a combination of simply ignoring them if their definition is the same as a property on the default export, and also assigning them to the default export.
