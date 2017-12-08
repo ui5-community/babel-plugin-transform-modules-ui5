@@ -16,13 +16,19 @@ const Options = {
     'class-convert-options-namedonly': {
       onlyConvertNamedClass: true
     },
+    'class-controller-w-oninit': {
+      moveControllerPropsToOnInit: true
+    },
+    'class-controller-wo-oninit': {
+      moveControllerPropsToOnInit: true
+    },
     'export-options-global': {
       exportAllGlobal: true
     }
   },
   dirs: {
     'min-wrap': {
-      minimalWrapping: true
+      noWrapBeforeImport: true
     }
   }
 }

@@ -1,6 +1,16 @@
 
 The major version will be kept the same as babel's.
 
+### 6.14.0 (2017-12-08
+
+#### Potential Breaking
+
+* Controller onInit logic is now off by default and uses flag moveControllerPropsToOnInit
+
+#### Features
+
+* noWrapBeforeImport functionality (using flag to opt-in)
+
 ### 6.13.0 (2017-11-24)
 
 #### Features
@@ -34,4 +44,3 @@ The major version will be kept the same as babel's.
 #### Breaking
 
 * Removed support for defining renderer and metadata variables in JSDoc
-

@@ -48,7 +48,7 @@ It is also recommended to use `babel-preset-env` to control which ES version the
 
 ## Features
 
-There are 2 main feature categories of the plugin, and you can use both or one without the other.: 
+There are 2 main feature categories of the plugin, and you can use both or one without the other.:
 
 1. Converting ES modules (import/export) into sap.ui.define or sap.ui.require.
 2. Converting ES classes into Control.extend(..) syntax.
@@ -113,7 +113,7 @@ sap.ui.define(['app/file'], function(__File) {
 
 ECMAScript allows for dynamic imports calls like `import(path)` that return a Promise which resolves with an ES Module.
 
-This plugin will convert that to an async `sap.ui.require` wrapped in a Promise. 
+This plugin will convert that to an async `sap.ui.require` wrapped in a Promise.
 The resolved object will be a ES module or pseudo ES module having a 'default' property on it to reference the module by, to match the format used by `import()`. If the module is not a real ES module and already has a default property, the promise will be rejected with an error.
 
 For JavaScript projects, this syntax doesn't provide much advantage over a small utility function and has the downside of not working if your module has a 'default' property. The main advantage of this syntax is with TypeScript projects, where the TypeScript compiler will know the type of the imported module, so there his no need to define a separate interface for it.
@@ -170,7 +170,7 @@ In order to determine which properties the default export already has, the plugi
 ```js
 export default {
 	prop: val
-}; 
+};
 // plugin knows about prop
 ```
 
@@ -181,7 +181,7 @@ const Module = {
 	prop1: val
 };
 Module.prop2 = val2;
-export default Module; 
+export default Module;
 // plugin knows about prop1 and prop2
 ```
 
@@ -196,7 +196,7 @@ const object1 = {
 const object2 = Object.assign({}, object1, {
 	prop2: val
 });
-export default object2; 
+export default object2;
 // plugin knows about prop1 and prop2
 ```
 
@@ -252,11 +252,11 @@ sap.ui.define([], function() {
 
 #### Minimal Wrapping
 
-By default, the plugin will wrap everything in the file into the `sap.ui.define` factory function, if there is an import or an export. 
+By default, the plugin will wrap everything in the file into the `sap.ui.define` factory function, if there is an import or an export.
 
-However sometimes you may want to have some code run prior to the generated  `sap.ui.define` call. In that case, set the property `minimalWrapping` to true and the plugin will minimize what gets wrapped.
+However sometimes you may want to have some code run prior to the generated  `sap.ui.define` call. In that case, set the property `noWrapBeforeImport` to true and the plugin will not wrap anything before the first `import`. If there are no imports, everything will still be wrapped.
 
-The current implementation is to no wrap everything before the first `import`. If there are no imports everything will still be wrapped. This may be enhanced in the future to only wrap the return with `sap.ui.define` if there are no imports.
+There may be a future property to minimize wrapping in the case that there are no imports (i.e. only wrap the export).
 
 Example:
 
@@ -272,7 +272,7 @@ export default {
 const X = 1;
 sap.ui.define(["./a"], (A) => {
 	return {
-		A, X	
+		A, X
 	};
 });
 ```
@@ -280,7 +280,7 @@ sap.ui.define(["./a"], (A) => {
 
 ### Converting ES classes into Control.extend(..) syntax
 
-By default, the plugin converts ES classes to Control.extend(..) syntax if the class extends from a class which has been imported. 
+By default, the plugin converts ES classes to Control.extend(..) syntax if the class extends from a class which has been imported.
 So a class without a parent will not be extended.
 
 There are a few options or some metadata you can use to control this.
@@ -405,7 +405,7 @@ const MyControl = SAPClass.extend('MyControl', {
 ```
 
 
-Since class properties are an early ES proposal, TypeScript's compiler (like babel's class properties transform) moves static properties outside the class definition, and moves instance properties inside the constructor (even if TypeScript is configured to output ESNext). 
+Since class properties are an early ES proposal, TypeScript's compiler (like babel's class properties transform) moves static properties outside the class definition, and moves instance properties inside the constructor (even if TypeScript is configured to output ESNext).
 
 To support this, the plugin will also search for static properties outside the class definition. It does not currently search in the constructor (but will in the future) so be sure to define renderer and metadata as static props if Typescript is used.
 
@@ -447,7 +447,7 @@ The default class property behaviour of babel is to move the property into the c
 
 When that property is enabled, any class with 'Controller' in the name or namespace, or having the JSDoc `@controller` will be treated as a controller.
 
-This is mostly beneficial for TypeScript projects that want easy access to controls without always casting them. In typescript, the `byId(..)` method of a controller returns a `Control` instance. Rather than continually casting that to the controller type such as `sap.m.Input`, it can be useful to use a class property. 
+This is mostly beneficial for TypeScript projects that want easy access to controls without always casting them. In typescript, the `byId(..)` method of a controller returns a `Control` instance. Rather than continually casting that to the controller type such as `sap.m.Input`, it can be useful to use a class property.
 
 ```ts
 /**
@@ -456,11 +456,11 @@ This is mostly beneficial for TypeScript projects that want easy access to contr
  */
 class MyController extends Controller {
 	input: SAPInput = this.byId("input") as SAPInput;
-   
+
 	constructor() {
 		super();
 	}
-	
+
 	onInit(evt: sap.ui.base.Event) {
 	}
 }
@@ -485,7 +485,7 @@ Of course, the alternative would be to define and instantiate the property separ
  */
 class MyController extends Controller {
 	input: SAPInput;
-   
+
 	onInit(evt: sap.ui.base.Event) {
 		this.input = this.byId("input") as SAPInput;
 	}
@@ -505,10 +505,8 @@ class MyController extends Controller {
 + `noExportExtend` (Default: false) Skips assigning named exports to the default export.
 + `exportAllGlobal` (Default: false) Adds the export flag to all sap.ui.define files.
 
-
 **Wrapping**
-+ `minimalWrapping` (Default: false) Minimizes what code gets wrapped with sap.ui.define(). 
-
++ `noWrapBeforeImport` (Default: false) Does not wrap code before the first import (if there are imports).
 
 **Class Conversion**
 + `namespacePrefix` (Default: '') Prefix to apply to namespace derived from directory.
