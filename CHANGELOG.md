@@ -1,7 +1,13 @@
 
 The major version will be kept the same as babel's.
 
-### 6.14.0 (2017-12-08
+### 6.14.1 (2017-12-13)
+
+#### Bug Fixes
+
+* Fix the dynamic import helper by setting __esModule flag.
+
+### 6.14.0 (2017-12-08)
 
 #### Potential Breaking
 
