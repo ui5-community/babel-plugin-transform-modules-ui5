@@ -3,6 +3,7 @@
   "flow.enabled": true,
   "cSpell.words": [
     "interop",
+    "preload",
     "sapui",
     "sourceroot",
     "supername"

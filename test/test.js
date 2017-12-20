@@ -19,7 +19,7 @@ function processDirectory(dir) {
     .filter(item => item.endsWith('.js'))
     .forEach(filename => {
       test(filename, () => {
-        // console.log(`Running ${filename}`) // eslint-disable-line
+        console.log(`Running ${filename}`) // eslint-disable-line
         const filePath = join(dir, filename)
         const outputPath = filePath.replace(FIXTURE_DIR_NAME, OUT_DIR_NAME)
         try  {

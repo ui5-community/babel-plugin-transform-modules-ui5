@@ -105,6 +105,40 @@ sap.ui.define(['sap/SAPClass'], SAPClass => {
 });"
 `;
 
+exports[`classes class-convert-controller-extend-static-assign.js 1`] = `
+"sap.ui.define(['sap/SAPController'], function (SAPController) {
+  const MyController = SAPController.extend('test.fixtures.classes.MyController', {
+    metadata: meta,
+    renderer: {},
+    myFormatter: Formatter
+  });
+
+  const meta = {};
+  const Formatter = {};
+  /**
+   * This tests finding the metadata after the class declaration.
+   * This is how typescript compiles static props.
+   */
+  MyController.metadata = meta;
+  MyController.renderer = {};
+  MyController.myFormatter = Formatter;
+  return MyController;
+});"
+`;
+
+exports[`classes class-convert-controller-extend-static-prop.js 1`] = `
+"sap.ui.define(['sap/SAPClass'], function (SAPController) {
+
+  const Formatter = {};
+
+  const MyController = SAPController.extend('test.fixtures.classes.MyController', {
+    myFormatter: Formatter,
+    metadata: {}
+  });
+  return MyController;
+});"
+`;
+
 exports[`classes class-convert-dec-alias.js 1`] = `
 "sap.ui.define(['sap/SAPClass'], function (SAPClass) {
   const MyClass = SAPClass.extend('x.y.Z', {});
@@ -201,12 +235,14 @@ exports[`classes class-convert-metadata-assign.js 1`] = `
   });
 
   const meta = {};
+  const Formatter = {};
   /**
    * This tests finding the metadata after the class declaration.
    * This is how typescript compiles static props.
    */
   MyClass.metadata = meta;
   MyClass.renderer = {};
+  MyClass.myFormatter = Formatter;
   return MyClass;
 });"
 `;
@@ -214,6 +250,7 @@ exports[`classes class-convert-metadata-assign.js 1`] = `
 exports[`classes class-convert-metadata-assign-nested.js 1`] = `
 "
 sap.ui.define(['sap/SAPClass'], SAPClass => {
+  const Formatter = {};
   const meta = {};
   /**
    * @name x.y.MyClass
@@ -223,6 +260,7 @@ sap.ui.define(['sap/SAPClass'], SAPClass => {
     renderer: {}
   });
 
+  MyClass.myFormatter = Formatter;
   MyClass.metadata = meta;
   MyClass.renderer = {};
   return MyClass;
@@ -232,10 +270,12 @@ sap.ui.define(['sap/SAPClass'], SAPClass => {
 exports[`classes class-convert-metadata-prop.js 1`] = `
 "sap.ui.define(['sap/SAPClass'], function (SAPClass) {
 
+  const Formatter = {};
   const mdata = {};
 
   const MyClass = SAPClass.extend('test.fixtures.classes.MyClass', {
-    metadata: mdata
+    metadata: mdata,
+    myFormatter: Formatter
   });
   return MyClass;
 });"
@@ -244,11 +284,13 @@ exports[`classes class-convert-metadata-prop.js 1`] = `
 exports[`classes class-convert-metadata-static.js 1`] = `
 "sap.ui.define(['sap/SAPClass'], function (SAPClass) {
 
+  const Formatter = Formatter;
   const mdata = {};
 
   const MyClass = SAPClass.extend('test.fixtures.classes.MyClass', {
     metadata: mdata
   });
+  MyClass.myFormatter = Formatter;
   return MyClass;
 });"
 `;

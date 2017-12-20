@@ -65,12 +65,10 @@ A more detailed list includes:
 	+ Class property arrow functions are bound correctly in the constructor.
 + Existing `sap.ui.define` calls don't get wrapped but can still be converted.
 	+ Fixes `constructor` shorthand method, if used.
-+ IIFE files don't get wrapped
 + Various options to control the class name string used.
 	+ JSDoc (name, namespace, alias)
 	+ Decorators (name, namespace, alias)
 	+ File path based namespace, including setting a prefix.
-
 
 ### Converting ES modules (import/export) into sap.ui.define or sap.ui.require
 
@@ -513,7 +511,7 @@ class MyController extends Controller {
 + `neverConvertClass` (Default: false) Never convert classes to SAPClass.extend() syntax.
 + `onlyConvertNamedClass` (Default false) Instead of converting any class which extends from an import, only convert if there is a `@name`.
 + `moveControllerPropsToOnInit` (Default: false) Moves class props in a controller to the onInit method instead of constructor.
-
++ `addControllerStaticPropsToExtend` (Default: false) Moves static props of a controller to the extends call. Useful for formatters.
 
 \* 'collapsing' named exports is a combination of simply ignoring them if their definition is the same as a property on the default export, and also assigning them to the default export.
 

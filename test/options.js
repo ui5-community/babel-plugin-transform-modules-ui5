@@ -24,6 +24,12 @@ const Options = {
     },
     'export-options-global': {
       exportAllGlobal: true
+    },
+    'class-convert-controller-extend-static-assign': {
+      addControllerStaticPropsToExtend: true
+    },
+    'class-convert-controller-extend-static-prop': {
+      addControllerStaticPropsToExtend: true
     }
   },
   dirs: {
@@ -33,11 +39,11 @@ const Options = {
   }
 }
 
-export function get(filepath: string) {
-  const { name, dir: dirpath } = parse(filepath)
-  const { base: dir } = parse(dirpath)
+export function get(filePath: string) {
+  const { name, dir: dirPath } = parse(filePath)
+  const { base: dir } = parse(dirPath)
   let options = {...Options.default}
-  if (filepath.includes('prefix')) {
+  if (filePath.includes('prefix')) {
     options.namespacePrefix = 'prefix'
   }
   const fileOverrides = Options.files[name]
@@ -47,11 +53,11 @@ export function get(filepath: string) {
       ...fileOverrides
     }
   }
-  const dirOverrride = Options.dirs[dir]
-  if (dirOverrride) {
+  const dirOverride = Options.dirs[dir]
+  if (dirOverride) {
     options = {
       ...options,
-      ...dirOverrride
+      ...dirOverride
     }
   }
   return options

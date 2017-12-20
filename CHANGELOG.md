@@ -1,6 +1,12 @@
 
 The major version will be kept the same as babel's.
 
+### 6.15.0
+
+#### Features
+
+* New option and feature `addControllerStaticPropsToExtend`.
+
 ### 6.14.1 (2017-12-13)
 
 #### Bug Fixes
