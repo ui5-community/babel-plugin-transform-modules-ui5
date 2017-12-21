@@ -854,7 +854,7 @@ exports[`exports export-multiple.js 1`] = `
   __exports.f = f;
   __exports.laterLet = laterLet;
   __exports.laterVar = laterVar;
-  return exports;
+  return __exports;
 });"
 `;
 
@@ -866,7 +866,7 @@ exports[`exports export-named-as-default.js 1`] = `
   });
   const one = 1;
   __exports.default = one;
-  return exports;
+  return __exports;
 });"
 `;
 
@@ -1001,7 +1001,7 @@ exports[`mixed mixed-import-export.js 1`] = `
   __exports.default = __3.default;
   __exports.default2 = __4.default;
   __exports.x = __5.v;
-  return exports;
+  return __exports;
 });"
 `;
 

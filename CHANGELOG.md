@@ -1,6 +1,12 @@
 
 The major version will be kept the same as babel's.
 
+### 6.15.2
+
+#### Bug Fixes
+
+* Fixing 6.15.1
+
 ### 6.15.1
 
 #### Bug Fixes

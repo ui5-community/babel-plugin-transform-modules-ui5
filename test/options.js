@@ -35,6 +35,11 @@ const Options = {
   dirs: {
     'min-wrap': {
       noWrapBeforeImport: true
+    },
+    '_private_': {
+      noWrapBeforeImport: true,
+      moveControllerPropsToOnInit: true,
+      addControllerStaticPropsToExtend: true,
     }
   }
 }
