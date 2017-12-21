@@ -31,7 +31,7 @@
     "lint:fix": "npm run lint -- --fix",
     "test": "npm run build:test & jest test",
     "test:dev": "npm run test -- --watch",
-    "prepublish": "npm run clean & npm run build",
+    "prepublish": "npm run clean & npm run build & jest test",
     "precommit": "lint-staged && yarn test"
   },
   "repository": {
