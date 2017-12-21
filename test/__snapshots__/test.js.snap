@@ -963,16 +963,18 @@ exports[`min-wrap min-wrap-no-import.js 1`] = `
 exports[`min-wrap min-wrap-simple.js 1`] = `
 "'use strict';
 
-function _interopRequireDefault(obj) {
-  return obj && obj.__esModule ? obj.default : obj;
-}
-
 const x = 1; // This should not be part of sap-ui-define
 
 sap.ui.define(['./foo'], function (__Foo) {
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj.default : obj;
+  }
+
   const Foo = _interopRequireDefault(__Foo);
 
-  return x;
+  const y = Foo(x); // This gets wrapped
+
+  return y;
 });"
 `;
 
