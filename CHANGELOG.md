@@ -1,6 +1,12 @@
 
 The major version will be kept the same as babel's.
 
+### 6.15.1
+
+#### Bug Fixes
+
+* Using __exports instead of exports in case "use strict"; doesn't get added so exports won't be defined globally.
+
 ### 6.15.0
 
 #### Features

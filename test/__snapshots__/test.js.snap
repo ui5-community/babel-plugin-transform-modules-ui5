@@ -826,8 +826,8 @@ exports[`exports export-default-named-function.js 1`] = `
 
 exports[`exports export-multiple.js 1`] = `
 "sap.ui.define([], function () {
-  const exports = {};
-  Object.defineProperty(exports, \\"__esModule\\", {
+  const __exports = {};
+  Object.defineProperty(__exports, \\"__esModule\\", {
     value: true
   });
 
@@ -845,27 +845,27 @@ exports[`exports export-multiple.js 1`] = `
 
   var laterVar;
   laterVar = \\"var\\";
-  exports.thing1 = thing1;
-  exports.thing2 = thing2;
-  exports.thing3 = thingy3;
-  exports.c = c;
-  exports.v = v;
-  exports.l = l;
-  exports.f = f;
-  exports.laterLet = laterLet;
-  exports.laterVar = laterVar;
+  __exports.thing1 = thing1;
+  __exports.thing2 = thing2;
+  __exports.thing3 = thingy3;
+  __exports.c = c;
+  __exports.v = v;
+  __exports.l = l;
+  __exports.f = f;
+  __exports.laterLet = laterLet;
+  __exports.laterVar = laterVar;
   return exports;
 });"
 `;
 
 exports[`exports export-named-as-default.js 1`] = `
 "sap.ui.define([], function () {
-  const exports = {};
-  Object.defineProperty(exports, \\"__esModule\\", {
+  const __exports = {};
+  Object.defineProperty(__exports, \\"__esModule\\", {
     value: true
   });
   const one = 1;
-  exports.default = one;
+  __exports.default = one;
   return exports;
 });"
 `;
@@ -978,8 +978,8 @@ sap.ui.define(['./foo'], function (__Foo) {
 
 exports[`mixed mixed-import-export.js 1`] = `
 "sap.ui.define(['1', '2', '3', '4', '5'], function (__1, __2, __3, __4, __5) {
-  const exports = {};
-  Object.defineProperty(exports, \\"__esModule\\", {
+  const __exports = {};
+  Object.defineProperty(__exports, \\"__esModule\\", {
     value: true
   });
 
@@ -995,12 +995,12 @@ exports[`mixed mixed-import-export.js 1`] = `
     });
   }
 
-  extendExports(exports, __1);
-  exports.a = __2.a;
-  exports.b2 = __2.b;
-  exports.default = __3.default;
-  exports.default2 = __4.default;
-  exports.x = __5.v;
+  extendExports(__exports, __1);
+  __exports.a = __2.a;
+  __exports.b2 = __2.b;
+  __exports.default = __3.default;
+  __exports.default2 = __4.default;
+  __exports.x = __5.v;
   return exports;
 });"
 `;
