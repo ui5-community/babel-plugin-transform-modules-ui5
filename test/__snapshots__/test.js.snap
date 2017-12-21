@@ -826,10 +826,9 @@ exports[`exports export-default-named-function.js 1`] = `
 
 exports[`exports export-multiple.js 1`] = `
 "sap.ui.define([], function () {
-  const __exports = {};
-  Object.defineProperty(__exports, \\"__esModule\\", {
-    value: true
-  });
+  const __exports = {
+    __esModule: true
+  };
 
   const thing1 = {};
   const thing2 = 2;
@@ -860,10 +859,9 @@ exports[`exports export-multiple.js 1`] = `
 
 exports[`exports export-named-as-default.js 1`] = `
 "sap.ui.define([], function () {
-  const __exports = {};
-  Object.defineProperty(__exports, \\"__esModule\\", {
-    value: true
-  });
+  const __exports = {
+    __esModule: true
+  };
   const one = 1;
   __exports.default = one;
   return __exports;
@@ -963,7 +961,9 @@ exports[`min-wrap min-wrap-no-import.js 1`] = `
 `;
 
 exports[`min-wrap min-wrap-simple.js 1`] = `
-"function _interopRequireDefault(obj) {
+"'use strict';
+
+function _interopRequireDefault(obj) {
   return obj && obj.__esModule ? obj.default : obj;
 }
 
@@ -978,10 +978,9 @@ sap.ui.define(['./foo'], function (__Foo) {
 
 exports[`mixed mixed-import-export.js 1`] = `
 "sap.ui.define(['1', '2', '3', '4', '5'], function (__1, __2, __3, __4, __5) {
-  const __exports = {};
-  Object.defineProperty(__exports, \\"__esModule\\", {
-    value: true
-  });
+  const __exports = {
+    __esModule: true
+  };
 
   function extendExports(exports, obj) {
     Object.keys(obj).forEach(function (key) {
