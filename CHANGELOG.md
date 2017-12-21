@@ -1,19 +1,26 @@
 
 The major version will be kept the same as babel's.
 
-### 6.15.2
+### 6.15.3 (2017-12-21)
+
+#### Bug Fixes
+
+* When using `noWrapBeforeImport`, the interop variables and helpers are now added inside sap.ui.define.
+* When using `noWrapBeforeImport`, if any code is added outside sap.ui.define, 'use strict'; is added.
+
+### 6.15.2 (2017-12-21)
 
 #### Bug Fixes
 
 * Fixing 6.15.1
 
-### 6.15.1
+### 6.15.1 (2017-12-20)
 
 #### Bug Fixes
 
 * Using __exports instead of exports in case "use strict"; doesn't get added so exports won't be defined globally.
 
-### 6.15.0
+### 6.15.0 (2017-12-20)
 
 #### Features
 
