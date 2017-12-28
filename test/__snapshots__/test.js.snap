@@ -887,6 +887,53 @@ exports[`exports export-obj.js 1`] = `
 });"
 `;
 
+exports[`imports import-all.js 1`] = `
+"sap.ui.define(['G'], function (G) {
+  return G;
+});"
+`;
+
+exports[`imports import-duplicate-src-1.js 1`] = `
+"sap.ui.define(['X'], function (XA) {
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj.default : obj;
+  }
+
+  const XD = _interopRequireDefault(XA);
+
+  const X2 = XA['X2'];
+  const X3 = XA['X3'];
+});"
+`;
+
+exports[`imports import-duplicate-src-2.js 1`] = `
+"sap.ui.define(['X'], function (__XD) {
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj.default : obj;
+  }
+
+  const XD = _interopRequireDefault(__XD);
+
+  const X2 = __XD['X2'];
+  const XA = __XD;
+  const X3 = __XD['X3'];
+});"
+`;
+
+exports[`imports import-duplicate-src-3.js 1`] = `
+"sap.ui.define(['X'], function (__XD) {
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj.default : obj;
+  }
+
+  const XD = _interopRequireDefault(__XD);
+
+  const XA = __XD;
+  const X2 = __XD['X2'];
+  const X3 = __XD['X3'];
+});"
+`;
+
 exports[`imports import-dynamic.js 1`] = `
 "sap.ui.define([], function () {
   function __ui5_require_async(path) {
@@ -921,7 +968,7 @@ exports[`imports import-dynamic.js 1`] = `
 `;
 
 exports[`imports import-multiple.js 1`] = `
-"sap.ui.define(['./../a/b', 'A', 'BC', 'DEF', 'G', 'HI'], function (____a_b, __A, __BC, __D, __G, __H) {
+"sap.ui.define(['./../a/b', 'A', 'BC', 'DEF', 'G', 'HI'], function (____a_b, __A, __BC, __D, G, __H) {
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj.default : obj;
   }
@@ -935,7 +982,6 @@ exports[`imports import-multiple.js 1`] = `
 
   const E = __D['E'];
   const F = __D['F'];
-  const G = __G;
 
   const H = _interopRequireDefault(__H);
 

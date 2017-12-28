@@ -1,6 +1,12 @@
 
 The major version will be kept the same as babel's.
 
+### 6.26.3 (2017-12-28)
+
+#### Features
+
+* Merge all imports from the same source into a single require and deconstruct from it.
+
 ### 6.15.3 (2017-12-21)
 
 #### Bug Fixes
