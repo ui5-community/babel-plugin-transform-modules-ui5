@@ -734,6 +734,14 @@ exports[`export-collapse object.assign-variable.js 1`] = `
 });"
 `;
 
+exports[`export-mixed export-mixed-arrow.js 1`] = `
+"sap.ui.define([], function () {
+  return () => {
+    return 1;
+  };
+});"
+`;
+
 exports[`export-mixed export-mixed-func.js 1`] = `
 "sap.ui.define([], function () {
   function def() {
@@ -826,10 +834,6 @@ exports[`exports export-default-named-function.js 1`] = `
 
 exports[`exports export-multiple.js 1`] = `
 "sap.ui.define([], function () {
-  const __exports = {
-    __esModule: true
-  };
-
   const thing1 = {};
   const thing2 = 2;
   const thingy3 = 3;
@@ -844,6 +848,9 @@ exports[`exports export-multiple.js 1`] = `
 
   var laterVar;
   laterVar = \\"var\\";
+  const __exports = {
+    __esModule: true
+  };
   __exports.thing1 = thing1;
   __exports.thing2 = thing2;
   __exports.thing3 = thingy3;
@@ -859,10 +866,10 @@ exports[`exports export-multiple.js 1`] = `
 
 exports[`exports export-named-as-default.js 1`] = `
 "sap.ui.define([], function () {
+  const one = 1;
   const __exports = {
     __esModule: true
   };
-  const one = 1;
   __exports.default = one;
   return __exports;
 });"
