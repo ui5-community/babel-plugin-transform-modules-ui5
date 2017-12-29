@@ -85,13 +85,14 @@ import { Named, Named2 } from 'module';
 import * as Name from 'module';
 ```
 
-The plugin uses a temporary name for the initial imported variable, and then extracts the properties from it as needed.
-This allows importing ES Modules which have a 'default' value, and also non-ES modules which don't.
+The plugin uses a temporary name (as needed) for the initial imported variable, and then extracts the properties from it as needed.
+This allows importing ES Modules which have a 'default' value, and also non-ES modules which don't. The plugin also allows for merged imports statements from the same source path into a single require and then deconstructs it accordingly.
 
 This:
 
 ```js
-import Default, { Name1, Name2 } from 'app/File'
+import Default, { Name1, Name2 } from 'app/File';
+import * as File from 'app/File';
 ```
 
 Becomes:
@@ -102,8 +103,9 @@ sap.ui.define(['app/file'], function(__File) {
 		return obj && obj.__esModule ? obj.default : obj;
 	}
 	const Default = _interopRequireDefault(__File);
-	const Name1 = __File.Name1;
-	const Name2 = __File.Name2;
+	const Name1 = __File["Name1"];
+	const Name2 = __File["Name2"];
+	const File = __File;
 }
 ```
 
