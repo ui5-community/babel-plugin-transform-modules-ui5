@@ -1,6 +1,12 @@
 
 The major version will be kept the same as babel's.
 
+### 6.16.1 (2017-12-28)
+
+#### Bug Fixes
+
+* t.isImport() was only working if the dynamic import plugin was used too, so avoiding that.
+
 ### 6.16.0 (2017-12-28)
 
 #### Features
