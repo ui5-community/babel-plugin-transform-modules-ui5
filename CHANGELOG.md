@@ -5,7 +5,8 @@ The major version will be kept the same as babel's.
 
 #### Bug Fixes
 
-* t.isImport() was only working if the dynamic import plugin was used too, so avoiding that.
+* Fix #1: Moved logic from `Program.exit` to `Program` so it runs before other plugins added by babel-preset-env such as class properties and class transform.
+* Removed t.isImport() since it only exists if the dynamic import plugin was used too.
 
 ### 6.16.0 (2017-12-28)
 
