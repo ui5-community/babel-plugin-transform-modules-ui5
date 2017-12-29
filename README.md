@@ -3,7 +3,7 @@
 
 An unofficial Babel transformer plugin for SAP/Open UI5.
 
-It allows you to develop SAP UI5 applications by using the latest [ES2015](http://babeljs.io/docs/learn-es2015/), including classes and modules, or even TypeScript.
+It allows you to develop SAP UI5 applications by using the latest [ECMAScript](http://babeljs.io/docs/learn-es2015/), including classes and modules, or even TypeScript.
 
 ## Install
 
@@ -150,9 +150,9 @@ Which might create an exported module that looks like:
 ```js
 {
 	__esModule: true,
-	 default: {
-			one() { return 1; }
-	 },
+	default: {
+		one() { return 1; }
+	},
 	two() { return 2; }
 }
 ```
@@ -160,8 +160,6 @@ Which might create an exported module that looks like:
 The export inter-op features do their best to only return the default export rather than returning an ES module. To do this, it determines if all the named exports already exist on the default export (with the same value reference), or whether they can be added to it if there is not a naming conflict. This plugin's terminology for that is 'collapsing'.
 
 If there is a naming conflict or other reason why the named export cannot be added to the default export, the plugin will throw an error by default.
-
-**Note** The plugin currently doesn't support assigning named exports as properties on an anonymous statement such as an arrow function or an object literal without a variable. This will be supported in the future.
 
 In order to determine which properties the default export already has, the plugin checks a few locations, if applicable.
 
@@ -556,8 +554,7 @@ Some preload plugins:
 + libs support, like sergiirocks'
 + See if we can export a live binding (getter?)
 + Configuration options
-	+ Support collapsing on an anonymous default export by using a temp var.
-	+ Export intern control
+	+ Export interop control
 	+ Others..
 
 Contribute

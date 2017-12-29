@@ -13,5 +13,5 @@ function b() {
 }
 
 export default {
-  a: b,
+  a: b, // conflicting definition from the named export a
 }

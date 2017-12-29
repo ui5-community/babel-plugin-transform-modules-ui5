@@ -1,5 +1,5 @@
 /*
-Tests the plugin's ability to find properies of the default export:
+Tests the plugin's ability to find properties of the default export:
  - when the default export is a variable.
  - from dot-assigned properties
  - from inside _extend function (used by TS and babel)

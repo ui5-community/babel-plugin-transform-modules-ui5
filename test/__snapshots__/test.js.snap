@@ -670,18 +670,8 @@ exports[`export-collapse add-props-obj.js 1`] = `
 });"
 `;
 
-exports[`export-collapse error-obj-method.js 1`] = `
-": Unsafe mixing of default and named exports. The following named exports can't be collapsed or ignored: 
-(fn)."
-`;
-
-exports[`export-collapse error-obj-prop.js 1`] = `
-": Unsafe mixing of default and named exports. The following named exports can't be collapsed or ignored: 
-(a)."
-`;
-
 exports[`export-collapse object.assign-literal.js 1`] = `
-"sap.ui.define(['x'], function (__X) {
+"sap.ui.define([\\"x\\"], function (__X) {
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj.default : obj;
   }
@@ -689,12 +679,21 @@ exports[`export-collapse object.assign-literal.js 1`] = `
   const X = _interopRequireDefault(__X);
 
   const one = 1;
-  function two() {}
+  const two = \\"2\\";
+  function foo() {}
 
-  return Object.assign({}, X, {
-    one,
-    two
+  const anotherN = 0;
+  const anotherS = \\"s\\";
+
+  const __exports = Object.assign({}, X, {
+    one: 1,
+    two: \\"2\\",
+    foo
   });
+
+  __exports.anotherN = anotherN;
+  __exports.anotherS = anotherS;
+  return __exports;
 });"
 `;
 
@@ -709,9 +708,11 @@ exports[`export-collapse object.assign-variable.js 1`] = `
   const one = 1;
   function two() {}
   const three = 3;
-  function four() {}
   function five() {}
   function six() {}
+
+  const anotherConst = 9;
+  function otherFN() {}
 
   const O2 = {
     six
@@ -726,27 +727,70 @@ exports[`export-collapse object.assign-variable.js 1`] = `
   );
 
   Utils.three = 3;
-  Utils.four = 4;
 
-  Utils.three = three;
-  Utils.four = four;
+  Utils.anotherConst = anotherConst;
+  Utils.otherFN = otherFN;
   return Utils;
+});"
+`;
+
+exports[`export-error error-assign-var.js 1`] = `"Unsafe mixing of conflicting default and named exports. The following named exports are conflicting: (foo)."`;
+
+exports[`export-error error-assign-var-recurs.js 1`] = `"Unsafe mixing of conflicting default and named exports. The following named exports are conflicting: (foo)."`;
+
+exports[`export-error error-obj-method.js 1`] = `"Unsafe mixing of conflicting default and named exports. The following named exports are conflicting: (a)."`;
+
+exports[`export-error error-obj-prop.js 1`] = `"Unsafe mixing of conflicting default and named exports. The following named exports are conflicting: (a)."`;
+
+exports[`export-mixed export-mixed-anon-func.js 1`] = `
+"sap.ui.define([], function () {
+  const named = {};
+
+  const __exports = function () {
+    console.log(\\"I'm the default\\");
+  };
+
+  __exports.named = named;
+  return __exports;
 });"
 `;
 
 exports[`export-mixed export-mixed-arrow.js 1`] = `
 "sap.ui.define([], function () {
-  return () => {
+  const two = 2;
+
+  const __exports = () => {
     return 1;
   };
+
+  __exports.two = two;
+  return __exports;
 });"
 `;
 
-exports[`export-mixed export-mixed-func.js 1`] = `
+exports[`export-mixed export-mixed-literal.js 1`] = `
+"sap.ui.define([], function () {
+  const a = 1;
+  const b = 2;
+
+  const c = 3;
+  const __exports = {
+    a,
+    x: a
+  };
+  __exports.b = b;
+  __exports.y = b;
+  __exports.c = c;
+  return __exports;
+});"
+`;
+
+exports[`export-mixed export-mixed-named-func.js 1`] = `
 "sap.ui.define([], function () {
   function def() {
     console.log(\\"I'm the default\\");
   }
+  def.hey = 'hey';
   // TODO detect the self reference and don't extend
   const named = {};
   def.def = def;

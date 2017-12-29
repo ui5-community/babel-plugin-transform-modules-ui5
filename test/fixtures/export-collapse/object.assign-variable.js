@@ -4,9 +4,11 @@ import X from 'x'
 export const one = 1
 export function two() {}
 export const three = 3
-export function four() {}
 export function five() {}
 export function six() {}
+
+export const anotherConst = 9
+export function otherFN() {}
 
 const O2 = {
   six
@@ -24,6 +26,5 @@ const Utils = Object.assign({},
 )
 
 Utils.three = 3
-Utils.four = 4
 
 export default Utils

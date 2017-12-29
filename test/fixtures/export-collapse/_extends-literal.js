@@ -1,5 +1,5 @@
  /*
- Test the plugin's ability to find properies of the default export:
+ Test the plugin's ability to find properties of the default export:
   - from inside _extend function (used by TS and babel)
     - including properties from another variable
     - when the _extends result is exported directly

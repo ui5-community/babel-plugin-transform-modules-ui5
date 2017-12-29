@@ -1,5 +1,11 @@
 
-The major version will be kept the same as babel's.
+The major version will be kept the same as babel's (currently 6.x.x).
+
+### 6.17.0 (2017-12-29)
+
+#### Features
+
+* Named exports can now be collapsed onto an anonymous default export by using a temporary variable for it.
 
 ### 6.16.1 (2017-12-28)
 

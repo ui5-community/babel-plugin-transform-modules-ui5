@@ -21,7 +21,7 @@ function processDirectory(dir) {
       test(filename, () => {
         console.log(`Running ${filename}`) // eslint-disable-line
         const filePath = join(dir, filename)
-        const outputPath = filePath.replace(FIXTURE_DIR_NAME, OUT_DIR_NAME)
+        let outputPath = filePath.replace(FIXTURE_DIR_NAME, OUT_DIR_NAME)
         try  {
           const opts = getOpts(filePath)
           const result: string = transformFileSync(filePath, {
@@ -51,8 +51,10 @@ function processDirectory(dir) {
         }
         catch (error) {
           if (filename.includes('error-')) {
-            const message = error.message.replace(filePath, '')
+            const message = error.message.replace(filePath, '').replace(': ', '')
+            outputPath = outputPath.replace('.js', '.txt')
             expect(message).toMatchSnapshot()
+            ensureDirSync(dir.replace(FIXTURE_DIR_NAME, OUT_DIR_NAME)) // This is delayed for when we run with a filter.
             writeFileSync(outputPath, message) // For manual verification
           }
           else {
