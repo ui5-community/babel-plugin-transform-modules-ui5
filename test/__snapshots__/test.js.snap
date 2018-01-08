@@ -98,7 +98,7 @@ sap.ui.define(['sap/SAPClass'], SAPClass => {
    */
   const MyClass = SAPClass.extend('com.app.MyClass', {
     constructor: function constructor(...args) {
-      SAPClass.prototype.constructor.call(this, ...args);
+      SAPClass.prototype.constructor.apply(this, [...args]);
     }
   });
   return MyClass;
@@ -458,7 +458,7 @@ exports[`classes class-extend-managed.js 1`] = `
     },
 
     shorthand_function: function shorthand_function(...args) {
-      SAPClass.prototype.foo.call(this, ...args);
+      SAPClass.prototype.foo.apply(this, [...args]);
       this.name = Relative.name();
     },
     async_shorthand_function: async function async_shorthand_function(arg) {
@@ -517,7 +517,7 @@ exports[`examples Animal.js 1`] = `
             }
         },
         constructor: function constructor(...args) {
-            ManagedObject.prototype.constructor.call(this, ...args);
+            ManagedObject.prototype.constructor.apply(this, [...args]);
         },
         init: function init() {
             ManagedObject.prototype.init.call(this);
@@ -1114,6 +1114,27 @@ exports[`no-wrap skip-iffe.js 1`] = `
 "(function () {
   window.x = {};
 })();"
+`;
+
+exports[`presets with-preset-env.js 1`] = `
+"'use strict';
+
+sap.ui.define(['sap/class'], function (SAPClass) {
+  var MyClass = SAPClass.extend('my.MyClass', {
+    x: 1,
+    fn: function fn() {
+      var _this = this;
+
+      // The purpose of the setTimeout is to ensure that 'this' is correct for the super call
+      // when the arrow function transform is applied (i.e. our super transform must run first)
+      setTimeout(function () {
+        SAPClass.prototype.fn.call(_this);
+      });
+    }
+  });
+  MyClass.X = 1;
+  return MyClass;
+});"
 `;
 
 exports[`wrapping export-const.js 1`] = `

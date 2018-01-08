@@ -7,11 +7,15 @@ The major version will be kept the same as babel's (currently 6.x.x).
 
 * Named exports can now be collapsed onto an anonymous default export by using a temporary variable for it.
 
+#### Bug Fixes
+
+* Fix Issue #2: super calls are now transformed using the correct AST (t.thisExpression() vs t.identifier('this')) so they are transformed correctly by arrow function transform.
+
 ### 6.16.1 (2017-12-28)
 
 #### Bug Fixes
 
-* Fix #1: Moved logic from `Program.exit` to `Program` so it runs before other plugins added by babel-preset-env such as class properties and class transform.
+* Fix Issue #1: Moved logic from `Program.exit` to `Program` so it runs before other plugins added by babel-preset-env such as class properties and class transform.
 * Removed t.isImport() since it only exists if the dynamic import plugin was used too.
 
 ### 6.16.0 (2017-12-28)

@@ -24,6 +24,14 @@ function processDirectory(dir) {
         let outputPath = filePath.replace(FIXTURE_DIR_NAME, OUT_DIR_NAME)
         try  {
           const opts = getOpts(filePath)
+          const presets = []
+
+          if (filePath.includes('preset-env')) {
+            presets.push(['env', {
+              // default targets for preset-env is ES5
+              // spec: true
+          }])
+          }
           const result: string = transformFileSync(filePath, {
             plugins: [
               'syntax-dynamic-import',
@@ -32,6 +40,7 @@ function processDirectory(dir) {
               ['syntax-class-properties', { useBuiltIns: true} ],
               [plugin, opts]
             ],
+            presets,
             sourceRoot: (filename.includes('sourceroot') ? rootFixtureDirPath : undefined),
             babelrc: false
           }).code
