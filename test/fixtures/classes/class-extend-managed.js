@@ -16,9 +16,13 @@ export default class MyClass extends SAPClass {
   set prop(val) {
     this.x = val
   }
-  shorthand_function(...args) {
+  shorthandMethod(...args) {
     super.foo(...args)
     this.name = Relative.name()
+  }
+  shorthandConflict() {
+    // Make sure the shorthand function doesn't a function with the same name.
+    return shorthandConflict();
   }
   async async_shorthand_function(arg) {
     return await 1
@@ -37,4 +41,8 @@ export default class MyClass extends SAPClass {
 
 MyClass.z = function() {
   return 'hey'
+}
+
+function shorthandConflict() {
+  return 1;
 }

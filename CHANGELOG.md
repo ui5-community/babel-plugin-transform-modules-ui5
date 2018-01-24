@@ -1,6 +1,12 @@
 
 The major version will be kept the same as babel's (currently 6.x.x).
 
+### 6.18.1 (2018-02-06)
+
+#### Bug Fixes
+
+* Fix Issue #3: Class method conversion can cause conflicts and stack overflow.
+
 ### 6.18.0 (2018-02-06)
 
 #### Behaviour Change
