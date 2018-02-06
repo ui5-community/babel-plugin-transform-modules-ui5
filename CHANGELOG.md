@@ -7,6 +7,7 @@ The major version will be kept the same as babel's (currently 6.x.x).
 
 * Fix Issue #3: Class method conversion can cause conflicts and stack overflow.
 * Fix Issue #5: Class prop injected into the controller should go between the super call and other statements.
+* Fix Issue #6: Class props using 'this' should be injected into constructor or onInit.
 
 ### 6.18.0 (2018-02-06)
 

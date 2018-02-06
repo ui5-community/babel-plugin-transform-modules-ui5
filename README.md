@@ -296,7 +296,7 @@ The default behaviour if no JSDoc or Decorator overrides are given is to use the
 This is based on the relative path from either the babelrc `sourceRoot` property or the current working directory.
 
 The plugin also supports supplying a namespace prefix in this mode, in case the desired namespace root is not a directory in the filesystem.
-
+	
 In order to pass the namespace prefix, pass it as a plugin option, and not a top-level babel option. Passing plugin options requires the array format for the plugin itself (within the outer plugins array).
 
 ```js
@@ -377,69 +377,80 @@ const AController = SAPController.extend("my.app.AController", {
 });
 ```
 
-### Handling metadata and renderer
-
-Because ES6 classes are not plain objects, you can't have an object property like 'metadata'.
-
-This plugin allows you to configure `metadata` and `renderer` as class properties (static or not) and the plugin will convert it to object properties for the extend call.
-
-This:
-```js
-class MyControl extends SAPClass {
-	static renderer = MyControlRenderer;
-	static metadata = {
-		...
-	}
-}
-```
-Becomes:
-```js
-const MyControl = SAPClass.extend('MyControl', {
-	renderer: MyControlRenderer,
-	metadata: {
-		...
-	}
-});
-```
-
-
-Since class properties are an early ES proposal, TypeScript's compiler (like babel's class properties transform) moves static properties outside the class definition, and moves instance properties inside the constructor (even if TypeScript is configured to output ESNext).
-
-To support this, the plugin will also search for static properties outside the class definition. It does not currently search in the constructor (but will in the future) so be sure to define renderer and metadata as static props if Typescript is used.
-
-
-```ts
-/** Typescript **/
-class MyControl extends SAPClass {
-	static renderer: any = MyControlRenderer;
-	static metadata: any = {
-		...
-	};
-}
-
-/** Typescript Output **/
-class MyControl extends SAPClass {}
-MyControl.renderer = MyControlRenderer;
-MyControl.metadata = {
-	...
-};
-
-/** Final Output **/
-const MyControl = SAPClass.extend('MyControl', {
-	renderer: MyControlRenderer,
-	metadata: {
-		...
-	}
-});
-```
-
-**CAUTION** The plugin does not currently search for 'metadata' or 'renderer' properties inside the constructor. So don't apply Babel's class property transform plugin before this one if you have metadata/renderer as instance properties (static properties are safe).
-
-#### Don't convert class
+### Don't convert class
 
 If you have a class which extends from an import that you don't want to convert to .extend(..) syntax, you can add the `@nonui5` (case insensitive) jsdoc or decorator to it. Also see Options below for overriding the default behaviour.
 
-### Special Class Property Handling for Controllers
+
+### Class Properties
+
+The plugin supports converting class properties, and there are a few scenarios.
+
++ https://github.com/tc39/proposal-class-public-fields
++ https://github.com/tc39/proposal-class-fields
+
+#### Static Class Props
+
+Static class props are always added to the extend object. It's recommended to always use static if you want the property as part of the extend object. Some examples of this are `metadata`, `renderer` and any formatters or factories you need in views.
+
+```js
+class MyControl extends SAPControl {
+  static metadata = {...};
+  static renderer = {...};
+}
+
+class Controller extends SAPController {
+  static ThingFactory = ThingFactory;
+  static ThingFormatter = ThingFormatter;
+}
+```
+
+#### Instance Class Props
+
+Instance props either get added to the constructor or the onInit function (for controller), or get added to the extend object. However in v7, there will be a breaking change to always put instance props in either the constructor or the onInit, so if you want a prop in the extend object, it's best to use a static prop.
+
+Refer to the next section to see the logic for determining if `constructor` or `onInit` is used as the init function for class properties.
+
+The logic for determining if the prop going into the controller/onInit or the extend object is whether it uses 'this' or needs 'this' context (i.e. arrow function).
+
+In the bind method (either constructor or onInit), the properties get added after the `super` call (if applicable) and before any other statements, so that it's safe to use those properties.
+
+```
+class Controller extends SAPController {
+  A = 1;            // added to extend object in v6
+  B = Imported.B;   // added to extend object in v6
+  C = () => true;   // added to constructor or onInit
+  D = this.B.C;     // added to constructor or onInit
+  E = func(this);   // added to constructor or onInit
+  F = func(this.A); // added to constructor or onInit
+
+  onInit() {
+    super.onInit();
+    // --- Props get added here ---
+    doThing(this.A, this.D);
+  }
+}
+```
+
+```
+const Controller = SAPController.extend('...', {
+  A: 1,
+  B: Imported.B,
+  onInit: function onInit() {
+    if (typeof SAPController.prototype.onInit === "function") {
+      SAPController.prototype.onInit.apply(this);
+    }
+    this.C = () => true;
+    this.D = this.B.C;
+    this.E = func(this);
+    this.F = func(this.A);
+    doThing(this.A, this.D);
+  }
+});
+```
+
+
+#### Special Class Property Handling for Controllers
 
 The default class property behaviour of babel is to move the property into the constructor. This plugin has a `moveControllerPropsToOnInit` option that moves them to the `onInit` function rather than the `constructor`. This is useful since the `onInit` method is called after the view's controls have been created (but not yet rendered).
 
@@ -490,7 +501,62 @@ class MyController extends Controller {
 }
 ```
 
+### Handling metadata and renderer
 
+Because ES6 classes are not plain objects, you can't have an object property like 'metadata'.
+
+This plugin allows you to configure `metadata` and `renderer` as class properties (static or not) and the plugin will convert it to object properties for the extend call.
+
+This:
+```js
+class MyControl extends SAPClass {
+	static renderer = MyControlRenderer;
+	static metadata = {
+		...
+	}
+}
+```
+Becomes:
+```js
+const MyControl = SAPClass.extend('MyControl', {
+	renderer: MyControlRenderer,
+	metadata: {
+		...
+	}
+});
+```
+
+Since class properties are an early ES proposal, TypeScript's compiler (like babel's class properties transform) moves static properties outside the class definition, and moves instance properties inside the constructor (even if TypeScript is configured to output ESNext).
+
+To support this, the plugin will also search for static properties outside the class definition. It does not currently search in the constructor (but will in the future) so be sure to define renderer and metadata as static props if Typescript is used.
+
+
+```ts
+/** Typescript **/
+class MyControl extends SAPClass {
+	static renderer: any = MyControlRenderer;
+	static metadata: any = {
+		...
+	};
+}
+
+/** Typescript Output **/
+class MyControl extends SAPClass {}
+MyControl.renderer = MyControlRenderer;
+MyControl.metadata = {
+	...
+};
+
+/** Final Output **/
+const MyControl = SAPClass.extend('MyControl', {
+	renderer: MyControlRenderer,
+	metadata: {
+		...
+	}
+});
+```
+
+**CAUTION** The plugin does not currently search for 'metadata' or 'renderer' properties inside the constructor. So don't apply Babel's class property transform plugin before this one if you have metadata/renderer as instance properties (static properties are safe).
 
 ## Options
 

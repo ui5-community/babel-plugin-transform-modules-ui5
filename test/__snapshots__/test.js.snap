@@ -22,7 +22,13 @@ exports[`classes class-controller-keep-constructor.js 1`] = `
 exports[`classes class-controller-w-oninit.js 1`] = `
 "sap.ui.define([\\"sap/ui/core/Controller\\"], function (Controller) {
   const MyController = Controller.extend(\\"test.fixtures.classes.MyController\\", {
+    prop: 1,
+    prop3: X.y,
     onInit: function _onInit() {
+      this.prop2 = this.a.b;
+      this.control = this.byId(\\"control\\");
+      this.other = getThing(this.prop);
+
       this.prop_func = () => true;
 
       console.log(\\"constructor\\");
@@ -31,7 +37,6 @@ exports[`classes class-controller-w-oninit.js 1`] = `
 
       this.y = this.x + 1;
     },
-    prop: 1,
 
     get getter() {
       return 1;
