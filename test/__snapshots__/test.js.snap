@@ -163,7 +163,7 @@ exports[`classes class-convert-dec-namespace.js 1`] = `
 exports[`classes class-convert-dec-nonui5.js 1`] = `
 "sap.ui.define(['other/NotSAPClass'], function (__NotSAPClass) {
   function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj.default : obj;
+    return obj && obj.__esModule && typeof obj.default !== \\"undefined\\" ? obj.default : obj;
   }
 
   const NotSAPClass = _interopRequireDefault(__NotSAPClass);
@@ -433,7 +433,7 @@ sap.ui.define(['sap/SAPClass'], SAPClass => {
 exports[`classes class-extend-managed.js 1`] = `
 "sap.ui.define(['sap/ui/core/SAPClass', './Relative'], function (SAPClass, __Relative) {
   function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj.default : obj;
+    return obj && obj.__esModule && typeof obj.default !== \\"undefined\\" ? obj.default : obj;
   }
 
   const Relative = _interopRequireDefault(__Relative);
@@ -534,7 +534,7 @@ exports[`examples Animal.js 1`] = `
 exports[`examples Cat.js 1`] = `
 "sap.ui.define([\\"./Animal\\"], function (__Animal) {
     function _interopRequireDefault(obj) {
-        return obj && obj.__esModule ? obj.default : obj;
+        return obj && obj.__esModule && typeof obj.default !== \\"undefined\\" ? obj.default : obj;
     }
 
     const Animal = _interopRequireDefault(__Animal);
@@ -593,7 +593,7 @@ exports[`examples Utils.js 1`] = `
 exports[`export-collapse _extends-literal.js 1`] = `
 "sap.ui.define(['x'], function (__X) {
   function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj.default : obj;
+    return obj && obj.__esModule && typeof obj.default !== \\"undefined\\" ? obj.default : obj;
   }
 
   const X = _interopRequireDefault(__X);
@@ -616,7 +616,7 @@ exports[`export-collapse _extends-literal.js 1`] = `
 exports[`export-collapse _extends-variable.js 1`] = `
 "sap.ui.define(['x'], function (__X) {
   function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj.default : obj;
+    return obj && obj.__esModule && typeof obj.default !== \\"undefined\\" ? obj.default : obj;
   }
 
   const X = _interopRequireDefault(__X);
@@ -673,7 +673,7 @@ exports[`export-collapse add-props-obj.js 1`] = `
 exports[`export-collapse object.assign-literal.js 1`] = `
 "sap.ui.define([\\"x\\"], function (__X) {
   function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj.default : obj;
+    return obj && obj.__esModule && typeof obj.default !== \\"undefined\\" ? obj.default : obj;
   }
 
   const X = _interopRequireDefault(__X);
@@ -700,7 +700,7 @@ exports[`export-collapse object.assign-literal.js 1`] = `
 exports[`export-collapse object.assign-variable.js 1`] = `
 "sap.ui.define(['x'], function (__X) {
   function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj.default : obj;
+    return obj && obj.__esModule && typeof obj.default !== \\"undefined\\" ? obj.default : obj;
   }
 
   const X = _interopRequireDefault(__X);
@@ -960,7 +960,7 @@ exports[`imports import-all.js 1`] = `
 exports[`imports import-duplicate-src-1.js 1`] = `
 "sap.ui.define(['X'], function (XA) {
   function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj.default : obj;
+    return obj && obj.__esModule && typeof obj.default !== \\"undefined\\" ? obj.default : obj;
   }
 
   const XD = _interopRequireDefault(XA);
@@ -973,7 +973,7 @@ exports[`imports import-duplicate-src-1.js 1`] = `
 exports[`imports import-duplicate-src-2.js 1`] = `
 "sap.ui.define(['X'], function (__XD) {
   function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj.default : obj;
+    return obj && obj.__esModule && typeof obj.default !== \\"undefined\\" ? obj.default : obj;
   }
 
   const XD = _interopRequireDefault(__XD);
@@ -987,7 +987,7 @@ exports[`imports import-duplicate-src-2.js 1`] = `
 exports[`imports import-duplicate-src-3.js 1`] = `
 "sap.ui.define(['X'], function (__XD) {
   function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj.default : obj;
+    return obj && obj.__esModule && typeof obj.default !== \\"undefined\\" ? obj.default : obj;
   }
 
   const XD = _interopRequireDefault(__XD);
@@ -1034,7 +1034,7 @@ exports[`imports import-dynamic.js 1`] = `
 exports[`imports import-multiple.js 1`] = `
 "sap.ui.define(['./../a/b', 'path/having-dash', 'A', 'BC', 'DEF', 'G', 'HI'], function (____a_b, __path_having_dash, __A, __BC, __D, G, __H) {
   function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj.default : obj;
+    return obj && obj.__esModule && typeof obj.default !== \\"undefined\\" ? obj.default : obj;
   }
 
   const A = _interopRequireDefault(__A);
@@ -1077,7 +1077,7 @@ const x = 1; // This should not be part of sap-ui-define
 
 sap.ui.define(['./foo'], function (__Foo) {
   function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj.default : obj;
+    return obj && obj.__esModule && typeof obj.default !== \\"undefined\\" ? obj.default : obj;
   }
 
   const Foo = _interopRequireDefault(__Foo);

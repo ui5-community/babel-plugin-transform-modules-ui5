@@ -100,7 +100,7 @@ Becomes:
 ```js
 sap.ui.define(['app/file'], function(__File) {
 	function _interopRequireDefault(obj) {
-		return obj && obj.__esModule ? obj.default : obj;
+		return (obj && obj.__esModule && (typeof obj.default !== "undefined")) ? obj.default : obj;
 	}
 	const Default = _interopRequireDefault(__File);
 	const Name1 = __File["Name1"];

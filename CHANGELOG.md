@@ -1,6 +1,12 @@
 
 The major version will be kept the same as babel's (currently 6.x.x).
 
+### 6.18.0 (2018-02-06)
+
+#### Behaviour Change
+
+* The import default interop function will now return the object itself if there is no 'default' property on it, even if __esModule is true. Note that interop is still only called when the import code imports default.
+
 ### 6.17.2 (2018-02-06)
 
 #### Bug Fixes
