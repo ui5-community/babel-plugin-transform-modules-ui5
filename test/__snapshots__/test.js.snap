@@ -1019,7 +1019,7 @@ exports[`imports import-dynamic.js 1`] = `
 `;
 
 exports[`imports import-multiple.js 1`] = `
-"sap.ui.define(['./../a/b', 'A', 'BC', 'DEF', 'G', 'HI'], function (____a_b, __A, __BC, __D, G, __H) {
+"sap.ui.define(['./../a/b', 'path/having-dash', 'A', 'BC', 'DEF', 'G', 'HI'], function (____a_b, __path_having_dash, __A, __BC, __D, G, __H) {
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj.default : obj;
   }

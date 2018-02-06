@@ -1,4 +1,5 @@
 import './../a/b'
+import 'path/having-dash'
 import A from 'A'
 import { B, C } from 'BC'
 import D, {E, F} from 'DEF'
