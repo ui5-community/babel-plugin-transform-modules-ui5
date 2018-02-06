@@ -23,13 +23,13 @@ exports[`classes class-controller-w-oninit.js 1`] = `
 "sap.ui.define([\\"sap/ui/core/Controller\\"], function (Controller) {
   const MyController = Controller.extend(\\"test.fixtures.classes.MyController\\", {
     onInit: function _onInit() {
+      this.prop_func = () => true;
+
       console.log(\\"constructor\\");
 
       this.x = 1;
 
-      this.y = 2;
-
-      this.prop_func = () => true;
+      this.y = this.x + 1;
     },
     prop: 1,
 
@@ -46,6 +46,8 @@ exports[`classes class-controller-wo-oninit.js 1`] = `
 "sap.ui.define([\\"sap/ui/core/Controller\\"], function (Controller) {
   const MyController = Controller.extend(\\"test.fixtures.classes.MyController\\", {
     onInit: function onInit() {
+      this.prop_func = () => true;
+
       console.log(\\"constructor\\");
 
       this.x = 1;
@@ -53,8 +55,6 @@ exports[`classes class-controller-wo-oninit.js 1`] = `
       if (typeof Controller.prototype.onInit === 'function') {
         Controller.prototype.onInit.apply(this, arguments);
       }
-
-      this.prop_func = () => true;
     },
     prop: 1,
 
@@ -307,9 +307,7 @@ sap.ui.define(['sap/SAPClass'], SAPClass => {
    */
   const MyClass = SAPClass.extend('com.app.MyClass', {
     constructor: function constructor() {
-      if (typeof SAPClass.prototype.constructor === 'function') {
-        SAPClass.prototype.constructor.apply(this, arguments);
-      }
+      SAPClass.prototype.constructor.apply(this, arguments);
 
       this.property_func = () => {
         return this.getProperty('/name');
@@ -444,9 +442,10 @@ exports[`classes class-extend-managed.js 1`] = `
     constructor: function _constructor(arg) {
       console.log(\\"constructor\\");
       SAPClass.prototype.constructor.call(this, arg);
-      this.x = 1;
 
       this.property_arrow_function = () => 1;
+
+      this.x = 1;
     },
 
     get prop() {

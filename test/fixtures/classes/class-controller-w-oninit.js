@@ -11,7 +11,7 @@ export default class MyController extends Controller {
     this.x = 1
   }
   onInit() {
-    this.y = 2
+    this.y = this.x + 1
   }
   prop = 1;
   prop_func = () => true;

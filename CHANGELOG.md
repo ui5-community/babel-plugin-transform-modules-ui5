@@ -6,6 +6,7 @@ The major version will be kept the same as babel's (currently 6.x.x).
 #### Bug Fixes
 
 * Fix Issue #3: Class method conversion can cause conflicts and stack overflow.
+* Fix Issue #5: Class prop injected into the controller should go between the super call and other statements.
 
 ### 6.18.0 (2018-02-06)
 
