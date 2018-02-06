@@ -835,7 +835,7 @@ exports[`exports export-default-anon-function.js 1`] = `
 
   let two = 2;
   return async function () {
-    // Since it's anonymous, this can be safetly moved to the end
+    // Since it's anonymous, this can be safely moved to the end
     return (await one) + two;
   };
 });"
@@ -915,6 +915,19 @@ exports[`exports export-named-as-default.js 1`] = `
     __esModule: true
   };
   __exports.default = one;
+  return __exports;
+});"
+`;
+
+exports[`exports export-named-from.js 1`] = `
+"sap.ui.define(['A', 'path/having-dash'], function (__A, __path_having_dash) {
+  const __exports = {
+    __esModule: true
+  };
+  __exports.A = __A.A;
+  __exports.B = __A.B;
+  __exports.C = __path_having_dash.C;
+  __exports.D = __path_having_dash.D;
   return __exports;
 });"
 `;

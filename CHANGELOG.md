@@ -1,6 +1,12 @@
 
 The major version will be kept the same as babel's (currently 6.x.x).
 
+### 6.17.2 (2018-02-06)
+
+#### Bug Fixes
+
+* Fix Issue #4: Export named from, having paths with dash cause invalid syntax.
+
 ### 6.17.1 (2018-02-06)
 
 #### Bug Fixes
