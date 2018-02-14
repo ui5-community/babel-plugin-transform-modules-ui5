@@ -1,5 +1,5 @@
 
-import SAPClass from 'sap/SAPClass'
+import SAPClass from "sap/SAPClass"
 export default class MyClass extends SAPClass {}
 const meta = {}
 const Formatter = {}

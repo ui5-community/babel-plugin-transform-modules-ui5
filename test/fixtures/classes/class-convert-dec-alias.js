@@ -1,6 +1,6 @@
 
-import SAPClass from 'sap/SAPClass'
+import SAPClass from "sap/SAPClass"
 
-@alias('x.y.Z')
+@alias("x.y.Z")
 export default class MyClass extends SAPClass {
 }

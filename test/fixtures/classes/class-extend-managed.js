@@ -1,6 +1,6 @@
 
-import SAPClass from 'sap/ui/core/SAPClass'
-import Relative from './Relative'
+import SAPClass from "sap/ui/core/SAPClass"
+import Relative from "./Relative"
 
 export default class MyClass extends SAPClass {
   metadata = {}
@@ -21,7 +21,7 @@ export default class MyClass extends SAPClass {
     this.name = Relative.name()
   }
   shorthandConflict() {
-    // Make sure the shorthand function doesn't a function with the same name.
+    // Make sure the shorthand function doesn"t a function with the same name.
     return shorthandConflict();
   }
   async async_shorthand_function(arg) {
@@ -40,7 +40,7 @@ export default class MyClass extends SAPClass {
 }
 
 MyClass.z = function() {
-  return 'hey'
+  return "hey"
 }
 
 function shorthandConflict() {

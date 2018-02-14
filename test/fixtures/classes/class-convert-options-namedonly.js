@@ -1,7 +1,7 @@
 /**
  * This test uses config options to only convert if there is a name provided.
  */
-sap.ui.define(['other/OtherClass', 'sap/SAPClass'], (OtherClass, SAPClass) => {
+sap.ui.define(["other/OtherClass", "sap/SAPClass"], (OtherClass, SAPClass) => {
 
   return class MyClass extends OtherClass {
     constructor() {

@@ -1,5 +1,5 @@
 
-import SAPController from 'sap/SAPController'
+import SAPController from "sap/SAPController"
 export default class MyController extends SAPController {}
 const meta = {}
 const Formatter = {}

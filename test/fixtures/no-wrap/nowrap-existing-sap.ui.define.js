@@ -1,4 +1,4 @@
 /* global sap */
-sap.ui.define(['JSONModel'], (JSONModel) => {
+sap.ui.define(["JSONModel"], (JSONModel) => {
   return new JSONModel()
 })

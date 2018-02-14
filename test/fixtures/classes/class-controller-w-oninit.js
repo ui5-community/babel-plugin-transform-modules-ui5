@@ -1,5 +1,5 @@
 
-import Controller from 'sap/ui/core/Controller'
+import Controller from "sap/ui/core/Controller"
 
 export default class MyController extends Controller {
   prop = 1;

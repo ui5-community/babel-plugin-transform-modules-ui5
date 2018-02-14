@@ -1,10 +1,10 @@
 
 /**
 Tests that exports can be collapsed onto to an object using a variable.
-  - Named export 'one' can be ignored since it's on X and as the same literal.
-  - Named export 'foo' can be ignored since it's on X and as the same literal.
-  - Named export 'two' gets assigned to 'X'
-  - Named export 'bar' gets assigned to 'X'
+  - Named export "one" can be ignored since it"s on X and as the same literal.
+  - Named export "foo" can be ignored since it"s on X and as the same literal.
+  - Named export "two" gets assigned to "X"
+  - Named export "bar" gets assigned to "X"
 */
 
 export function one() {}

@@ -18,7 +18,7 @@ export default class Animal extends ManagedObject {
     }
 
     callMe() {
-        alert(`I'm a ${this.getType()}.
+        alert(`I"m a ${this.getType()}.
         Call me ${this.getNickName()}.`);
     }
 

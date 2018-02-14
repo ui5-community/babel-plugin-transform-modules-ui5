@@ -1,5 +1,5 @@
 
-import SAPClass from 'sap/SAPClass'
+import SAPClass from "sap/SAPClass"
 
 /**
  * This test overrides the opts.sourceRoot value

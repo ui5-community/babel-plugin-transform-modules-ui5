@@ -1,5 +1,5 @@
 
-sap.ui.define(['sap/SAPClass'], (SAPClass) => {
+sap.ui.define(["sap/SAPClass"], (SAPClass) => {
   const Formatter = {};
   const meta = {}
   /**

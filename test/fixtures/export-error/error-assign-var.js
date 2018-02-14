@@ -1,5 +1,5 @@
 
-import X from 'x'
+import X from "x"
 
 export function foo() {} // conflicts with Exported.foo
 
