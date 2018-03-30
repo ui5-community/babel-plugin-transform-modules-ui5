@@ -74,7 +74,7 @@ The plugin will wrap any code having import/export statements in an sap.ui.defin
 
 #### Static Import ####
 
-The plugin supports all of the ES6 import statements, and will convert them into sap.ui.define arguments.
+The plugin supports all of the ES import statements, and will convert them into sap.ui.define arguments.
 
 ```js
 import Default from 'module';
@@ -107,6 +107,8 @@ sap.ui.define(['app/file'], function(__File) {
 }
 ```
 
+Also refer to the `noImportInteropPrefixes` option below.
+
 #### Dynamic Import ####
 
 ECMAScript allows for dynamic imports calls like `import(path)` that return a Promise which resolves with an ES Module.
@@ -115,6 +117,8 @@ This plugin will convert that to an async `sap.ui.require` wrapped in a Promise.
 The resolved object will be a ES module or pseudo ES module having a 'default' property on it to reference the module by, to match the format used by `import()`. If the module is not a real ES module and already has a default property, the promise will be rejected with an error.
 
 For JavaScript projects, this syntax doesn't provide much advantage over a small utility function and has the downside of not working if your module has a 'default' property. The main advantage of this syntax is with TypeScript projects, where the TypeScript compiler will know the type of the imported module, so there his no need to define a separate interface for it.
+
+Also note that while the ES dynamic import specification requires a relative path, `sap.ui.require` works with absolute paths using a module prefix.
 
 #### Export ####
 
@@ -136,9 +140,13 @@ Export is a bit trickier if you want your exported module to be imported by code
 Imagine a file like this:
 
 ```js
-export function two() { return 2; }
+export function two() {
+    return 2;
+}
 export default {
-    one() { return 1;}
+    one() {
+        return 1;
+    }
 }
 ```
 
@@ -148,13 +156,34 @@ Which might create an exported module that looks like:
 {
     __esModule: true,
     default: {
-        one() { return 1; }
+        one() { 
+            return 1;
+        }
     },
-    two() { return 2; }
+    two() {
+        return 2;
+    }
 }
 ```
 
-The export inter-op features do their best to only return the default export rather than returning an ES module. To do this, it determines if all the named exports already exist on the default export (with the same value reference), or whether they can be added to it if there is not a naming conflict. This plugin's terminology for that is 'collapsing'.
+But in order to be usable in a standard `sap.ui.require` file, what we want is actually:
+
+```js
+{
+    one() {
+        return 1;
+    }
+    two() {
+        return 2;
+    }
+}
+```
+
+This plugin's terminology for that is 'collapsing'.
+
+##### Export Collapsing to default export #####
+
+The export inter-op features do their best to only return the default export rather than returning an ES module. To do this, it determines if all the named exports already exist on the default export (with the same value reference), or whether they can be added to it if there is not a naming conflict. 
 
 If there is a naming conflict or other reason why the named export cannot be added to the default export, the plugin will throw an error by default.
 
@@ -244,6 +273,8 @@ sap.ui.define([], function() {
 }, true);
 ```
 
+Also refer to the option `exportAllGlobal` below.
+
 #### Minimal Wrapping ####
 
 By default, the plugin will wrap everything in the file into the `sap.ui.define` factory function, if there is an import or an export.
@@ -310,7 +341,7 @@ If the default file-based namespace does not work for you (perhaps the app name 
 
 The simplest way to override the names is to use JSDoc. This approach will also work well with classes output from TypeScript if you configure TypeScript to generate ES6 or higher, and don't enable removeComments.
 
-You can set the `@name`/`@alias` directly or just the `@namespace` and have the name derived from the ES6 class name.
+You can set the `@name`/`@alias` directly or just the `@namespace` and have the name derived from the ES class name.
 
 `@name` and `@alias` behave the same; `@name` was used originally but the `@alias` JSDoc property is used in UI5 source code, so support for that was added.
 
@@ -494,7 +525,7 @@ class MyController extends Controller {
 
 ### Handling metadata and renderer ###
 
-Because ES6 classes are not plain objects, you can't have an object property like 'metadata'.
+Because ES classes are not plain objects, you can't have an object property like 'metadata'.
 
 This plugin allows you to configure `metadata` and `renderer` as class properties (static or not) and the plugin will convert it to object properties for the extend call.
 
@@ -588,13 +619,11 @@ TODO more options and better description.
 
 ## Example ##
 
-[SAP's openui5-master-detail-app converted to TypeScript](https://github.com/r-murphy/openui5-masterdetail-app-ts)
-
-My own example coming soon.
+[openui5-master-detail-app-ts](https://github.com/r-murphy/openui5-masterdetail-app-ts), which is my fork of SAP's openui5-master-detail-app converted to TypeScript.
 
 ## Building with Webpack ##
 
-Take a look at [ui5-loader](https://github.com/MagicCube/ui5-loader).
+Take a look at [ui5-loader](https://github.com/MagicCube/ui5-loader) (I have not tried this).
 
 ## Modularization / Preload ##
 
