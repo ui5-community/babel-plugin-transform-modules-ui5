@@ -24,7 +24,7 @@ At a minimum, add `transform-modules-ui5` to the `plugins`.
 
 ```js
 {
-  "plugins": ["transform-modules-ui5"]
+    "plugins": ["transform-modules-ui5"]
 }
 ```
 
@@ -42,7 +42,7 @@ Or if you want to supply plugin options, use the array syntax.
 
 At the time of writing, the babel version is 6.26.0, which does not natively support class property syntax. To use that syntax also add the plugin `babel-plugin-syntax-class-properties`.
 
-It is also recommended to use `babel-preset-env` to control which ES version the final code is transformed to.
+It is also recommended to use [babel-preset-env](https://babeljs.io/docs/plugins/preset-env/) to control which ES version the final code is transformed to.
 
 ## Features ##
 
