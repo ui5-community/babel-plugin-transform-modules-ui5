@@ -40,9 +40,9 @@ Or if you want to supply plugin options, use the array syntax.
 }
 ```
 
-At the time of writing, the babel version is 6.26.0, which does not natively support class property syntax. To use that syntax also add the plugin `babel-plugin-syntax-class-properties`.
+At the time of writing, the babel version is 7.0, which does not natively support class property syntax. To use that syntax also add the plugin `@babel/plugin-syntax-class-properties`.
 
-It is also recommended to use [babel-preset-env](https://babeljs.io/docs/plugins/preset-env/) to control which ES version the final code is transformed to.
+It is also recommended to use [@babel/preset-env](https://babeljs.io/docs/en/next/babel-preset-env.html) to control which ES version the final code is transformed to.
 
 ## Features ##
 
@@ -156,7 +156,7 @@ Which might create an exported module that looks like:
 {
     __esModule: true,
     default: {
-        one() { 
+        one() {
             return 1;
         }
     },
@@ -183,7 +183,8 @@ This plugin's terminology for that is 'collapsing'.
 
 ##### Export Collapsing to default export #####
 
-The export inter-op features do their best to only return the default export rather than returning an ES module. To do this, it determines if all the named exports already exist on the default export (with the same value reference), or whether they can be added to it if there is not a naming conflict. 
+The export inter-op features do their best to only return the default export rather than returning an ES module.
+To do this, it determines if all the named exports already exist on the default export (with the same value reference), or whether they can be added to it if there is not a naming conflict.
 
 If there is a naming conflict or other reason why the named export cannot be added to the default export, the plugin will throw an error by default.
 
