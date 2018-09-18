@@ -27,17 +27,16 @@ function processDirectory(dir) {
           const presets = []
 
           if (filePath.includes('preset-env')) {
-            presets.push(['env', {
+            presets.push(['@babel/preset-env', {
               // default targets for preset-env is ES5
-              // spec: true
           }])
           }
           const result: string = transformFileSync(filePath, {
             plugins: [
-              'syntax-dynamic-import',
-              'syntax-decorators',
-              'syntax-object-rest-spread',
-              ['syntax-class-properties', { useBuiltIns: true} ],
+              '@babel/plugin-syntax-dynamic-import',
+              '@babel/plugin-syntax-object-rest-spread',
+              ['@babel/plugin-syntax-decorators', { legacy: true } ],
+              ['@babel/plugin-syntax-class-properties', { useBuiltIns: true} ],
               [plugin, opts]
             ],
             presets,
