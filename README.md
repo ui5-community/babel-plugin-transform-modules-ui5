@@ -612,7 +612,7 @@ const MyControl = SAPClass.extend('MyControl', {
 
 \** This plugin also makes use of babel's standard `sourceRoot` option.
 
-TODO more options and better description.
+TODO: more options and better description.
 
 ## Other Similar Plugins ##
 

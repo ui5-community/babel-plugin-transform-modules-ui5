@@ -810,7 +810,7 @@ exports[`export-mixed export-mixed-named-func.js 1`] = `
   }
 
   def.hey = \\"hey\\";
-  // TODO detect the self reference and don\\"t extend
+  // TODO: detect the self reference and don\\"t extend
   const named = {};
   def.def = def;
   def.named = named;
