@@ -1,6 +1,6 @@
 {
   "name": "babel-plugin-transform-modules-ui5",
-  "version": "6.18.1",
+  "version": "7.0.0-alpha1",
   "description": "An unofficial babel plugin for SAP UI5.",
   "main": "dist/index.js",
   "engines": {
@@ -12,6 +12,7 @@
     "sapui5",
     "openui5",
     "babel",
+    "babel7",
     "babeljs",
     "babel-plugin",
     "babelplugin",
@@ -60,10 +61,8 @@
     "object-assign-defined": "^1.0.2"
   },
   "devDependencies": {
-    "@babel/core": "^7.0.0",
-    "@babel/template": "^7.1.0",
-    "@babel/types": "^7.0.0",
     "@babel/cli": "^7.1.0",
+    "@babel/core": "^7.0.0",
     "@babel/plugin-proposal-object-rest-spread": "^7.0.0",
     "@babel/plugin-syntax-class-properties": "^7.0.0",
     "@babel/plugin-syntax-decorators": "^7.1.0",
@@ -71,8 +70,9 @@
     "@babel/plugin-syntax-object-rest-spread": "^7.0.0",
     "@babel/plugin-transform-flow-strip-types": "^7.0.0",
     "@babel/preset-env": "^7.1.0",
-    "babel-core": "^7.0.0-0",
-    "babel-eslint": "^9.0.0",
+    "@babel/template": "^7.1.2",
+    "@babel/types": "^7.0.0",
+    "babel-eslint": "^10.0.1",
     "babel-jest": "^23.6.0",
     "babel-plugin-source-map-support": "^2.0.1",
     "babel-plugin-transform-es2015-duplicate-keys": "^6.24.1",

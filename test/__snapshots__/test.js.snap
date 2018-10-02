@@ -179,6 +179,9 @@ exports[`classes class-convert-dec-nonui5.js 1`] = `
 
 exports[`classes class-convert-file-namespace.js 1`] = `
 "sap.ui.define([\\"sap/SAPClass\\"], function (SAPClass) {
+  /**
+   * The default behaviour is to use the filename to get the namespace.
+   */
   const MyClass = SAPClass.extend(\\"test.fixtures.classes.MyClass\\", {});
   return MyClass;
 });"
@@ -186,6 +189,9 @@ exports[`classes class-convert-file-namespace.js 1`] = `
 
 exports[`classes class-convert-file-namespace-prefixed.js 1`] = `
 "sap.ui.define([\\"sap/SAPClass\\"], function (SAPClass) {
+  /**
+   * This test sets the namespace prefix.
+   */
   const MyClass = SAPClass.extend(\\"prefix.test.fixtures.classes.MyClass\\", {});
   return MyClass;
 });"
@@ -193,6 +199,10 @@ exports[`classes class-convert-file-namespace-prefixed.js 1`] = `
 
 exports[`classes class-convert-file-namespace-sourceroot.js 1`] = `
 "sap.ui.define([\\"sap/SAPClass\\"], function (SAPClass) {
+  /**
+   * This test overrides the opts.sourceRoot value
+   * which babel passes in to the plugin.
+   */
   const MyClass = SAPClass.extend(\\"classes.MyClass\\", {});
   return MyClass;
 });"
@@ -200,6 +210,9 @@ exports[`classes class-convert-file-namespace-sourceroot.js 1`] = `
 
 exports[`classes class-convert-jsdoc-alias.js 1`] = `
 "sap.ui.define([\\"sap/SAPClass\\"], function (SAPClass) {
+  /**
+   * @alias x.y.Z
+   */
   const MyClass = SAPClass.extend(\\"x.y.Z\\", {});
   return MyClass;
 });"
@@ -207,6 +220,9 @@ exports[`classes class-convert-jsdoc-alias.js 1`] = `
 
 exports[`classes class-convert-jsdoc-name.js 1`] = `
 "sap.ui.define([\\"sap/SAPClass\\"], function (SAPClass) {
+  /**
+   * @name x.y.Z
+   */
   const MyClass = SAPClass.extend(\\"x.y.Z\\", {});
   return MyClass;
 });"
@@ -214,6 +230,9 @@ exports[`classes class-convert-jsdoc-name.js 1`] = `
 
 exports[`classes class-convert-jsdoc-namespace.js 1`] = `
 "sap.ui.define([\\"sap/SAPClass\\"], function (SAPClass) {
+  /**
+   * @namespace x.y
+   */
   const MyClass = SAPClass.extend(\\"x.y.MyClass\\", {});
   return MyClass;
 });"
@@ -553,6 +572,10 @@ exports[`examples Cat.js 1`] = `
   }
 
   const Animal = _interopRequireDefault(__Animal);
+  /**
+   * @name othernamespace.Cat
+   */
+
 
   const Cat = Animal.extend(\\"othernamespace.Cat\\", {
     init: function _init() {
@@ -614,6 +637,12 @@ exports[`export-collapse _extends-literal.js 1`] = `
     return obj && obj.__esModule && typeof obj.default !== \\"undefined\\" ? obj.default : obj;
   }
 
+  /*
+  Test the plugin\\"s ability to find properties of the default export:
+   - from inside _extend function (used by TS and babel)
+     - including properties from another variable
+     - when the _extends result is exported directly
+   */
   const X = _interopRequireDefault(__X);
 
   const one = 1;
@@ -637,6 +666,13 @@ exports[`export-collapse _extends-variable.js 1`] = `
     return obj && obj.__esModule && typeof obj.default !== \\"undefined\\" ? obj.default : obj;
   }
 
+  /*
+  Tests the plugin\\"s ability to find properties of the default export:
+   - when the default export is a variable.
+   - from dot-assigned properties
+   - from inside _extend function (used by TS and babel)
+     - including properties from another variable
+   */
   const X = _interopRequireDefault(__X);
 
   const one = 1;
@@ -992,6 +1028,7 @@ exports[`imports import-duplicate-src-2.js 1`] = `
     return obj && obj.__esModule && typeof obj.default !== \\"undefined\\" ? obj.default : obj;
   }
 
+  // default line first
   const XD = _interopRequireDefault(__XD);
 
   const X2 = __XD[\\"X2\\"];
@@ -1006,6 +1043,7 @@ exports[`imports import-duplicate-src-3.js 1`] = `
     return obj && obj.__esModule && typeof obj.default !== \\"undefined\\" ? obj.default : obj;
   }
 
+  // default line first, mixed with namespace
   const XD = _interopRequireDefault(__XD);
 
   const XA = __XD;
@@ -1149,6 +1187,9 @@ exports[`presets with-preset-env.js 1`] = `
 "\\"use strict\\";
 
 sap.ui.define([\\"sap/class\\"], function (SAPClass) {
+  /**
+   * @name my.MyClass
+   */
   var MyClass = SAPClass.extend(\\"my.MyClass\\", {
     x: 1,
     fn: function _fn() {

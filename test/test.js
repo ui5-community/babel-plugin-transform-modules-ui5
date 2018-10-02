@@ -1,7 +1,7 @@
 /* global test, expect, describe */
 import { writeFileSync, statSync, readdirSync, emptyDirSync, ensureDirSync } from 'fs-extra'
 import { join, resolve } from 'path'
-import { transformFileSync } from 'babel-core'
+import { transformFileSync } from '@babel/core'
 import { get as getOpts } from './options'
 import plugin from '..'
 
@@ -32,6 +32,7 @@ function processDirectory(dir) {
           }])
           }
           const result: string = transformFileSync(filePath, {
+            comments: true,
             plugins: [
               '@babel/plugin-syntax-dynamic-import',
               '@babel/plugin-syntax-object-rest-spread',

@@ -1,5 +1,11 @@
 
-The major version will be kept the same as babel's (currently 6.x.x).
+The major version will be kept the same as babel's (currently 7.x.x).
+
+### 7.0.0-alpha1 (2018-08-17)
+
+#### Behaviour Change
+
+* Requires babel 7
 
 ### 6.18.1 (2018-02-06)
 
