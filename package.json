@@ -25,13 +25,13 @@
   ],
   "scripts": {
     "clean": "rimraf dist",
-    "build": "babel lib -d dist",
-    "build:watch": "babel lib -d dist -w",
-    "build:test": "babel --plugins source-map-support lib -d dist",
+    "build": "npx babel lib -d dist",
+    "build:watch": "npx babel lib -d dist -w",
+    "build:test": "npx babel --plugins source-map-support lib -d dist",
     "lint": "eslint lib test",
     "lint:fix": "npm run lint -- --fix",
-    "test": "npm run build:test & jest test",
-    "test:dev": "npm run test -- --watch"
+    "test": "npm run build:test & npx jest test",
+    "test:dev": "npm test -- --watch"
   },
   "husky": {
     "hooks": {
@@ -77,11 +77,10 @@
     "@babel/preset-env": "^7.1.0",
     "@babel/template": "^7.1.2",
     "@babel/types": "^7.0.0",
+    "babel-core": "^7.0.0-bridge",
     "babel-eslint": "^10.0.1",
     "babel-jest": "^23.6.0",
     "babel-plugin-source-map-support": "^2.0.1",
-    "babel-plugin-transform-es2015-duplicate-keys": "^6.24.1",
-    "babel-plugin-transform-flow-strip-types": "^6.22.0",
     "eslint": "^5.6.0",
     "eslint-config-standard": "^12.0.0",
     "eslint-plugin-import": "^2.7.0",
