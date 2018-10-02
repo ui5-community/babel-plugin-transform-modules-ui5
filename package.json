@@ -31,9 +31,13 @@
     "lint": "eslint lib test",
     "lint:fix": "npm run lint -- --fix",
     "test": "npm run build:test & jest test",
-    "test:dev": "npm run test -- --watch",
-    "prepublish": "npm run clean & npm run build & jest test",
-    "precommit": "lint-staged && yarn test"
+    "test:dev": "npm run test -- --watch"
+  },
+  "husky": {
+    "hooks": {
+      "prepublish": "npm run clean & npm run build & jest test",
+      "precommit": "lint-staged && yarn test"
+    }
   },
   "repository": {
     "type": "git",
@@ -69,6 +73,7 @@
     "@babel/plugin-syntax-dynamic-import": "^7.0.0",
     "@babel/plugin-syntax-object-rest-spread": "^7.0.0",
     "@babel/plugin-transform-flow-strip-types": "^7.0.0",
+    "@babel/plugin-transform-typescript": "^7.1.0",
     "@babel/preset-env": "^7.1.0",
     "@babel/template": "^7.1.2",
     "@babel/types": "^7.0.0",
@@ -84,7 +89,7 @@
     "eslint-plugin-promise": "^4.0.1",
     "eslint-plugin-standard": "^4.0.0",
     "fs-extra": "^7.0.0",
-    "husky": "^0.14.3",
+    "husky": "^1.1.0",
     "jest": "^23.6.0",
     "lint-staged": "^7.1.0",
     "rimraf": "^2.6.2",
