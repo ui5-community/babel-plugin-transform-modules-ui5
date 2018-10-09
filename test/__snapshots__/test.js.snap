@@ -1,26 +1,10 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`classes class-controller-keep-constructor.js 1`] = `
-"sap.ui.define([\\"sap/ui/core/Controller\\"], function (Controller) {
-  const MyController = Controller.extend(\\"test.fixtures.classes.MyController\\", {
-    constructor: function _constructor(arg) {
-      console.log(\\"constructor\\");
-      Controller.prototype.constructor.call(this, arg);
-      this.x = 1;
-    },
-    other: 1,
-
-    get getter() {
-      return 1;
-    }
-
-  });
-  return MyController;
-});"
-`;
-
 exports[`classes class-controller-w-oninit.js 1`] = `
 "sap.ui.define([\\"sap/ui/core/Controller\\"], function (Controller) {
+  /**
+   * @name test.fixtures.classes.MyController
+   */
   const MyController = Controller.extend(\\"test.fixtures.classes.MyController\\", {
     prop: 1,
     prop3: X.y,
@@ -47,6 +31,9 @@ exports[`classes class-controller-w-oninit.js 1`] = `
 
 exports[`classes class-controller-wo-oninit.js 1`] = `
 "sap.ui.define([\\"sap/ui/core/Controller\\"], function (Controller) {
+  /**
+   * @name test.fixtures.classes.MyController
+   */
   const MyController = Controller.extend(\\"test.fixtures.classes.MyController\\", {
     onInit: function onInit() {
       this.prop_func = () => true;
@@ -66,6 +53,12 @@ exports[`classes class-controller-wo-oninit.js 1`] = `
 
   });
   return MyController;
+});"
+`;
+
+exports[`classes class-convert.controller.js 1`] = `
+"sap.ui.define([\\"sap/ui/core/Controller\\"], function (SAPController) {
+  const MyController = SAPController.extend(\\"test.fixtures.classes.MyController\\", {});
 });"
 `;
 
@@ -111,6 +104,9 @@ sap.ui.define([\\"sap/SAPClass\\"], SAPClass => {
 
 exports[`classes class-convert-controller-extend-static-assign.js 1`] = `
 "sap.ui.define([\\"sap/SAPController\\"], function (SAPController) {
+  /**
+   * @name test.fixtures.classes.MyController
+   */
   const MyController = SAPController.extend(\\"test.fixtures.classes.MyController\\", {
     metadata: meta,
     renderer: {},
@@ -133,6 +129,10 @@ exports[`classes class-convert-controller-extend-static-assign.js 1`] = `
 exports[`classes class-convert-controller-extend-static-prop.js 1`] = `
 "sap.ui.define([\\"sap/SAPClass\\"], function (SAPController) {
   const Formatter = {};
+  /**
+   * @name test.fixtures.classes.MyController
+   */
+
   const MyController = SAPController.extend(\\"test.fixtures.classes.MyController\\", {
     myFormatter: Formatter,
     metadata: {}
@@ -155,7 +155,7 @@ exports[`classes class-convert-dec-name.js 1`] = `
 });"
 `;
 
-exports[`classes class-convert-dec-namespace.js 1`] = `
+exports[`classes class-convert-dec-namespace.controller.js 1`] = `
 "sap.ui.define([\\"sap/SAPClass\\"], function (SAPClass) {
   const MyClass = SAPClass.extend(\\"x.y.MyClass\\", {});
   return MyClass;
@@ -177,7 +177,77 @@ exports[`classes class-convert-dec-nonui5.js 1`] = `
 });"
 `;
 
-exports[`classes class-convert-file-namespace.js 1`] = `
+exports[`classes class-convert-extend-managed.js 1`] = `
+"sap.ui.define([\\"sap/ui/core/SAPClass\\", \\"./Relative\\"], function (SAPClass, __Relative) {
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== \\"undefined\\" ? obj.default : obj;
+  }
+
+  const Relative = _interopRequireDefault(__Relative);
+  /**
+   * @name test.fixtures.classes.MyClass
+   */
+
+
+  const MyClass = SAPClass.extend(\\"test.fixtures.classes.MyClass\\", {
+    renderer: {},
+    metadata: {},
+    constructor: function _constructor(arg) {
+      console.log(\\"constructor\\");
+      SAPClass.prototype.constructor.call(this, arg);
+
+      this.property_arrow_function = () => 1;
+
+      this.x = 1;
+    },
+
+    get prop() {
+      return 1;
+    },
+
+    set prop(val) {
+      this.x = val;
+    },
+
+    shorthandMethod: function _shorthandMethod(...args) {
+      SAPClass.prototype.foo.apply(this, [...args]);
+      this.name = Relative.name();
+    },
+    shorthandConflict: function _shorthandConflict() {
+      // Make sure the shorthand function doesn\\"t a function with the same name.
+      return shorthandConflict();
+    },
+    async_shorthand_function: async function _async_shorthand_function(arg) {
+      return await 1;
+    },
+    property_value: 1
+  });
+
+  MyClass.static_shorthand_function = function static_shorthand_function() {
+    return 1;
+  };
+
+  MyClass.static_property_value = 1;
+
+  MyClass.static_property_arrow = () => 1;
+
+  MyClass.static_async_shorthand_function = async function static_async_shorthand_function() {
+    return await 1;
+  };
+
+  MyClass.z = function () {
+    return \\"hey\\";
+  };
+
+  function shorthandConflict() {
+    return 1;
+  }
+
+  return MyClass;
+});"
+`;
+
+exports[`classes class-convert-file-namespace.controller.controller.js 1`] = `
 "sap.ui.define([\\"sap/SAPClass\\"], function (SAPClass) {
   /**
    * The default behaviour is to use the filename to get the namespace.
@@ -187,23 +257,14 @@ exports[`classes class-convert-file-namespace.js 1`] = `
 });"
 `;
 
-exports[`classes class-convert-file-namespace-prefixed.js 1`] = `
+exports[`classes class-convert-file-namespace-prefixed.controller.js 1`] = `
 "sap.ui.define([\\"sap/SAPClass\\"], function (SAPClass) {
   /**
-   * This test sets the namespace prefix.
+   * This test sets the namespace prefix (TODO: Implement prefix)
+   *
+   * @prefix xyz
    */
   const MyClass = SAPClass.extend(\\"prefix.test.fixtures.classes.MyClass\\", {});
-  return MyClass;
-});"
-`;
-
-exports[`classes class-convert-file-namespace-sourceroot.js 1`] = `
-"sap.ui.define([\\"sap/SAPClass\\"], function (SAPClass) {
-  /**
-   * This test overrides the opts.sourceRoot value
-   * which babel passes in to the plugin.
-   */
-  const MyClass = SAPClass.extend(\\"classes.MyClass\\", {});
   return MyClass;
 });"
 `;
@@ -228,7 +289,7 @@ exports[`classes class-convert-jsdoc-name.js 1`] = `
 });"
 `;
 
-exports[`classes class-convert-jsdoc-namespace.js 1`] = `
+exports[`classes class-convert-jsdoc-namespace.controller.js 1`] = `
 "sap.ui.define([\\"sap/SAPClass\\"], function (SAPClass) {
   /**
    * @namespace x.y
@@ -249,8 +310,30 @@ exports[`classes class-convert-jsdoc-nonui5.js 1`] = `
 });"
 `;
 
+exports[`classes class-convert-keep-constructor.controller.js 1`] = `
+"sap.ui.define([\\"sap/ui/core/Controller\\"], function (Controller) {
+  const MyController = Controller.extend(\\"test.fixtures.classes.MyController\\", {
+    constructor: function _constructor(arg) {
+      console.log(\\"constructor\\");
+      Controller.prototype.constructor.call(this, arg);
+      this.x = 1;
+    },
+    other: 1,
+
+    get getter() {
+      return 1;
+    }
+
+  });
+  return MyController;
+});"
+`;
+
 exports[`classes class-convert-metadata-assign.js 1`] = `
 "sap.ui.define([\\"sap/SAPClass\\"], function (SAPClass) {
+  /**
+   * @name test.fixtures.classes.MyClass
+   */
   const MyClass = SAPClass.extend(\\"test.fixtures.classes.MyClass\\", {
     metadata: meta,
     renderer: {}
@@ -292,6 +375,10 @@ exports[`classes class-convert-metadata-prop.js 1`] = `
 "sap.ui.define([\\"sap/SAPClass\\"], function (SAPClass) {
   const Formatter = {};
   const mdata = {};
+  /**
+   * @name test.fixtures.classes.MyClass
+   */
+
   const MyClass = SAPClass.extend(\\"test.fixtures.classes.MyClass\\", {
     metadata: mdata,
     myFormatter: Formatter
@@ -304,11 +391,29 @@ exports[`classes class-convert-metadata-static.js 1`] = `
 "sap.ui.define([\\"sap/SAPClass\\"], function (SAPClass) {
   const Formatter = Formatter;
   const mdata = {};
+  /**
+   * @name test.fixtures.classes.MyClass
+   */
+
   const MyClass = SAPClass.extend(\\"test.fixtures.classes.MyClass\\", {
     metadata: mdata
   });
   MyClass.myFormatter = Formatter;
   return MyClass;
+});"
+`;
+
+exports[`classes class-convert-never.controller.js 1`] = `
+"/**
+ * This test uses config options to never convert.
+ */
+sap.ui.define([\\"other/OtherClass\\"], OtherClass => {
+  return class MyClass extends OtherClass {
+    constructor() {
+      super();
+    }
+
+  };
 });"
 `;
 
@@ -336,6 +441,18 @@ sap.ui.define([\\"sap/SAPClass\\"], SAPClass => {
 });"
 `;
 
+exports[`classes class-convert-nonui5-return.js 1`] = `
+"/**
+ * This fixture tests a nonui5 scenario inside an sap.ui.define.
+ */
+sap.ui.define([\\"sap/SAPClass\\"], SAPClass => {
+  /**
+   * @nonui5
+   */
+  return class MyClass extends SAPClass {};
+});"
+`;
+
 exports[`classes class-convert-options-namedonly.js 1`] = `
 "/**
  * This test uses config options to only convert if there is a name provided.
@@ -360,17 +477,14 @@ sap.ui.define([\\"other/OtherClass\\", \\"sap/SAPClass\\"], (OtherClass, SAPClas
 });"
 `;
 
-exports[`classes class-convert-options-never.js 1`] = `
-"/**
- * This test uses config options to never convert.
- */
-sap.ui.define([\\"other/OtherClass\\"], OtherClass => {
-  return class MyClass extends OtherClass {
-    constructor() {
-      super();
-    }
-
-  };
+exports[`classes class-convert-sourceroot.controller.js 1`] = `
+"sap.ui.define([\\"sap/SAPClass\\"], function (SAPClass) {
+  /**
+   * This test overrides the opts.sourceRoot value
+   * which babel passes in to the plugin.
+   */
+  const MySourceRootTestController = SAPClass.extend(\\"classes.MySourceRootTestController\\", {});
+  return MySourceRootTestController;
 });"
 `;
 
@@ -436,84 +550,6 @@ sap.ui.define([\\"sap/SAPClass\\"], SAPClass => {
 });"
 `;
 
-exports[`classes class-covert-nonui5-return.js 1`] = `
-"/**
- * This fixture tests a nonui5 scenario inside an sap.ui.define.
- */
-sap.ui.define([\\"sap/SAPClass\\"], SAPClass => {
-  /**
-   * @nonui5
-   */
-  return class MyClass extends SAPClass {};
-});"
-`;
-
-exports[`classes class-extend-managed.js 1`] = `
-"sap.ui.define([\\"sap/ui/core/SAPClass\\", \\"./Relative\\"], function (SAPClass, __Relative) {
-  function _interopRequireDefault(obj) {
-    return obj && obj.__esModule && typeof obj.default !== \\"undefined\\" ? obj.default : obj;
-  }
-
-  const Relative = _interopRequireDefault(__Relative);
-
-  const MyClass = SAPClass.extend(\\"test.fixtures.classes.MyClass\\", {
-    renderer: {},
-    metadata: {},
-    constructor: function _constructor(arg) {
-      console.log(\\"constructor\\");
-      SAPClass.prototype.constructor.call(this, arg);
-
-      this.property_arrow_function = () => 1;
-
-      this.x = 1;
-    },
-
-    get prop() {
-      return 1;
-    },
-
-    set prop(val) {
-      this.x = val;
-    },
-
-    shorthandMethod: function _shorthandMethod(...args) {
-      SAPClass.prototype.foo.apply(this, [...args]);
-      this.name = Relative.name();
-    },
-    shorthandConflict: function _shorthandConflict() {
-      // Make sure the shorthand function doesn\\"t a function with the same name.
-      return shorthandConflict();
-    },
-    async_shorthand_function: async function _async_shorthand_function(arg) {
-      return await 1;
-    },
-    property_value: 1
-  });
-
-  MyClass.static_shorthand_function = function static_shorthand_function() {
-    return 1;
-  };
-
-  MyClass.static_property_value = 1;
-
-  MyClass.static_property_arrow = () => 1;
-
-  MyClass.static_async_shorthand_function = async function static_async_shorthand_function() {
-    return await 1;
-  };
-
-  MyClass.z = function () {
-    return \\"hey\\";
-  };
-
-  function shorthandConflict() {
-    return 1;
-  }
-
-  return MyClass;
-});"
-`;
-
 exports[`classes class-fix-with-existing-define.js 1`] = `
 "/* global sap */
 
@@ -539,7 +575,10 @@ sap.ui.define([\\"sap/SAPClass\\"], SAPClass => {
 
 exports[`examples Animal.js 1`] = `
 "sap.ui.define([\\"sap/ui/base/ManagedObject\\"], function (ManagedObject) {
-  const Animal = ManagedObject.extend(\\"test.fixtures.examples.Animal\\", {
+  /**
+   * @name examples.Animal
+   */
+  const Animal = ManagedObject.extend(\\"examples.Animal\\", {
     metadata: {
       properties: {
         type: {
@@ -1110,6 +1149,10 @@ exports[`imports import-multiple.js 1`] = `
 exports[`libs libs-sap-imports.js 1`] = `
 "sap.ui.define([\\"sap/SAPClass\\"], function (SAPClass) {
   const Levels = SAPClass[\\"Levels\\"];
+  /**
+   * @name test.fixtures.libs.MyClass
+   */
+
   const MyClass = SAPClass.extend(\\"test.fixtures.libs.MyClass\\", {});
   MyClass.Levels = Levels;
   return MyClass;

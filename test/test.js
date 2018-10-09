@@ -41,7 +41,7 @@ function processDirectory(dir) {
               [plugin, opts]
             ],
             presets,
-            sourceRoot: (filename.includes('sourceroot') ? rootFixtureDirPath : undefined),
+            sourceRoot: (filename.toLowerCase().includes('sourceroot') ? rootFixtureDirPath : undefined),
             babelrc: false
           }).code
 

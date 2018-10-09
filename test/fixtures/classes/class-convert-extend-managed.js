@@ -2,6 +2,9 @@
 import SAPClass from "sap/ui/core/SAPClass"
 import Relative from "./Relative"
 
+/**
+ * @name test.fixtures.classes.MyClass
+ */
 export default class MyClass extends SAPClass {
   metadata = {}
   renderer = {}

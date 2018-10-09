@@ -1,6 +1,9 @@
 
 import Controller from "sap/ui/core/Controller"
 
+/**
+ * @name test.fixtures.classes.MyController
+ */
 export default class MyController extends Controller {
   prop = 1;
   prop2 = this.a.b;

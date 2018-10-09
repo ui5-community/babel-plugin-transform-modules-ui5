@@ -1,5 +1,8 @@
 import ManagedObject from "sap/ui/base/ManagedObject";
 
+/**
+ * @name examples.Animal
+ */
 export default class Animal extends ManagedObject {
 
     metadata = {

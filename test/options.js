@@ -10,11 +10,8 @@ const Options = {
     noImportInteropPrefixes: ['sap/'],
   },
   files: {
-    'class-convert-options-never': {
+    'class-convert-never.controller': {
       neverConvertClass: true
-    },
-    'class-convert-options-namedonly': {
-      onlyConvertNamedClass: true
     },
     'class-controller-w-oninit': {
       moveControllerPropsToOnInit: true
@@ -30,7 +27,10 @@ const Options = {
     },
     'class-convert-controller-extend-static-prop': {
       addControllerStaticPropsToExtend: true
-    }
+    },
+    'class-convert-all': {
+      autoConvertAllExtendClasses: true
+    },
   },
   dirs: {
     'min-wrap': {

@@ -1,5 +1,8 @@
 
 import SAPController from "sap/SAPController"
+/**
+ * @name test.fixtures.classes.MyController
+ */
 export default class MyController extends SAPController {}
 const meta = {}
 const Formatter = {}

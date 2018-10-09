@@ -1,5 +1,8 @@
 
 import SAPClass from "sap/SAPClass"
+/**
+ * @name test.fixtures.classes.MyClass
+ */
 export default class MyClass extends SAPClass {}
 const meta = {}
 const Formatter = {}
