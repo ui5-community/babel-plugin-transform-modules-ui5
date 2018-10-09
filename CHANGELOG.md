@@ -1,5 +1,19 @@
+#
+
+## CHANGELOG
 
 The major version will be kept the same as babel's (currently 7.x.x).
+
+### 7.0.0-alpha2 (2018-10-08)
+
+#### Breaking
+
+* Default behaviour is now similar to previous `onlyConvertNamedClass=true`, but also with logic to convert `*.controller.js` classes automatically.
+  * Added option `autoConvertAllExtendClasses` to restore version 6 behaviour.
+
+#### Behaviour Change
+
+* Added option `autoConvertControllerClass` to disable new `*.controller.js` behaviour (enabled by default)
 
 ### 7.0.0-alpha1 (2018-08-17)
 

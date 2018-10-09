@@ -1,64 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`classes class-controller-w-oninit.js 1`] = `
-"sap.ui.define([\\"sap/ui/core/Controller\\"], function (Controller) {
-  /**
-   * @name test.fixtures.classes.MyController
-   */
-  const MyController = Controller.extend(\\"test.fixtures.classes.MyController\\", {
-    prop: 1,
-    prop3: X.y,
-    onInit: function _onInit() {
-      this.prop2 = this.a.b;
-      this.control = this.byId(\\"control\\");
-      this.other = getThing(this.prop);
+exports[`classes class-convert-all.js 1`] = `
+"sap.ui.define([\\"sap/class\\"], function (SAPClass) {
+  const MyClass = SAPClass.extend(\\"test.fixtures.classes.MyClass\\", {});
 
-      this.prop_func = () => true;
+  class BaseClass {}
 
-      console.log(\\"constructor\\");
-      this.x = 1;
-      this.y = this.x + 1;
-    },
-
-    get getter() {
-      return 1;
-    }
-
-  });
-  return MyController;
-});"
-`;
-
-exports[`classes class-controller-wo-oninit.js 1`] = `
-"sap.ui.define([\\"sap/ui/core/Controller\\"], function (Controller) {
-  /**
-   * @name test.fixtures.classes.MyController
-   */
-  const MyController = Controller.extend(\\"test.fixtures.classes.MyController\\", {
-    onInit: function onInit() {
-      this.prop_func = () => true;
-
-      console.log(\\"constructor\\");
-      this.x = 1;
-
-      if (typeof Controller.prototype.onInit === 'function') {
-        Controller.prototype.onInit.apply(this, arguments);
-      }
-    },
-    prop: 1,
-
-    get getter() {
-      return 1;
-    }
-
-  });
-  return MyController;
-});"
-`;
-
-exports[`classes class-convert.controller.js 1`] = `
-"sap.ui.define([\\"sap/ui/core/Controller\\"], function (SAPController) {
-  const MyController = SAPController.extend(\\"test.fixtures.classes.MyController\\", {});
+  class MyError extends Error {}
 });"
 `;
 
@@ -102,6 +50,12 @@ sap.ui.define([\\"sap/SAPClass\\"], SAPClass => {
 });"
 `;
 
+exports[`classes class-convert-controller-basic.controller.js 1`] = `
+"sap.ui.define([\\"sap/ui/core/Controller\\"], function (SAPController) {
+  const MyController = SAPController.extend(\\"test.fixtures.classes.MyController\\", {});
+});"
+`;
+
 exports[`classes class-convert-controller-extend-static-assign.js 1`] = `
 "sap.ui.define([\\"sap/SAPController\\"], function (SAPController) {
   /**
@@ -126,16 +80,87 @@ exports[`classes class-convert-controller-extend-static-assign.js 1`] = `
 });"
 `;
 
-exports[`classes class-convert-controller-extend-static-prop.js 1`] = `
+exports[`classes class-convert-controller-extend-static-prop.controller.js 1`] = `
 "sap.ui.define([\\"sap/SAPClass\\"], function (SAPController) {
   const Formatter = {};
+  const MyController = SAPController.extend(\\"test.fixtures.classes.MyController\\", {
+    metadata: {}
+  });
+  MyController.myFormatter = Formatter;
+  return MyController;
+});"
+`;
+
+exports[`classes class-convert-controller-multi.controller.js 1`] = `
+"sap.ui.define([\\"sap/ui/core/Controller\\", \\"other\\"], function (SAPController, __Other) {
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== \\"undefined\\" ? obj.default : obj;
+  }
+
+  const Other = _interopRequireDefault(__Other);
+
+  const MyController = SAPController.extend(\\"test.fixtures.classes.MyController\\", {});
+  const Controller2 = SAPController.extend(\\"test.fixtures.classes.Controller2\\", {});
+  /**
+   * @nonui5
+   */
+
+  class NotUI5 extends Other {}
+});"
+`;
+
+exports[`classes class-convert-controller-w-oninit.controller.js 1`] = `
+"sap.ui.define([\\"sap/ui/core/Controller\\"], function (Controller) {
   /**
    * @name test.fixtures.classes.MyController
    */
+  const MyController = Controller.extend(\\"test.fixtures.classes.MyController\\", {
+    prop: 1,
+    prop3: X.y,
+    constructor: function _constructor(arg) {
+      console.log(\\"constructor\\");
+      Controller.prototype.constructor.call(this, arg);
+      this.prop2 = this.a.b;
+      this.control = this.byId(\\"control\\");
+      this.other = getThing(this.prop);
 
-  const MyController = SAPController.extend(\\"test.fixtures.classes.MyController\\", {
-    myFormatter: Formatter,
-    metadata: {}
+      this.prop_func = () => true;
+
+      this.x = 1;
+    },
+    onInit: function _onInit() {
+      this.y = this.x + 1;
+    },
+
+    get getter() {
+      return 1;
+    }
+
+  });
+  return MyController;
+});"
+`;
+
+exports[`classes class-convert-controller-wo-oninit.controller.js 1`] = `
+"sap.ui.define([\\"sap/ui/core/Controller\\"], function (Controller) {
+  /**
+   * @name test.fixtures.classes.MyController
+   */
+  const MyController = Controller.extend(\\"test.fixtures.classes.MyController\\", {
+    constructor: function _constructor(arg) {
+      console.log(\\"constructor\\");
+      Controller.prototype.constructor.call(this, arg);
+
+      this.prop_func = () => true;
+
+      this.x = 1;
+    },
+    prop: 1,
+
+    get getter() {
+      return 1;
+    }
+
   });
   return MyController;
 });"
