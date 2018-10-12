@@ -75,8 +75,6 @@
     "@babel/plugin-transform-flow-strip-types": "^7.0.0",
     "@babel/plugin-transform-typescript": "^7.1.0",
     "@babel/preset-env": "^7.1.0",
-    "@babel/template": "^7.1.2",
-    "@babel/types": "^7.0.0",
     "babel-core": "^7.0.0-bridge",
     "babel-eslint": "^10.0.1",
     "babel-jest": "^23.6.0",
@@ -93,8 +91,5 @@
     "lint-staged": "^7.1.0",
     "rimraf": "^2.6.2",
     "source-map-support": "^0.5.0"
-  },
-  "peerDependencies": {
-    "@babel/core": "^7.+"
   }
 }
