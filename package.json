@@ -1,6 +1,6 @@
 {
   "name": "babel-plugin-transform-modules-ui5",
-  "version": "7.0.0-alpha2",
+  "version": "7.0.0-alpha3",
   "description": "An unofficial babel plugin for SAP UI5.",
   "main": "dist/index.js",
   "engines": {
