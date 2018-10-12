@@ -4,6 +4,14 @@
 
 The major version will be kept the same as babel's (currently 7.x.x).
 
+### 7.0.0-alpha4 (2018-10-12)
+
+* Internal updates
+
+### 7.0.0-alpha3 (2018-10-11)
+
+* Internal updates, and removed peerDependency
+
 ### 7.0.0-alpha2 (2018-10-08)
 
 #### Breaking
