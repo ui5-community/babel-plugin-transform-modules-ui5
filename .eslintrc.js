@@ -9,8 +9,8 @@ module.exports = {
       node: true
     },
     "rules": {
-      "semi": ["warn", "never"],
-      "quotes": ["warn", "single", {"allowTemplateLiterals": true}],
+      "semi": ["warn", "always"],
+      "quotes": ["warn", "double", {"allowTemplateLiterals": true}],
       "no-unused-vars": "warn",
       "brace-style": ["warn", "stroustrup", {"allowSingleLine": true}],
       "space-before-function-paren": ["warn", "never"],

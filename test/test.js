@@ -1,77 +1,77 @@
 /* global test, expect, describe */
-import { writeFileSync, statSync, readdirSync, emptyDirSync, ensureDirSync } from 'fs-extra'
-import { join, resolve } from 'path'
-import { transformFileSync } from '@babel/core'
-import { get as getOpts } from './options'
-import plugin from '..'
+import { writeFileSync, statSync, readdirSync, emptyDirSync, ensureDirSync } from "fs-extra";
+import { join, resolve } from "path";
+import { transformFileSync } from "@babel/core";
+import { get as getOpts } from "./options";
+import plugin from "..";
 
-const FIXTURE_DIR_NAME = 'fixtures'
-const OUT_DIR_NAME = 'output'
+const FIXTURE_DIR_NAME = "fixtures";
+const OUT_DIR_NAME = "output";
 
-const rootFixtureDirPath = resolve(__dirname, FIXTURE_DIR_NAME)
+const rootFixtureDirPath = resolve(__dirname, FIXTURE_DIR_NAME);
 
-emptyDirSync(join(__dirname, OUT_DIR_NAME))
+emptyDirSync(join(__dirname, OUT_DIR_NAME));
 
 function processDirectory(dir) {
-  const items = readdirSync(dir)
+  const items = readdirSync(dir);
   // Process Files first
   items
-    .filter(item => item.endsWith('.js'))
+    .filter(item => item.endsWith(".js"))
     .forEach(filename => {
       test(filename, () => {
         console.log(`Running ${filename}`) // eslint-disable-line
-        const filePath = join(dir, filename)
-        let outputPath = filePath.replace(FIXTURE_DIR_NAME, OUT_DIR_NAME)
+        const filePath = join(dir, filename);
+        let outputPath = filePath.replace(FIXTURE_DIR_NAME, OUT_DIR_NAME);
         try  {
-          const opts = getOpts(filePath)
-          const presets = []
+          const opts = getOpts(filePath);
+          const presets = [];
 
-          if (filePath.includes('preset-env')) {
-            presets.push(['@babel/preset-env', {
+          if (filePath.includes("preset-env")) {
+            presets.push(["@babel/preset-env", {
               // default targets for preset-env is ES5
-          }])
+          }]);
           }
           const result: string = transformFileSync(filePath, {
             comments: true,
             plugins: [
-              '@babel/plugin-syntax-dynamic-import',
-              '@babel/plugin-syntax-object-rest-spread',
-              ['@babel/plugin-syntax-decorators', { legacy: true } ],
-              ['@babel/plugin-syntax-class-properties', { useBuiltIns: true} ],
+              "@babel/plugin-syntax-dynamic-import",
+              "@babel/plugin-syntax-object-rest-spread",
+              ["@babel/plugin-syntax-decorators", { legacy: true } ],
+              ["@babel/plugin-syntax-class-properties", { useBuiltIns: true} ],
               [plugin, opts]
             ],
             presets,
-            sourceRoot: (filename.toLowerCase().includes('sourceroot') ? rootFixtureDirPath : undefined),
+            sourceRoot: (filename.toLowerCase().includes("sourceroot") ? rootFixtureDirPath : undefined),
             babelrc: false
-          }).code
+          }).code;
 
-          ensureDirSync(dir.replace(FIXTURE_DIR_NAME, OUT_DIR_NAME)) // This is delayed for when we run with a filter.
-          writeFileSync(outputPath, result) // For manual verification
+          ensureDirSync(dir.replace(FIXTURE_DIR_NAME, OUT_DIR_NAME)); // This is delayed for when we run with a filter.
+          writeFileSync(outputPath, result); // For manual verification
 
-          if (filePath.includes('-error-')) {
-            throw new Error(`Expected ${filename} to throw error`)
+          if (filePath.includes("-error-")) {
+            throw new Error(`Expected ${filename} to throw error`);
           }
           // if (!opts.allowMixedExports && result.includes(`"__esModule"`)) {
           //   throw new Error(`Unexpected __esModule declaration in ${filename}`)
           // }
-          if (!filePath.includes('_private_')) {
-            expect(result).toMatchSnapshot()
+          if (!filePath.includes("_private_")) {
+            expect(result).toMatchSnapshot();
           }
         }
         catch (error) {
-          if (filename.includes('error-')) {
-            const message = error.message.replace(filePath, '').replace(': ', '')
-            outputPath = outputPath.replace('.js', '.txt')
-            expect(message).toMatchSnapshot()
-            ensureDirSync(dir.replace(FIXTURE_DIR_NAME, OUT_DIR_NAME)) // This is delayed for when we run with a filter.
-            writeFileSync(outputPath, message) // For manual verification
+          if (filename.includes("error-")) {
+            const message = error.message.replace(filePath, "").replace(": ", "");
+            outputPath = outputPath.replace(".js", ".txt");
+            expect(message).toMatchSnapshot();
+            ensureDirSync(dir.replace(FIXTURE_DIR_NAME, OUT_DIR_NAME)); // This is delayed for when we run with a filter.
+            writeFileSync(outputPath, message); // For manual verification
           }
           else {
-            throw error
+            throw error;
           }
         }
-      })
-    })
+      });
+    });
 
   // Recurse into directories
   items
@@ -79,11 +79,11 @@ function processDirectory(dir) {
     .filter(item => statSync(item.path).isDirectory())
     .forEach(item => {
       describe(item.name, () => {
-        processDirectory(item.path)
-      })
-    })
+        processDirectory(item.path);
+      });
+    });
 }
 
 (() => {
-  processDirectory(rootFixtureDirPath)
-})()
+  processDirectory(rootFixtureDirPath);
+})();
