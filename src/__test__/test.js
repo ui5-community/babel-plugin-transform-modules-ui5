@@ -6,9 +6,7 @@ import { get as getOpts } from "./options";
 import plugin from "..";
 
 const FIXTURE_DIR_NAME = "fixtures";
-const OUT_DIR_NAME = "output";
-
-const rootFixtureDirPath = resolve(__dirname, FIXTURE_DIR_NAME);
+const OUT_DIR_NAME = "__output__";
 
 emptyDirSync(join(__dirname, OUT_DIR_NAME));
 
@@ -19,7 +17,6 @@ function processDirectory(dir) {
     .filter(item => item.endsWith(".js"))
     .forEach(filename => {
       test(filename, () => {
-        console.log(`Running ${filename}`) // eslint-disable-line
         const filePath = join(dir, filename);
         let outputPath = filePath.replace(FIXTURE_DIR_NAME, OUT_DIR_NAME);
         try  {
@@ -32,7 +29,6 @@ function processDirectory(dir) {
           }]);
           }
           const result: string = transformFileSync(filePath, {
-            comments: true,
             plugins: [
               "@babel/plugin-syntax-dynamic-import",
               "@babel/plugin-syntax-object-rest-spread",
@@ -41,7 +37,8 @@ function processDirectory(dir) {
               [plugin, opts]
             ],
             presets,
-            sourceRoot: (filename.toLowerCase().includes("sourceroot") ? rootFixtureDirPath : undefined),
+            sourceRoot: __dirname,
+            comments: true,
             babelrc: false
           }).code;
 
@@ -85,5 +82,5 @@ function processDirectory(dir) {
 }
 
 (() => {
-  processDirectory(rootFixtureDirPath);
+  processDirectory(resolve(__dirname, FIXTURE_DIR_NAME));
 })();

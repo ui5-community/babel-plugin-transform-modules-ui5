@@ -30,8 +30,8 @@ node_modules
 .node_repl_history
 
 # Test Output
-/test/output
-/test/fixtures/_private_/*.js
+__output__
+__private__
 
 package-lock.json
 

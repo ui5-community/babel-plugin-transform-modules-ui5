@@ -2,7 +2,7 @@
 
 exports[`classes class-convert-all.js 1`] = `
 "sap.ui.define([\\"sap/class\\"], function (SAPClass) {
-  const MyClass = SAPClass.extend(\\"test.fixtures.classes.MyClass\\", {});
+  const MyClass = SAPClass.extend(\\"fixtures.classes.MyClass\\", {});
 
   class BaseClass {}
 
@@ -52,7 +52,7 @@ sap.ui.define([\\"sap/SAPClass\\"], SAPClass => {
 
 exports[`classes class-convert-controller-basic.controller.js 1`] = `
 "sap.ui.define([\\"sap/ui/core/Controller\\"], function (SAPController) {
-  const MyController = SAPController.extend(\\"test.fixtures.classes.MyController\\", {});
+  const MyController = SAPController.extend(\\"fixtures.classes.MyController\\", {});
 });"
 `;
 
@@ -83,7 +83,7 @@ exports[`classes class-convert-controller-extend-static-assign.js 1`] = `
 exports[`classes class-convert-controller-extend-static-prop.controller.js 1`] = `
 "sap.ui.define([\\"sap/SAPClass\\"], function (SAPController) {
   const Formatter = {};
-  const MyController = SAPController.extend(\\"test.fixtures.classes.MyController\\", {
+  const MyController = SAPController.extend(\\"fixtures.classes.MyController\\", {
     metadata: {}
   });
   MyController.myFormatter = Formatter;
@@ -99,8 +99,8 @@ exports[`classes class-convert-controller-multi.controller.js 1`] = `
 
   const Other = _interopRequireDefault(__Other);
 
-  const MyController = SAPController.extend(\\"test.fixtures.classes.MyController\\", {});
-  const Controller2 = SAPController.extend(\\"test.fixtures.classes.Controller2\\", {});
+  const MyController = SAPController.extend(\\"fixtures.classes.MyController\\", {});
+  const Controller2 = SAPController.extend(\\"fixtures.classes.Controller2\\", {});
   /**
    * @nonui5
    */
@@ -277,7 +277,7 @@ exports[`classes class-convert-file-namespace.controller.controller.js 1`] = `
   /**
    * The default behaviour is to use the filename to get the namespace.
    */
-  const MyClass = SAPClass.extend(\\"test.fixtures.classes.MyClass\\", {});
+  const MyClass = SAPClass.extend(\\"fixtures.classes.MyClass\\", {});
   return MyClass;
 });"
 `;
@@ -289,7 +289,7 @@ exports[`classes class-convert-file-namespace-prefixed.controller.js 1`] = `
    *
    * @prefix xyz
    */
-  const MyClass = SAPClass.extend(\\"prefix.test.fixtures.classes.MyClass\\", {});
+  const MyClass = SAPClass.extend(\\"prefix.fixtures.classes.MyClass\\", {});
   return MyClass;
 });"
 `;
@@ -337,7 +337,7 @@ exports[`classes class-convert-jsdoc-nonui5.js 1`] = `
 
 exports[`classes class-convert-keep-constructor.controller.js 1`] = `
 "sap.ui.define([\\"sap/ui/core/Controller\\"], function (Controller) {
-  const MyController = Controller.extend(\\"test.fixtures.classes.MyController\\", {
+  const MyController = Controller.extend(\\"fixtures.classes.MyController\\", {
     constructor: function _constructor(arg) {
       console.log(\\"constructor\\");
       Controller.prototype.constructor.call(this, arg);
@@ -499,17 +499,6 @@ sap.ui.define([\\"other/OtherClass\\", \\"sap/SAPClass\\"], (OtherClass, SAPClas
     }
   });
   return MyUI5Class;
-});"
-`;
-
-exports[`classes class-convert-sourceroot.controller.js 1`] = `
-"sap.ui.define([\\"sap/SAPClass\\"], function (SAPClass) {
-  /**
-   * This test overrides the opts.sourceRoot value
-   * which babel passes in to the plugin.
-   */
-  const MySourceRootTestController = SAPClass.extend(\\"classes.MySourceRootTestController\\", {});
-  return MySourceRootTestController;
 });"
 `;
 

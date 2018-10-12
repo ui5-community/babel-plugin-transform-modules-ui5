@@ -24,18 +24,16 @@
     "ts"
   ],
   "scripts": {
-    "clean": "rimraf dist",
-    "build": "npx babel lib -d dist",
-    "build:watch": "npx babel lib -d dist -w",
-    "build:test": "npx babel --plugins source-map-support lib -d dist",
-    "lint": "eslint lib test",
+    "clean": "npx rimraf dist",
+    "build": "npx babel src -d dist --ignore '**/__test__'",
+    "lint": "npx eslint src",
     "lint:fix": "npm run lint -- --fix",
-    "test": "npm run build:test & npx jest test",
+    "test": "npx jest __test__ --coverage=no",
     "test:dev": "npm test -- --watch"
   },
   "husky": {
     "hooks": {
-      "prepublish": "npm run clean & npm run build & jest test",
+      "prepublish": "npm run clean & npm run build & npm run test",
       "precommit": "lint-staged && yarn test"
     }
   },
