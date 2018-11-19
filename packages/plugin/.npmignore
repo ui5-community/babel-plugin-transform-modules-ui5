@@ -1,2 +1,6 @@
 __test__
 node_modules/
+coverage/
+src/
+.babelrc
+.eslintignore
