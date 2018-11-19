@@ -1,4 +1,4 @@
-// @flow
+
 import { parse } from "path";
 
 const Options = {
@@ -44,7 +44,7 @@ const Options = {
   }
 };
 
-export function get(filePath: string) {
+export function get(filePath) {
   const { name, dir: dirPath } = parse(filePath);
   const { base: dir } = parse(dirPath);
   let options = {...Options.default};

@@ -9,12 +9,12 @@
   },
   "scripts": {
     "clean": "npx rimraf dist",
-    "build": "npx babel src -d dist --ignore '**/__test__'",
+    "build": "npx babel src -d dist",
     "lint": "npx eslint src",
     "lint:fix": "npm run lint -- --fix",
     "test": "npx jest __test__ --coverage=no",
     "test:dev": "npm test -- --watch",
-    "prepublish": "npm test && npm run build"
+    "prepare": "npm test && npm run build"
   },
   "keywords": [
     "ui5",
@@ -35,7 +35,7 @@
   ],
   "husky": {
     "hooks": {
-      "prepublish": "npm run clean & npm run build & npm run test",
+      "prepare": "npm run clean & npm run build & npm run test",
       "precommit": "lint-staged && npm run test"
     }
   },
@@ -68,16 +68,16 @@
     "@babel/plugin-syntax-decorators": "^7.1.0",
     "@babel/plugin-syntax-dynamic-import": "^7.0.0",
     "@babel/plugin-syntax-object-rest-spread": "^7.0.0",
-    "@babel/plugin-transform-flow-strip-types": "^7.1.6",
     "@babel/plugin-transform-typescript": "^7.1.0",
     "@babel/preset-env": "^7.1.6",
-    "babel-core": "^7.0.0-bridge",
+    "@babel/preset-typescript": "^7.1.0",
+    "babel-core": "^7.0.0-bridge.0",
     "babel-eslint": "^10.0.1",
     "babel-jest": "^23.6.0",
     "eslint": "^5.9.0",
     "eslint-config-standard": "^12.0.0",
-    "eslint-plugin-import": "^2.7.0",
-    "eslint-plugin-node": "^7.0.1",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-node": "^8.0.0",
     "eslint-plugin-promise": "^4.0.1",
     "eslint-plugin-standard": "^4.0.0",
     "fs-extra": "^7.0.1",

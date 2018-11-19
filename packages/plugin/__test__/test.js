@@ -28,7 +28,7 @@ function processDirectory(dir) {
               // default targets for preset-env is ES5
           }]);
           }
-          const result: string = transformFileSync(filePath, {
+          const result = transformFileSync(filePath, {
             plugins: [
               "@babel/plugin-syntax-dynamic-import",
               "@babel/plugin-syntax-object-rest-spread",
