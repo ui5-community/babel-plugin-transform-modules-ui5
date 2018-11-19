@@ -1280,6 +1280,27 @@ exports[`typescript ts-class-props.ts 1`] = `
 });"
 `;
 
+exports[`typescript ts-export-interface.ts 1`] = `
+"sap.ui.define([], function () {
+  const MY_CONSTANT = \\"constant\\";
+  let MyEnum;
+
+  (function (MyEnum) {
+    MyEnum[MyEnum[\\"A\\"] = 0] = \\"A\\";
+    MyEnum[MyEnum[\\"B\\"] = 1] = \\"B\\";
+    MyEnum[MyEnum[\\"C\\"] = 2] = \\"C\\";
+  })(MyEnum || (MyEnum = {}));
+
+  ;
+  const __exports = {
+    __esModule: true
+  };
+  __exports.MY_CONSTANT = MY_CONSTANT;
+  __exports.MyEnum = MyEnum;
+  return __exports;
+});"
+`;
+
 exports[`wrapping export-const.js 1`] = `
 "sap.ui.define([], function () {
   const X = {};

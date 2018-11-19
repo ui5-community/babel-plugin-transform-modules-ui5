@@ -199,6 +199,7 @@ module.exports = () => {
         path.remove();
       }
       else if (declaration) { // export const c = 1 | export function f() {}
+        if (declaration.type === "TSInterfaceDeclaration") return;
         const name = ast.getIdName(declaration);
         if (name) { // export function f() {}
           const id = t.identifier(declaration.id.name);
@@ -286,7 +287,6 @@ module.exports = () => {
     Class: {
       enter(path, { file, opts = {} }) {
         const { node, parent, parentPath } = path;
-        // console.log('====================================');
 
         if (opts.neverConvertClass) {
           return;
@@ -302,10 +302,6 @@ module.exports = () => {
         if (classInfo.nonUI5) {
           return;
         }
-
-        // console.log('====================================');
-        // console.log(classInfo);
-        // console.log('====================================');
 
         let shouldConvert = (!!opts.autoConvertAllExtendClasses) // default false
           || (classInfo.name || classInfo.alias)
