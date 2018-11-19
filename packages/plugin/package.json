@@ -13,7 +13,7 @@
     "lint": "npx eslint src",
     "lint:fix": "npm run lint -- --fix",
     "test": "npx jest __test__ --coverage=no",
-    "test:dev": "npm test -- --watch",
+    "test:watch": "npm test -- --watch",
     "prepare": "npm test && npm run build"
   },
   "keywords": [

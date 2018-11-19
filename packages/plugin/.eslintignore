@@ -2,3 +2,4 @@
 /__test__/__output__/
 build/
 coverage/
+dist/
