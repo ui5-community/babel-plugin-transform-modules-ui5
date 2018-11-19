@@ -23,8 +23,12 @@ function processDirectory(dir) {
           const opts = getOpts(filePath);
           const presets = [];
 
-          if(filePath.endsWith(".ts")) {
+          if (filePath.endsWith(".ts")) {
             presets.push(["@babel/preset-typescript"]);
+          }
+
+          if (filePath.includes("flow")) {
+            presets.push(["@babel/preset-flow"]);
           }
 
           if (filePath.includes("preset-env")) {

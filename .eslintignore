@@ -1,4 +1,4 @@
-__test__/fixtures/
-__test__/__output__/
+__test__/fixtures/**
+__test__/__output__/**
 build/
 dist/

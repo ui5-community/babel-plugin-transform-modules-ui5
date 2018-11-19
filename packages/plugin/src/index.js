@@ -68,6 +68,8 @@ module.exports = () => {
     ImportDeclaration(path) { // { opts = {} }
       const { node } = path;
 
+      if (node.importKind === "type") return; // flow-type
+
       const { specifiers, source } = node;
       const src = source.value.replace(/\\/g, "/");
 
@@ -123,7 +125,6 @@ module.exports = () => {
           }
         }
         else if (t.isImportNamespaceSpecifier(specifier)) {
-          // console.log(specifier)
           if (specifiers.length === 1 && !imp.locked) { // import * as X from 'X'
             // If the namespace specifier is the only import, we can avoid the temp name and the destructor
             imp.name = specifier.local.name;
@@ -199,7 +200,7 @@ module.exports = () => {
         path.remove();
       }
       else if (declaration) { // export const c = 1 | export function f() {}
-        if (declaration.type === "TSInterfaceDeclaration") return;
+        if (["TypeAlias", "InterfaceDeclaration", "TSInterfaceDeclaration"].includes(declaration.type)) return; // TS or Flow-types
         const name = ast.getIdName(declaration);
         if (name) { // export function f() {}
           const id = t.identifier(declaration.id.name);
@@ -307,12 +308,7 @@ module.exports = () => {
           || (classInfo.name || classInfo.alias)
           || (/.*[.]controller[.]js$/.test(file.opts.filename) && opts.autoConvertControllerClass !== false); // default true
 
-        // console.log(/.*[.]controller[.]js$/.test(file.opts.filename))
-        // console.log(opts.autoConvertControllerClass !== false)
-        // console.log((/.*[.]controller[.]js$/.test(file.opts.filename) && opts.autoConvertControllerClass !== false))
-        // console.log(shouldConvert)
-
-        if (/.*[.]controller[.]js$/.test(file.opts.filenam) && opts.autoConvertControllerClass !== false) {
+        if (/.*[.]controller[.]js$/.test(file.opts.filename) && opts.autoConvertControllerClass !== false) {
           shouldConvert = true;
         }
 
@@ -427,7 +423,6 @@ module.exports = () => {
       ? [thisEx, t.arrayExpression(node.arguments)]
       : [thisEx, ...node.arguments]
     );
-    // console.log(callArgs)
     path.replaceWith(
       t.callExpression(t.identifier(`${superClassName}.prototype.${methodName}.${caller}`), callArgs)
     );
