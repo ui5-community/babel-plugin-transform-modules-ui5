@@ -1264,6 +1264,22 @@ sap.ui.define([\\"sap/class\\"], function (SAPClass) {
 });"
 `;
 
+exports[`typescript ts-class-props.ts 1`] = `
+"sap.ui.define([\\"sap/Class\\"], function (SAPClass) {
+  /**
+   * @name MyClass
+   */
+  const MyClass = SAPClass.extend(\\"MyClass\\", {
+    S: \\"S\\",
+    PS: \\"PS\\",
+    PRS: \\"PRS\\"
+  });
+  MyClass.SS = \\"SS\\";
+  MyClass.PSS = \\"PSS\\";
+  MyClass.PSRS = \\"PSRS\\";
+});"
+`;
+
 exports[`wrapping export-const.js 1`] = `
 "sap.ui.define([], function () {
   const X = {};

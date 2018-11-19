@@ -82,6 +82,7 @@ export function convertClassToUI5Extend(path, node, classInfo, extraStaticProps,
       }
     }
     else if (t.isClassProperty(member)) {
+      if (!member.value) continue; // un-initialized static class prop (typescript)
       if (memberName === "metadata" || memberName === "renderer") {
         // Special handling for TypeScript limitation where metadata and renderer must be properties.
         extendProps.unshift(

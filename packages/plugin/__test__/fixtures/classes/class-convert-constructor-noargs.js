@@ -8,6 +8,7 @@ sap.ui.define(["sap/SAPClass"], (SAPClass) => {
    * @name com.app.MyClass
    */
   return class MyClass extends SAPClass {
+
     constructor() {
       super()
     }

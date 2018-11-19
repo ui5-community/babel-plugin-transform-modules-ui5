@@ -14,7 +14,7 @@ function processDirectory(dir) {
   const items = readdirSync(dir);
   // Process Files first
   items
-    .filter(item => item.endsWith(".js"))
+    .filter(item => item.endsWith(".js") || item.endsWith(".ts"))
     .forEach(filename => {
       test(filename, () => {
         const filePath = join(dir, filename);
@@ -23,10 +23,14 @@ function processDirectory(dir) {
           const opts = getOpts(filePath);
           const presets = [];
 
+          if(filePath.endsWith(".ts")) {
+            presets.push(["@babel/preset-typescript"]);
+          }
+
           if (filePath.includes("preset-env")) {
             presets.push(["@babel/preset-env", {
               // default targets for preset-env is ES5
-          }]);
+            }]);
           }
           const result = transformFileSync(filePath, {
             plugins: [
