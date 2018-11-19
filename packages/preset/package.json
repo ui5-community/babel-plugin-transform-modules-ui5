@@ -1,6 +1,6 @@
 {
   "name": "babel-preset-transform-ui5",
-  "version": "1.0.0-alpha1",
+  "version": "7.0.0-alpha4",
   "main": "index.js",
   "license": "MIT",
   "repository": "https://github.com/r-murphy/babel-plugin-ui5/tree/master/packages/preset",

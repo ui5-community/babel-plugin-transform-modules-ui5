@@ -1,5 +1,6 @@
 {
   "name": "babel-ui5",
+  "version": "7.0.0-alpha4",
   "private": true,
   "scripts": {
     "build": "make build",
