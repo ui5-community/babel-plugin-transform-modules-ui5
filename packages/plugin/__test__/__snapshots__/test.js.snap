@@ -11,16 +11,7 @@ exports[`classes class-convert-all.js 1`] = `
 `;
 
 exports[`classes class-convert-constructor-noargs.js 1`] = `
-"/* global sap */
-
-/**
- * Test notes: Even though there is an existing sp.ui.define,
- * the class should be converted.
- */
-sap.ui.define([\\"sap/SAPClass\\"], SAPClass => {
-  /**
-   * @name com.app.MyClass
-   */
+"sap.ui.define([\\"sap/SAPClass\\"], SAPClass => {
   const MyClass = SAPClass.extend(\\"com.app.MyClass\\", {
     constructor: function _constructor() {
       SAPClass.prototype.constructor.call(this);
@@ -31,16 +22,7 @@ sap.ui.define([\\"sap/SAPClass\\"], SAPClass => {
 `;
 
 exports[`classes class-convert-constructor-spread.js 1`] = `
-"/* global sap */
-
-/**
- * Test notes: Even though there is an existing sp.ui.define,
- * the class should be converted.
- */
-sap.ui.define([\\"sap/SAPClass\\"], SAPClass => {
-  /**
-   * @name com.app.MyClass
-   */
+"sap.ui.define([\\"sap/SAPClass\\"], SAPClass => {
   const MyClass = SAPClass.extend(\\"com.app.MyClass\\", {
     constructor: function _constructor(...args) {
       SAPClass.prototype.constructor.apply(this, [...args]);
@@ -58,9 +40,6 @@ exports[`classes class-convert-controller-basic.controller.js 1`] = `
 
 exports[`classes class-convert-controller-extend-static-assign.js 1`] = `
 "sap.ui.define([\\"sap/SAPController\\"], function (SAPController) {
-  /**
-   * @name test.fixtures.classes.MyController
-   */
   const MyController = SAPController.extend(\\"test.fixtures.classes.MyController\\", {
     metadata: meta,
     renderer: {},
@@ -68,11 +47,6 @@ exports[`classes class-convert-controller-extend-static-assign.js 1`] = `
   });
   const meta = {};
   const Formatter = {};
-  /**
-   * This tests finding the metadata after the class declaration.
-   * This is how typescript compiles static props.
-   */
-
   MyController.metadata = meta;
   MyController.renderer = {};
   MyController.myFormatter = Formatter;
@@ -101,9 +75,6 @@ exports[`classes class-convert-controller-multi.controller.js 1`] = `
 
   const MyController = SAPController.extend(\\"fixtures.classes.MyController\\", {});
   const Controller2 = SAPController.extend(\\"fixtures.classes.Controller2\\", {});
-  /**
-   * @nonui5
-   */
 
   class NotUI5 extends Other {}
 });"
@@ -111,9 +82,6 @@ exports[`classes class-convert-controller-multi.controller.js 1`] = `
 
 exports[`classes class-convert-controller-w-oninit.controller.js 1`] = `
 "sap.ui.define([\\"sap/ui/core/Controller\\"], function (Controller) {
-  /**
-   * @name test.fixtures.classes.MyController
-   */
   const MyController = Controller.extend(\\"test.fixtures.classes.MyController\\", {
     prop: 1,
     prop3: X.y,
@@ -143,9 +111,6 @@ exports[`classes class-convert-controller-w-oninit.controller.js 1`] = `
 
 exports[`classes class-convert-controller-wo-oninit.controller.js 1`] = `
 "sap.ui.define([\\"sap/ui/core/Controller\\"], function (Controller) {
-  /**
-   * @name test.fixtures.classes.MyController
-   */
   const MyController = Controller.extend(\\"test.fixtures.classes.MyController\\", {
     constructor: function _constructor(arg) {
       console.log(\\"constructor\\");
@@ -209,10 +174,6 @@ exports[`classes class-convert-extend-managed.js 1`] = `
   }
 
   const Relative = _interopRequireDefault(__Relative);
-  /**
-   * @name test.fixtures.classes.MyClass
-   */
-
 
   const MyClass = SAPClass.extend(\\"test.fixtures.classes.MyClass\\", {
     renderer: {},
@@ -239,7 +200,6 @@ exports[`classes class-convert-extend-managed.js 1`] = `
       this.name = Relative.name();
     },
     shorthandConflict: function _shorthandConflict() {
-      // Make sure the shorthand function doesn\\"t a function with the same name.
       return shorthandConflict();
     },
     async_shorthand_function: async function _async_shorthand_function(arg) {
@@ -274,9 +234,6 @@ exports[`classes class-convert-extend-managed.js 1`] = `
 
 exports[`classes class-convert-file-namespace.controller.controller.js 1`] = `
 "sap.ui.define([\\"sap/SAPClass\\"], function (SAPClass) {
-  /**
-   * The default behaviour is to use the filename to get the namespace.
-   */
   const MyClass = SAPClass.extend(\\"fixtures.classes.MyClass\\", {});
   return MyClass;
 });"
@@ -284,11 +241,6 @@ exports[`classes class-convert-file-namespace.controller.controller.js 1`] = `
 
 exports[`classes class-convert-file-namespace-prefixed.controller.js 1`] = `
 "sap.ui.define([\\"sap/SAPClass\\"], function (SAPClass) {
-  /**
-   * This test sets the namespace prefix (TODO: Implement prefix)
-   *
-   * @prefix xyz
-   */
   const MyClass = SAPClass.extend(\\"prefix.fixtures.classes.MyClass\\", {});
   return MyClass;
 });"
@@ -296,9 +248,6 @@ exports[`classes class-convert-file-namespace-prefixed.controller.js 1`] = `
 
 exports[`classes class-convert-jsdoc-alias.js 1`] = `
 "sap.ui.define([\\"sap/SAPClass\\"], function (SAPClass) {
-  /**
-   * @alias x.y.Z
-   */
   const MyClass = SAPClass.extend(\\"x.y.Z\\", {});
   return MyClass;
 });"
@@ -306,9 +255,6 @@ exports[`classes class-convert-jsdoc-alias.js 1`] = `
 
 exports[`classes class-convert-jsdoc-name.js 1`] = `
 "sap.ui.define([\\"sap/SAPClass\\"], function (SAPClass) {
-  /**
-   * @name x.y.Z
-   */
   const MyClass = SAPClass.extend(\\"x.y.Z\\", {});
   return MyClass;
 });"
@@ -316,9 +262,6 @@ exports[`classes class-convert-jsdoc-name.js 1`] = `
 
 exports[`classes class-convert-jsdoc-namespace.controller.js 1`] = `
 "sap.ui.define([\\"sap/SAPClass\\"], function (SAPClass) {
-  /**
-   * @namespace x.y
-   */
   const MyClass = SAPClass.extend(\\"x.y.MyClass\\", {});
   return MyClass;
 });"
@@ -326,9 +269,6 @@ exports[`classes class-convert-jsdoc-namespace.controller.js 1`] = `
 
 exports[`classes class-convert-jsdoc-nonui5.js 1`] = `
 "sap.ui.define([\\"sap/SAPClass\\"], function (SAPClass) {
-  /**
-   * @nonui5
-   */
   class MyClass extends SAPClass {}
 
   return MyClass;
@@ -356,20 +296,12 @@ exports[`classes class-convert-keep-constructor.controller.js 1`] = `
 
 exports[`classes class-convert-metadata-assign.js 1`] = `
 "sap.ui.define([\\"sap/SAPClass\\"], function (SAPClass) {
-  /**
-   * @name test.fixtures.classes.MyClass
-   */
   const MyClass = SAPClass.extend(\\"test.fixtures.classes.MyClass\\", {
     metadata: meta,
     renderer: {}
   });
   const meta = {};
   const Formatter = {};
-  /**
-   * This tests finding the metadata after the class declaration.
-   * This is how typescript compiles static props.
-   */
-
   MyClass.metadata = meta;
   MyClass.renderer = {};
   MyClass.myFormatter = Formatter;
@@ -381,10 +313,6 @@ exports[`classes class-convert-metadata-assign-nested.js 1`] = `
 "sap.ui.define([\\"sap/SAPClass\\"], SAPClass => {
   const Formatter = {};
   const meta = {};
-  /**
-   * @name x.y.MyClass
-   */
-
   const MyClass = SAPClass.extend(\\"x.y.MyClass\\", {
     metadata: meta,
     renderer: {}
@@ -400,10 +328,6 @@ exports[`classes class-convert-metadata-prop.js 1`] = `
 "sap.ui.define([\\"sap/SAPClass\\"], function (SAPClass) {
   const Formatter = {};
   const mdata = {};
-  /**
-   * @name test.fixtures.classes.MyClass
-   */
-
   const MyClass = SAPClass.extend(\\"test.fixtures.classes.MyClass\\", {
     metadata: mdata,
     myFormatter: Formatter
@@ -416,10 +340,6 @@ exports[`classes class-convert-metadata-static.js 1`] = `
 "sap.ui.define([\\"sap/SAPClass\\"], function (SAPClass) {
   const Formatter = Formatter;
   const mdata = {};
-  /**
-   * @name test.fixtures.classes.MyClass
-   */
-
   const MyClass = SAPClass.extend(\\"test.fixtures.classes.MyClass\\", {
     metadata: mdata
   });
@@ -429,10 +349,7 @@ exports[`classes class-convert-metadata-static.js 1`] = `
 `;
 
 exports[`classes class-convert-never.controller.js 1`] = `
-"/**
- * This test uses config options to never convert.
- */
-sap.ui.define([\\"other/OtherClass\\"], OtherClass => {
+"sap.ui.define([\\"other/OtherClass\\"], OtherClass => {
   return class MyClass extends OtherClass {
     constructor() {
       super();
@@ -443,16 +360,7 @@ sap.ui.define([\\"other/OtherClass\\"], OtherClass => {
 `;
 
 exports[`classes class-convert-no-constructor.js 1`] = `
-"/* global sap */
-
-/**
- * Test notes: Even though there is an existing sp.ui.define,
- * the class should be converted.
- */
-sap.ui.define([\\"sap/SAPClass\\"], SAPClass => {
-  /**
-   * @name com.app.MyClass
-   */
+"sap.ui.define([\\"sap/SAPClass\\"], SAPClass => {
   const MyClass = SAPClass.extend(\\"com.app.MyClass\\", {
     constructor: function constructor() {
       SAPClass.prototype.constructor.apply(this, arguments);
@@ -467,32 +375,19 @@ sap.ui.define([\\"sap/SAPClass\\"], SAPClass => {
 `;
 
 exports[`classes class-convert-nonui5-return.js 1`] = `
-"/**
- * This fixture tests a nonui5 scenario inside an sap.ui.define.
- */
-sap.ui.define([\\"sap/SAPClass\\"], SAPClass => {
-  /**
-   * @nonui5
-   */
+"sap.ui.define([\\"sap/SAPClass\\"], SAPClass => {
   return class MyClass extends SAPClass {};
 });"
 `;
 
 exports[`classes class-convert-options-namedonly.js 1`] = `
-"/**
- * This test uses config options to only convert if there is a name provided.
- */
-sap.ui.define([\\"other/OtherClass\\", \\"sap/SAPClass\\"], (OtherClass, SAPClass) => {
+"sap.ui.define([\\"other/OtherClass\\", \\"sap/SAPClass\\"], (OtherClass, SAPClass) => {
   return class MyClass extends OtherClass {
     constructor() {
       super();
     }
 
   };
-  /**
-   * @name my.app.MyUI5Class
-   */
-
   const MyUI5Class = SAPClass.extend(\\"my.app.MyUI5Class\\", {
     constructor: function _constructor() {
       SAPClass.prototype.constructor.call(this);
@@ -503,25 +398,13 @@ sap.ui.define([\\"other/OtherClass\\", \\"sap/SAPClass\\"], (OtherClass, SAPClas
 `;
 
 exports[`classes class-convert-with-existing-define-defer-return.js 1`] = `
-"/* global sap */
-
-/**
- * Test notes: Even though there is an existing sp.ui.define,
- * the class should be converted.
- */
-sap.ui.define([\\"sap/SAPClass\\"], SAPClass => {
-  /**
-   * @UI5
-   * @name com.app.MyClass
-   * @namespace com.app
-   */
+"sap.ui.define([\\"sap/SAPClass\\"], SAPClass => {
   const MyClass = SAPClass.extend(\\"com.app.MyClass\\", {
     metadata: {
       thing: \\"string\\"
     },
     renderer: {},
     constructor: function _constructor(data) {
-      // This incorrect shorthand gets fixed
       SAPClass.prototype.constructor.call(this, data);
 
       this.property_func = () => {
@@ -534,25 +417,13 @@ sap.ui.define([\\"sap/SAPClass\\"], SAPClass => {
 `;
 
 exports[`classes class-convert-with-existing-define-immediate-return.js 1`] = `
-"/* global sap */
-
-/**
- * Test notes: Even though there is an existing sp.ui.define,
- * the class should be converted.
- */
-sap.ui.define([\\"sap/SAPClass\\"], SAPClass => {
-  /**
-   * @UI5
-   * @name com.app.MyClass
-   * @namespace com.app
-   */
+"sap.ui.define([\\"sap/SAPClass\\"], SAPClass => {
   const MyClass = SAPClass.extend(\\"com.app.MyClass\\", {
     metadata: {
       thing: \\"string\\"
     },
     renderer: {},
     constructor: function _constructor(data) {
-      // This incorrect shorthand gets fixed
       SAPClass.prototype.constructor.call(this, data);
 
       this.property_func = () => {
@@ -565,15 +436,8 @@ sap.ui.define([\\"sap/SAPClass\\"], SAPClass => {
 `;
 
 exports[`classes class-fix-with-existing-define.js 1`] = `
-"/* global sap */
-
-/**
- * Test notes: Even though there is an existing sp.ui.define,
- * and it uses .extend() syntax, the constructor function should be fixed.
- */
-sap.ui.define([\\"sap/SAPClass\\"], SAPClass => {
+"sap.ui.define([\\"sap/SAPClass\\"], SAPClass => {
   const X = SAPClass.extend(\\"X\\", {
-    // This incorrect shorthand will get fixed
     constructor: function constructor(data) {
       SAPClass.prototype.constructor.call(this, data);
     },
@@ -589,9 +453,6 @@ sap.ui.define([\\"sap/SAPClass\\"], SAPClass => {
 
 exports[`examples Animal.js 1`] = `
 "sap.ui.define([\\"sap/ui/base/ManagedObject\\"], function (ManagedObject) {
-  /**
-   * @name examples.Animal
-   */
   const Animal = ManagedObject.extend(\\"examples.Animal\\", {
     metadata: {
       properties: {
@@ -625,10 +486,6 @@ exports[`examples Cat.js 1`] = `
   }
 
   const Animal = _interopRequireDefault(__Animal);
-  /**
-   * @name othernamespace.Cat
-   */
-
 
   const Cat = Animal.extend(\\"othernamespace.Cat\\", {
     init: function _init() {
@@ -673,7 +530,6 @@ exports[`examples Utils.js 1`] = `
   }
 
   function add(a, b) {
-    // Not a named export but gets added for sap.ui.define() interop.
     return a + b;
   }
 
@@ -690,12 +546,6 @@ exports[`export-collapse _extends-literal.js 1`] = `
     return obj && obj.__esModule && typeof obj.default !== \\"undefined\\" ? obj.default : obj;
   }
 
-  /*
-  Test the plugin\\"s ability to find properties of the default export:
-   - from inside _extend function (used by TS and babel)
-     - including properties from another variable
-     - when the _extends result is exported directly
-   */
   const X = _interopRequireDefault(__X);
 
   const one = 1;
@@ -719,13 +569,6 @@ exports[`export-collapse _extends-variable.js 1`] = `
     return obj && obj.__esModule && typeof obj.default !== \\"undefined\\" ? obj.default : obj;
   }
 
-  /*
-  Tests the plugin\\"s ability to find properties of the default export:
-   - when the default export is a variable.
-   - from dot-assigned properties
-   - from inside _extend function (used by TS and babel)
-     - including properties from another variable
-   */
   const X = _interopRequireDefault(__X);
 
   const one = 1;
@@ -754,13 +597,6 @@ exports[`export-collapse _extends-variable.js 1`] = `
 
 exports[`export-collapse add-props-obj.js 1`] = `
 "sap.ui.define([], function () {
-  /**
-  Tests that exports can be collapsed onto to an object using a variable.
-    - Named export \\"one\\" can be ignored since it\\"s on X and as the same literal.
-    - Named export \\"foo\\" can be ignored since it\\"s on X and as the same literal.
-    - Named export \\"two\\" gets assigned to \\"X\\"
-    - Named export \\"bar\\" gets assigned to \\"X\\"
-  */
   function one() {}
 
   function two() {}
@@ -833,8 +669,7 @@ exports[`export-collapse object.assign-variable.js 1`] = `
     two
   }, {
     five
-  }, O2 // recursion test
-  );
+  }, O2);
   Utils.three = 3;
   Utils.anotherConst = anotherConst;
   Utils.otherFN = otherFN;
@@ -899,7 +734,6 @@ exports[`export-mixed export-mixed-named-func.js 1`] = `
   }
 
   def.hey = \\"hey\\";
-  // TODO: detect the self reference and don\\"t extend
   const named = {};
   def.def = def;
   def.named = named;
@@ -945,7 +779,6 @@ exports[`exports export-default-anon-function.js 1`] = `
   let one = 1;
   let two = 2;
   return async function () {
-    // Since it\\"s anonymous, this can be safely moved to the end
     return (await one) + two;
   };
 });"
@@ -1040,7 +873,6 @@ exports[`exports export-named-from.js 1`] = `
 
 exports[`exports export-obj.js 1`] = `
 "sap.ui.define([], function () {
-  // Hello World
   function getFoo() {
     return 1;
   }
@@ -1058,12 +890,7 @@ exports[`exports export-obj.js 1`] = `
 
 exports[`flow flow-exports.js 1`] = `
 "sap.ui.define([\\"sap/SAPClass\\"], function (SAPClass) {
-  /**
-   * @name Foo
-   */
-  const Foo = SAPClass.extend(\\"Foo\\", {}); // let fooInstance: Foo = new Foo();
-  // export fooInstance;
-
+  const Foo = SAPClass.extend(\\"Foo\\", {});
   return Foo;
 });"
 `;
@@ -1093,7 +920,6 @@ exports[`imports import-duplicate-src-2.js 1`] = `
     return obj && obj.__esModule && typeof obj.default !== \\"undefined\\" ? obj.default : obj;
   }
 
-  // default line first
   const XD = _interopRequireDefault(__XD);
 
   const X2 = __XD[\\"X2\\"];
@@ -1108,7 +934,6 @@ exports[`imports import-duplicate-src-3.js 1`] = `
     return obj && obj.__esModule && typeof obj.default !== \\"undefined\\" ? obj.default : obj;
   }
 
-  // default line first, mixed with namespace
   const XD = _interopRequireDefault(__XD);
 
   const XA = __XD;
@@ -1175,10 +1000,6 @@ exports[`imports import-multiple.js 1`] = `
 exports[`libs libs-sap-imports.js 1`] = `
 "sap.ui.define([\\"sap/SAPClass\\"], function (SAPClass) {
   const Levels = SAPClass[\\"Levels\\"];
-  /**
-   * @name test.fixtures.libs.MyClass
-   */
-
   const MyClass = SAPClass.extend(\\"test.fixtures.libs.MyClass\\", {});
   MyClass.Levels = Levels;
   return MyClass;
@@ -1187,8 +1008,7 @@ exports[`libs libs-sap-imports.js 1`] = `
 
 exports[`min-wrap min-wrap-no-import.js 1`] = `
 "sap.ui.define([], function () {
-  const x = 1; // This should not be part of sap-ui-define
-
+  const x = 1;
   return x;
 });"
 `;
@@ -1196,8 +1016,7 @@ exports[`min-wrap min-wrap-no-import.js 1`] = `
 exports[`min-wrap min-wrap-simple.js 1`] = `
 "\\"use strict\\";
 
-const x = 1; // This should not be part of sap-ui-define
-
+const x = 1;
 sap.ui.define([\\"./foo\\"], function (__Foo) {
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule && typeof obj.default !== \\"undefined\\" ? obj.default : obj;
@@ -1205,8 +1024,7 @@ sap.ui.define([\\"./foo\\"], function (__Foo) {
 
   const Foo = _interopRequireDefault(__Foo);
 
-  const y = Foo(x); // This gets wrapped
-
+  const y = Foo(x);
   return y;
 });"
 `;
@@ -1240,8 +1058,7 @@ exports[`mixed mixed-import-export.js 1`] = `
 `;
 
 exports[`no-wrap nowrap-existing-sap.ui.define.js 1`] = `
-"/* global sap */
-sap.ui.define([\\"JSONModel\\"], JSONModel => {
+"sap.ui.define([\\"JSONModel\\"], JSONModel => {
   return new JSONModel();
 });"
 `;
@@ -1256,16 +1073,11 @@ exports[`presets with-preset-env.js 1`] = `
 "\\"use strict\\";
 
 sap.ui.define([\\"sap/class\\"], function (SAPClass) {
-  /**
-   * @name my.MyClass
-   */
   var MyClass = SAPClass.extend(\\"my.MyClass\\", {
     x: 1,
     fn: function _fn() {
       var _this = this;
 
-      // The purpose of the setTimeout is to ensure that \\"this\\" is correct for the super call
-      // when the arrow function transform is applied (i.e. our super transform must run first)
       setTimeout(function () {
         SAPClass.prototype.fn.call(_this);
       });
@@ -1278,9 +1090,6 @@ sap.ui.define([\\"sap/class\\"], function (SAPClass) {
 
 exports[`typescript ts-class-props.ts 1`] = `
 "sap.ui.define([\\"sap/Class\\"], function (SAPClass) {
-  /**
-   * @name MyClass
-   */
   const MyClass = SAPClass.extend(\\"MyClass\\", {
     S: \\"S\\",
     PS: \\"PS\\",

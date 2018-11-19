@@ -46,7 +46,7 @@ function processDirectory(dir) {
             ],
             presets,
             sourceRoot: __dirname,
-            comments: true,
+            comments: false,
             babelrc: false
           }).code;
 
