@@ -36,7 +36,7 @@
   "husky": {
     "hooks": {
       "prepublish": "npm run clean & npm run build & npm run test",
-      "precommit": "lint-staged && yarn test"
+      "precommit": "lint-staged && npm run test"
     }
   },
   "author": "Ryan Murphy",
@@ -56,34 +56,34 @@
   },
   "dependencies": {
     "array-flatten": "^2.1.1",
-    "doctrine": "^2.0.0",
+    "doctrine": "^3.0.0",
     "ignore-case": "^0.1.0",
     "object-assign-defined": "^1.0.2"
   },
   "devDependencies": {
-    "@babel/cli": "^7.1.0",
-    "@babel/core": "^7.0.0",
+    "@babel/cli": "^7.1.5",
+    "@babel/core": "^7.1.6",
     "@babel/plugin-proposal-object-rest-spread": "^7.0.0",
     "@babel/plugin-syntax-class-properties": "^7.0.0",
     "@babel/plugin-syntax-decorators": "^7.1.0",
     "@babel/plugin-syntax-dynamic-import": "^7.0.0",
     "@babel/plugin-syntax-object-rest-spread": "^7.0.0",
-    "@babel/plugin-transform-flow-strip-types": "^7.0.0",
+    "@babel/plugin-transform-flow-strip-types": "^7.1.6",
     "@babel/plugin-transform-typescript": "^7.1.0",
-    "@babel/preset-env": "^7.1.0",
+    "@babel/preset-env": "^7.1.6",
     "babel-core": "^7.0.0-bridge",
     "babel-eslint": "^10.0.1",
     "babel-jest": "^23.6.0",
-    "eslint": "^5.6.0",
+    "eslint": "^5.9.0",
     "eslint-config-standard": "^12.0.0",
     "eslint-plugin-import": "^2.7.0",
     "eslint-plugin-node": "^7.0.1",
     "eslint-plugin-promise": "^4.0.1",
     "eslint-plugin-standard": "^4.0.0",
-    "fs-extra": "^7.0.0",
-    "husky": "^1.1.0",
+    "fs-extra": "^7.0.1",
+    "husky": "^1.1.4",
     "jest": "^23.6.0",
-    "lint-staged": "^7.1.0",
+    "lint-staged": "^8.0.5",
     "rimraf": "^2.6.2"
   }
 }

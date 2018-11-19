@@ -3,7 +3,7 @@ import { writeFileSync, statSync, readdirSync, emptyDirSync, ensureDirSync } fro
 import { join, resolve } from "path";
 import { transformFileSync } from "@babel/core";
 import { get as getOpts } from "./options";
-import plugin from "..";
+import plugin from "../src";
 
 const FIXTURE_DIR_NAME = "fixtures";
 const OUT_DIR_NAME = "__output__";
