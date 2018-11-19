@@ -1,93 +1,11 @@
 {
-  "name": "babel-plugin-transform-modules-ui5",
-  "version": "7.0.0-alpha4",
-  "description": "An unofficial babel plugin for SAP UI5.",
-  "main": "dist/index.js",
-  "engines": {
-    "node": ">=6"
-  },
-  "keywords": [
-    "ui5",
-    "sap",
-    "sapui5",
-    "openui5",
-    "babel",
-    "babel7",
-    "babeljs",
-    "babel-plugin",
-    "babelplugin",
-    "es6",
-    "module",
-    "import",
-    "export",
-    "typescript",
-    "ts"
-  ],
+  "name": "babel-ui5",
+  "private": true,
   "scripts": {
-    "clean": "npx rimraf dist",
-    "build": "npx babel src -d dist --ignore '**/__test__'",
-    "lint": "npx eslint src",
-    "lint:fix": "npm run lint -- --fix",
-    "test": "npx jest __test__ --coverage=no",
-    "test:dev": "npm test -- --watch"
-  },
-  "husky": {
-    "hooks": {
-      "prepublish": "npm run clean & npm run build & npm run test",
-      "precommit": "lint-staged && yarn test"
-    }
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/r-murphy/babel-plugin-ui5.git"
-  },
-  "author": "Ryan Murphy",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/r-murphy/babel-plugin-ui5/issues"
-  },
-  "homepage": "https://github.com/r-murphy/babel-plugin-ui5#readme",
-  "jest": {
-    "collectCoverage": true
-  },
-  "lint-staged": {
-    "lib/**/*.js": [
-      "eslint --fix",
-      "git add"
-    ]
-  },
-  "dependencies": {
-    "array-flatten": "^2.1.1",
-    "doctrine": "^2.0.0",
-    "ignore-case": "^0.1.0",
-    "object-assign-defined": "^1.0.2"
+    "build": "make build",
+    "test": "make test"
   },
   "devDependencies": {
-    "@babel/cli": "^7.1.0",
-    "@babel/core": "^7.0.0",
-    "@babel/plugin-proposal-object-rest-spread": "^7.0.0",
-    "@babel/plugin-syntax-class-properties": "^7.0.0",
-    "@babel/plugin-syntax-decorators": "^7.1.0",
-    "@babel/plugin-syntax-dynamic-import": "^7.0.0",
-    "@babel/plugin-syntax-object-rest-spread": "^7.0.0",
-    "@babel/plugin-transform-flow-strip-types": "^7.0.0",
-    "@babel/plugin-transform-typescript": "^7.1.0",
-    "@babel/preset-env": "^7.1.0",
-    "babel-core": "^7.0.0-bridge",
-    "babel-eslint": "^10.0.1",
-    "babel-jest": "^23.6.0",
-    "babel-plugin-source-map-support": "^2.0.1",
-    "eslint": "^5.6.0",
-    "eslint-config-standard": "^12.0.0",
-    "eslint-plugin-import": "^2.7.0",
-    "eslint-plugin-node": "^7.0.1",
-    "eslint-plugin-promise": "^4.0.1",
-    "eslint-plugin-standard": "^4.0.0",
-    "fs-extra": "^7.0.0",
-    "husky": "^1.1.0",
-    "jest": "^23.6.0",
-    "lint-staged": "^7.1.0",
-    "rimraf": "^2.6.2",
-    "source-map-support": "^0.5.0"
+    "lerna": "^3.4.3"
   }
 }

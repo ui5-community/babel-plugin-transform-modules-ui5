@@ -33,6 +33,4 @@ node_modules
 __output__
 __private__
 
-package-lock.json
-
 /dist/
