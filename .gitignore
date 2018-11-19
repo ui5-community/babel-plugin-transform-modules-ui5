@@ -33,4 +33,4 @@ node_modules
 __output__
 __private__
 
-/dist/
+dist/

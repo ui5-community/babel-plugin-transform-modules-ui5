@@ -1,4 +1,4 @@
-# babel-plugin-transform-modules-ui5 for Babel 6+ #
+# babel-ui5 #
 
 An unofficial Babel transformer plugin for SAP/Open UI5.
 
@@ -10,14 +10,16 @@ It allows you to develop SAP UI5 applications by using the latest [ECMAScript](h
 
 ## Install ##
 
+This repo contains both a preset and a plugin. It is recommended to use the preset.
+
 ```sh
-npm install babel-plugin-transform-modules-ui5 --save-dev
+npm install babel-preset-transform-ui5 --save-dev
 ```
 
 or
 
 ```sh
-yarn add babel-plugin-transform-modules-ui5 --dev
+yarn add babel-preset-transform-ui5 --dev
 ```
 
 ## Configure ##
@@ -28,7 +30,7 @@ At a minimum, add `transform-modules-ui5` to the `plugins`.
 
 ```js
 {
-    "plugins": ["transform-modules-ui5"]
+    "presets": ["transform-ui5"]
 }
 ```
 
@@ -36,8 +38,8 @@ Or if you want to supply plugin options, use the array syntax.
 
 ```js
 {
-    "plugins": [
-        ["transform-modules-ui5", {
+    "presets": [
+        ["transform-ui5", {
             ...pluginOpts
         }]
     ]

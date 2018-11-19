@@ -1,6 +1,6 @@
 {
-  "name": "babel-preset-ui5",
-  "version": "1.0.0",
+  "name": "babel-preset-transform-ui5",
+  "version": "1.0.0-alpha1",
   "main": "index.js",
   "license": "MIT",
   "repository": "https://github.com/r-murphy/babel-plugin-ui5/tree/master/packages/preset",
@@ -9,5 +9,20 @@
   },
   "devDependencies": {
     "@babel/core": "^7.1.6"
-  }
+  },
+  "keywords": [
+    "ui5",
+    "sap",
+    "sapui5",
+    "openui5",
+    "babel",
+    "babel7",
+    "babeljs",
+    "es6",
+    "module",
+    "import",
+    "export",
+    "typescript",
+    "ts"
+  ]
 }
