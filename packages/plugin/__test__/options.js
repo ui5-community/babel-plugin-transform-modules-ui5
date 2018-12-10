@@ -40,6 +40,9 @@ const Options = {
       moveControllerPropsToOnInit: true,
       addControllerStaticPropsToExtend: true,
     },
+    libs: {
+      libs: ["^sap/"],
+    },
   },
 };
 

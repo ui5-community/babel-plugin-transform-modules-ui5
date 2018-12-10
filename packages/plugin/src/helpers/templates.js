@@ -75,7 +75,7 @@ export const buildDefaultImportInterop = template(`
   function _interopRequireDefault(obj) { return (obj && obj.__esModule && typeof obj.default !== "undefined") ? obj.default : obj; }
 `);
 
-export const buildDefaultImportDestructor = template(`
+export const buildDefaultImportDeconstructor = template(`
   const LOCAL = _interopRequireDefault(MODULE);
 `);
 

@@ -11,6 +11,7 @@ export function wrap(visitor, programNode, opts) {
     injectDynamicImportHelper,
     imports,
     namedExports,
+    ignoredImports,
   } = visitor;
 
   let { body } = programNode;
@@ -46,9 +47,9 @@ export function wrap(visitor, programNode, opts) {
     }
   }
 
-  // If the noWrapBeforeImport opt is set, split any code before the first define and afterwards into separate arrays.
+  const preDefine = [...ignoredImports];
+  // If the noWrapBeforeImport opt is set, split any code before the first import and afterwards into separate arrays.
   // This should be done before any interops or other vars are injected.
-  const preDefine = [];
   if (opts.noWrapBeforeImport && firstImport) {
     let reachedFirstImport = false;
     const fullBody = body;

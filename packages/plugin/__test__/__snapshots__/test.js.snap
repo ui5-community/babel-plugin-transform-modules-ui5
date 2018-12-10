@@ -997,6 +997,16 @@ exports[`imports import-multiple.js 1`] = `
 });"
 `;
 
+exports[`libs libs-other-imports.js 1`] = `
+"import _ from \\"lodash\\";
+sap.ui.define([\\"sap/SAPClass\\"], function (SAPClass) {
+  const Levels = SAPClass[\\"Levels\\"];
+  const MyClass = SAPClass.extend(\\"test.fixtures.libs.MyClass\\", {});
+  MyClass.Levels = Levels;
+  return MyClass;
+});"
+`;
+
 exports[`libs libs-sap-imports.js 1`] = `
 "sap.ui.define([\\"sap/SAPClass\\"], function (SAPClass) {
   const Levels = SAPClass[\\"Levels\\"];

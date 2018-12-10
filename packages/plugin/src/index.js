@@ -41,6 +41,7 @@ module.exports = () => {
       this.defaultExport = null;
       this.defaultExportNode = null;
       this.exportGlobal = false;
+      this.ignoredImports = [];
       this.imports = [];
       this.namedExports = [];
       this.requires = [];
@@ -72,8 +73,7 @@ module.exports = () => {
     /*!
      * Removes the ES6 import and adds the details to the import array in our state.
      */
-    ImportDeclaration(path) {
-      // , { opts = {} }
+    ImportDeclaration(path, { opts = {} }) {
       const { node } = path;
 
       if (node.importKind === "type") return; // flow-type
@@ -81,33 +81,40 @@ module.exports = () => {
       const { specifiers, source } = node;
       const src = source.value.replace(/\\/g, "/");
 
-      const shouldInterop = !this.noImportInteropPrefixesRegexp.test(src);
+      // When 'libs' are used, only 'libs' will be converted to UI5 imports.
+      const { libs = [".*"] } = opts;
+      const isLibToConvert = new RegExp(`(${libs.join("|")})`).test(src);
+      if (!isLibToConvert) {
+        this.ignoredImports.push(node);
+        path.remove();
+        return;
+      }
+      //const testSrc = (opts.libs || ["^sap/"]).concat(opts.files || []);
+      // const isUi5SrcRE = testSrc.length && new RegExp(`(${testSrc.join("|")})`);
+      // const isUi5Src = isUi5SrcRE.test(src);
 
-      // NOTE: DO NOT REMOVE. This code is for future enhancements, not old logic.
-      // const testLibs = opts.libs || [];
-      // const isLibRE = testLibs.length && new RegExp(`(${testLibs.join("|")})`);
-      // const isLib = isLibRE.test(src)
-      // const testSrc = (opts.libs || ['^sap/']).concat(opts.files || [])
-      // const isUi5SrcRE = testSrc.length && new RegExp(`(${testSrc.join('|')})`)
-      // const isUi5Src = isUi5SrcRE.test(src)
+      // Importing using an interop is the default behaviour but can be opt-out using regex.
+      const shouldInterop = !this.noImportInteropPrefixesRegexp.test(src);
 
       const name = cleanImportSource(src); // default to the src for import without named var
 
+      // Note that existingImport may get mutated if there are multiple import lines from the same module.
       const existingImport = this.imports.find(imp => imp.src === src);
+
       const imp = existingImport || {
         src, // url
         name,
         // isLib, // for future use separating UI5 imports from npm/webpack imports
         // isUi5Src, // not used yet
         tmpName: shouldInterop ? tempModuleName(name) : name,
-        destructors: [],
+        deconstructors: [],
         default: false,
         interop: false,
         path: path,
         locked: false,
       };
 
-      const destructors = [];
+      const deconstructors = [];
 
       for (const specifier of specifiers) {
         if (t.isImportDefaultSpecifier(specifier)) {
@@ -125,8 +132,8 @@ module.exports = () => {
           }
 
           if (shouldInterop) {
-            destructors.push(
-              th.buildDefaultImportDestructor({
+            deconstructors.push(
+              th.buildDefaultImportDeconstructor({
                 MODULE: t.identifier(imp.tmpName),
                 LOCAL: specifier.local,
               })
@@ -138,11 +145,11 @@ module.exports = () => {
             // If the namespace specifier is the only import, we can avoid the temp name and the destructor
             imp.name = specifier.local.name;
             imp.tmpName = specifier.local.name;
-            imp.locked = true;
+            imp.locked = true; // Don't let another import line for the same module change the name.
           } else {
             // e.g. import X, * as X2 from 'X'
-            // Else it's probably combined with a default export. keep the tmpName and destruct it
-            destructors.push(
+            // Else it's probably combined with a default export. keep the tmpName and destructure it
+            deconstructors.push(
               th.buildConstDeclaration({
                 NAME: specifier.local,
                 VALUE: t.identifier(imp.tmpName),
@@ -151,7 +158,7 @@ module.exports = () => {
           }
         } else if (t.isImportSpecifier(specifier)) {
           // e.g. import { A } from 'X'
-          destructors.push(
+          deconstructors.push(
             th.buildNamedImportDestructor({
               MODULE: t.identifier(imp.tmpName),
               LOCAL: specifier.local,
@@ -165,16 +172,18 @@ module.exports = () => {
         }
       }
 
-      path.replaceWithMultiple(destructors);
-      if (destructors.length) {
+      path.replaceWithMultiple(deconstructors);
+
+      if (deconstructors.length) {
+        // Keep the same variable name if the same module is imported on another line.
         imp.locked = true;
       }
 
-      imp.destructors = imp.destructors.concat(destructors);
+      imp.deconstructors = imp.deconstructors.concat(deconstructors);
 
-      // TODO: now that we're saving destructors on the imp, dynamically determine firstImport if needed.
-      if (!this.firstImport && imp.destructors[0]) {
-        this.firstImport = imp.destructors[0];
+      // TODO: now that we're saving deconstructors on the import, dynamically determine firstImport if needed.
+      if (!this.firstImport && imp.deconstructors[0]) {
+        this.firstImport = imp.deconstructors[0];
       }
 
       if (!existingImport) {
