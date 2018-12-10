@@ -1,4 +1,3 @@
-
 import { types as t } from "@babel/core";
 import * as th from "./helpers/templates";
 import * as ast from "./helpers/ast";
@@ -16,21 +15,23 @@ AST Explorer: https://astexplorer.net/
 */
 
 const CONSTRUCTOR = "constructor";
-const tempModuleName = (name) => `__${name}`;
-const cleanImportSource = (src) => src.replace(/(\/)|(-)/g, "_").replace(/\./g, "");
+const tempModuleName = name => `__${name}`;
+const cleanImportSource = src =>
+  src.replace(/(\/)|(-)/g, "_").replace(/\./g, "");
 
 module.exports = () => {
-
   const ProgramVisitor = {
     // Use a ProgramVisitor to efficiently avoid processing the same file twice if babel calls twice.
-    // The UI5ModuleVisitor will only be used if it hasn't let ran.
+    // The UI5ModuleVisitor will only be used if it hasn't ran.
     Program(path, { opts }) {
       if (this.ran) return;
       this.ran = true;
       let { node } = path;
 
       if (opts.onlyConvertNamedClass == false) {
-        throw new Error("ERROR: onlyConvertNamedClass=false is no longer supported. Use autoConvertAllExtendClassesByDefault=true");
+        throw new Error(
+          "ERROR: onlyConvertNamedClass=false is no longer supported. Use autoConvertAllExtendClassesByDefault=true"
+        );
       }
       // TODO: enable this in a later version
       // else if (opts.onlyConvertNamedClass == true) {
@@ -49,23 +50,30 @@ module.exports = () => {
       // Opts handling
       this.namespacePrefix = opts.namespacePrefix;
       this.noImportInteropPrefixes = opts.noImportInteropPrefixes || ["sap/"];
-      this.noImportInteropPrefixesRegexp = new RegExp(this.noImportInteropPrefixes.map(p => `(^${p}.*)`).join("|"));
+      this.noImportInteropPrefixesRegexp = new RegExp(
+        this.noImportInteropPrefixes.map(p => `(^${p}.*)`).join("|")
+      );
 
       path.traverse(UI5ModuleVisitor, this);
 
-      const needsWrap = !!(this.defaultExport || this.imports.length || this.namedExports.length || this.injectDynamicImportHelper);
+      const needsWrap = !!(
+        this.defaultExport ||
+        this.imports.length ||
+        this.namedExports.length ||
+        this.injectDynamicImportHelper
+      );
       if (needsWrap) {
         wrap(this, node, opts);
       }
-    }
+    },
   };
 
   const UI5ModuleVisitor = {
-
     /*!
      * Removes the ES6 import and adds the details to the import array in our state.
      */
-    ImportDeclaration(path) { // { opts = {} }
+    ImportDeclaration(path) {
+      // , { opts = {} }
       const { node } = path;
 
       if (node.importKind === "type") return; // flow-type
@@ -76,8 +84,8 @@ module.exports = () => {
       const shouldInterop = !this.noImportInteropPrefixesRegexp.test(src);
 
       // NOTE: DO NOT REMOVE. This code is for future enhancements, not old logic.
-      // const testLibs = opts.libs || ['^sap/']
-      // const isLibRE = testLibs.length && new RegExp(`(${testLibs.join('|')})`)
+      // const testLibs = opts.libs || [];
+      // const isLibRE = testLibs.length && new RegExp(`(${testLibs.join("|")})`);
       // const isLib = isLibRE.test(src)
       // const testSrc = (opts.libs || ['^sap/']).concat(opts.files || [])
       // const isUi5SrcRE = testSrc.length && new RegExp(`(${testSrc.join('|')})`)
@@ -91,18 +99,19 @@ module.exports = () => {
         name,
         // isLib, // for future use separating UI5 imports from npm/webpack imports
         // isUi5Src, // not used yet
-        tmpName: (shouldInterop ? tempModuleName(name) : name),
+        tmpName: shouldInterop ? tempModuleName(name) : name,
         destructors: [],
         default: false,
         interop: false,
         path: path,
-        locked: false
+        locked: false,
       };
 
       const destructors = [];
 
       for (const specifier of specifiers) {
-        if (t.isImportDefaultSpecifier(specifier)) { // import X from 'X'
+        if (t.isImportDefaultSpecifier(specifier)) {
+          // e.g. import X from 'X'
           imp.default = true;
           imp.interop = shouldInterop;
 
@@ -123,15 +132,15 @@ module.exports = () => {
               })
             );
           }
-        }
-        else if (t.isImportNamespaceSpecifier(specifier)) {
-          if (specifiers.length === 1 && !imp.locked) { // import * as X from 'X'
+        } else if (t.isImportNamespaceSpecifier(specifier)) {
+          if (specifiers.length === 1 && !imp.locked) {
+            // e.g. import * as X from 'X'
             // If the namespace specifier is the only import, we can avoid the temp name and the destructor
             imp.name = specifier.local.name;
             imp.tmpName = specifier.local.name;
             imp.locked = true;
-          }
-          else { // import X, * as X2 from 'X'
+          } else {
+            // e.g. import X, * as X2 from 'X'
             // Else it's probably combined with a default export. keep the tmpName and destruct it
             destructors.push(
               th.buildConstDeclaration({
@@ -140,18 +149,19 @@ module.exports = () => {
               })
             );
           }
-        }
-        else if (t.isImportSpecifier(specifier)) { // import { A } from 'X'
+        } else if (t.isImportSpecifier(specifier)) {
+          // e.g. import { A } from 'X'
           destructors.push(
             th.buildNamedImportDestructor({
               MODULE: t.identifier(imp.tmpName),
               LOCAL: specifier.local,
-              IMPORTED: t.stringLiteral(specifier.imported.name)
+              IMPORTED: t.stringLiteral(specifier.imported.name),
             })
           );
-        }
-        else {
-          throw path.buildCodeFrameError(`Unknown ImportDeclaration specifier type ${specifier.type}`);
+        } else {
+          throw path.buildCodeFrameError(
+            `Unknown ImportDeclaration specifier type ${specifier.type}`
+          );
         }
       }
 
@@ -182,7 +192,8 @@ module.exports = () => {
       const { specifiers, declaration, source } = node;
 
       let fromSource = "";
-      if (source) { // export { one, two } from 'x'
+      if (source) {
+        // e.g. export { one, two } from 'x'
         const src = source.value;
         const name = cleanImportSource(src);
         const tmpName = tempModuleName(name);
@@ -190,7 +201,8 @@ module.exports = () => {
         fromSource = tmpName + ".";
       }
 
-      if (specifiers && specifiers.length) { // export { one, two }
+      if (specifiers && specifiers.length) {
+        // e.g. export { one, two }
         for (const specifier of path.node.specifiers) {
           this.namedExports.push({
             key: specifier.exported,
@@ -198,34 +210,42 @@ module.exports = () => {
           });
         }
         path.remove();
-      }
-      else if (declaration) { // export const c = 1 | export function f() {}
-        if (["TypeAlias", "InterfaceDeclaration", "TSInterfaceDeclaration"].includes(declaration.type)) return; // TS or Flow-types
+      } else if (declaration) {
+        // e.g. export const c = 1 | export function f() {}
+        if (
+          [
+            "TypeAlias",
+            "InterfaceDeclaration",
+            "TSInterfaceDeclaration",
+          ].includes(declaration.type)
+        )
+          return; // TS or Flow-types
         const name = ast.getIdName(declaration);
-        if (name) { // export function f() {}
+        if (name) {
+          // e.g. export function f() {}
           const id = t.identifier(declaration.id.name);
           this.namedExports.push({
             key: id,
             value: id,
-            declaration
+            declaration,
           });
-        }
-        else if (declaration.declarations) { // export const c = 1
+        } else if (declaration.declarations) {
+          // e.g. export const c = 1
           for (const subDeclaration of declaration.declarations) {
             const id = t.identifier(subDeclaration.id.name);
             this.namedExports.push({
               value: id,
               key: id,
-              declaration: subDeclaration
+              declaration: subDeclaration,
             });
           }
-        }
-        else {
-          throw path.buildCodeFrameError("Unknown ExportNamedDeclaration shape.");
+        } else {
+          throw path.buildCodeFrameError(
+            "Unknown ExportNamedDeclaration shape."
+          );
         }
         path.replaceWith(declaration);
-      }
-      else {
+      } else {
         throw path.buildCodeFrameError("Unknown ExportNamedDeclaration shape.");
       }
     },
@@ -239,7 +259,8 @@ module.exports = () => {
       const { node } = path;
       const { declaration } = node;
       const declarationName = ast.getIdName(declaration);
-      if (hasGlobalExportFlag(node)) { // check for jsdoc @export
+      if (hasGlobalExportFlag(node)) {
+        // check for jsdoc @export
         this.exportGlobal = true;
       }
       if (declarationName) {
@@ -247,15 +268,19 @@ module.exports = () => {
         // Leave the declaration in-line and preserve the identifier for the return statement.
         path.replaceWith(declaration);
         this.defaultExport = t.identifier(declarationName);
-      }
-      else {
+      } else {
         // Identifier, ObjectExpression or anonymous FunctionDeclaration
         // Safe to move to the end and return directly
         if (t.isFunctionDeclaration(declaration)) {
           const { params, body, generator, async: isAsync } = declaration;
-          this.defaultExport = t.functionExpression(null, params, body, generator, isAsync);
-        }
-        else {
+          this.defaultExport = t.functionExpression(
+            null,
+            params,
+            body,
+            generator,
+            isAsync
+          );
+        } else {
           this.defaultExport = declaration;
         }
         path.remove();
@@ -292,7 +317,9 @@ module.exports = () => {
         if (opts.neverConvertClass) {
           return;
         }
-        if (!doesClassExtendFromImport(node, [...this.imports, ...this.requires])) {
+        if (
+          !doesClassExtendFromImport(node, [...this.imports, ...this.requires])
+        ) {
           // If it doesn't extend from an import, treat it as plain ES2015 class.
           return;
         }
@@ -304,11 +331,16 @@ module.exports = () => {
           return;
         }
 
-        let shouldConvert = (!!opts.autoConvertAllExtendClasses) // default false
-          || (classInfo.name || classInfo.alias)
-          || (/.*[.]controller[.]js$/.test(file.opts.filename) && opts.autoConvertControllerClass !== false); // default true
+        let shouldConvert =
+          !!opts.autoConvertAllExtendClasses || // default false
+          (classInfo.name || classInfo.alias) ||
+          (/.*[.]controller[.]js$/.test(file.opts.filename) &&
+            opts.autoConvertControllerClass !== false); // default true
 
-        if (/.*[.]controller[.]js$/.test(file.opts.filename) && opts.autoConvertControllerClass !== false) {
+        if (
+          /.*[.]controller[.]js$/.test(file.opts.filename) &&
+          opts.autoConvertControllerClass !== false
+        ) {
           shouldConvert = true;
         }
 
@@ -320,26 +352,37 @@ module.exports = () => {
 
         // Find the Block scoped parent (Program or Function body) and search for assigned properties within that.
         const blockParent = path.findParent(path => path.isBlock()).node;
-        const staticProps = ast.groupPropertiesByName(ast.getOtherPropertiesOfIdentifier(blockParent, name));
+        const staticProps = ast.groupPropertiesByName(
+          ast.getOtherPropertiesOfIdentifier(blockParent, name)
+        );
         // TODO: flag metadata and renderer for removal if applicable
-        const ui5ExtendClass = classes.convertClassToUI5Extend(path, node, classInfo, staticProps, opts);
+        const ui5ExtendClass = classes.convertClassToUI5Extend(
+          path,
+          node,
+          classInfo,
+          staticProps,
+          opts
+        );
 
-        if (path.isClassDeclaration()) { // class X {}
+        if (path.isClassDeclaration()) {
+          // e.g. class X {}
           path.replaceWithMultiple(ui5ExtendClass);
-        }
-        else if (path.isClassExpression()) { // return class X {}
+        } else if (path.isClassExpression()) {
+          //e.g.  return class X {}
           if (t.isReturnStatement(parent)) {
             // Add the return statement back before calling replace
-            ui5ExtendClass.push(th.buildReturn({
-              ID: t.identifier(classInfo.localName)
-            }));
+            ui5ExtendClass.push(
+              th.buildReturn({
+                ID: t.identifier(classInfo.localName),
+              })
+            );
           }
           parentPath.replaceWithMultiple(ui5ExtendClass);
         }
       },
       exit() {
         this.superClassName = null;
-      }
+      },
     },
 
     /*!
@@ -352,19 +395,17 @@ module.exports = () => {
         this.injectDynamicImportHelper = true;
         path.replaceWith({
           ...node,
-          callee: t.identifier("__ui5_require_async")
+          callee: t.identifier("__ui5_require_async"),
         });
       }
       // If the file already has sap.ui.define, get the names of variables it creates to use for the class logic.
       else if (ast.isCallExpressionCalling(node, "sap.ui.define")) {
         this.requires = getRequiredParamsOfSAPUIDefine(path, node);
         return;
-      }
-      else if (this.superClassName) {
+      } else if (this.superClassName) {
         if (t.isSuper(callee)) {
           replaceConstructorSuperCall(path, node, this.superClassName);
-        }
-        else if (t.isSuper(callee.object)) {
+        } else if (t.isSuper(callee.object)) {
           replaceObjectSuperCall(path, node, this.superClassName);
         }
       }
@@ -386,16 +427,17 @@ module.exports = () => {
             t.functionExpression(
               t.identifier(CONSTRUCTOR),
               node.params,
-              node.body)));
+              node.body
+            )
+          )
+        );
       }
-    }
-
+    },
   };
 
   function getRequiredParamsOfSAPUIDefine(path, node) {
     const defineArgs = node.arguments;
-    const callbackNode = defineArgs
-      .find(argNode => (t.isFunction(argNode)));
+    const callbackNode = defineArgs.find(argNode => t.isFunction(argNode));
     return callbackNode.params; // Identifier
   }
 
@@ -410,7 +452,12 @@ module.exports = () => {
    * Replace super.method() call
    */
   function replaceObjectSuperCall(path, node, superClassName) {
-    replaceSuperNamedCall(path, node, superClassName, node.callee.property.name);
+    replaceSuperNamedCall(
+      path,
+      node,
+      superClassName,
+      node.callee.property.name
+    );
   }
 
   function replaceSuperNamedCall(path, node, superClassName, methodName) {
@@ -418,13 +465,15 @@ module.exports = () => {
     // if it gets further transpiled by babel spread args transform (will be .call.apply(...).
     const thisEx = t.thisExpression();
     const hasSpread = node.arguments.some(t.isSpreadElement);
-    const caller = (hasSpread ? "apply" : "call");
-    const callArgs = (hasSpread
+    const caller = hasSpread ? "apply" : "call";
+    const callArgs = hasSpread
       ? [thisEx, t.arrayExpression(node.arguments)]
-      : [thisEx, ...node.arguments]
-    );
+      : [thisEx, ...node.arguments];
     path.replaceWith(
-      t.callExpression(t.identifier(`${superClassName}.prototype.${methodName}.${caller}`), callArgs)
+      t.callExpression(
+        t.identifier(`${superClassName}.prototype.${methodName}.${caller}`),
+        callArgs
+      )
     );
   }
 
@@ -433,7 +482,9 @@ module.exports = () => {
     if (!superClass) {
       return false;
     }
-    const isImported = imports.some(imported => imported.name === superClass.name);
+    const isImported = imports.some(
+      imported => imported.name === superClass.name
+    );
     return isImported;
   }
 
@@ -442,6 +493,6 @@ module.exports = () => {
   }
 
   return {
-    visitor: ProgramVisitor
+    visitor: ProgramVisitor,
   };
 };

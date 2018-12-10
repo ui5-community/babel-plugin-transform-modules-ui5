@@ -1,4 +1,3 @@
-
 import { types as t } from "@babel/core";
 import * as th from "./templates";
 import Path from "path";
@@ -13,7 +12,14 @@ import { getDecoratorClassInfo } from "./decorators";
  * Any static methods or properties will be moved outside the class body.
  * The path will be updated with the new AST.
  */
-export function convertClassToUI5Extend(path, node, classInfo, extraStaticProps, opts) { // eslint-disable-line no-unused-vars
+export function convertClassToUI5Extend(
+  path,
+  node,
+  classInfo,
+  extraStaticProps,
+  opts
+) {
+  // eslint-disable-line no-unused-vars
   if (!(t.isClassDeclaration(node) || t.isClassExpression(node))) {
     return node;
   }
@@ -24,9 +30,12 @@ export function convertClassToUI5Extend(path, node, classInfo, extraStaticProps,
   const className = classNameIdentifier.name;
   const superClass = node.superClass; // Identifier
   const superClassName = node.superClass.name;
-  const isController = className.includes("Controller") || !!classInfo.controller;
-  const moveControllerPropsToOnInit = isController && !!opts.moveControllerPropsToOnInit;
-  const moveStaticStaticPropsToExtend = isController && !!opts.addControllerStaticPropsToExtend;
+  const isController =
+    className.includes("Controller") || !!classInfo.controller;
+  const moveControllerPropsToOnInit =
+    isController && !!opts.moveControllerPropsToOnInit;
+  const moveStaticStaticPropsToExtend =
+    isController && !!opts.addControllerStaticPropsToExtend;
 
   const extendProps = [];
   const boundProps = [];
@@ -36,7 +45,9 @@ export function convertClassToUI5Extend(path, node, classInfo, extraStaticProps,
   let constructor;
   let constructorComments;
 
-  const staticPropsToAdd = (moveStaticStaticPropsToExtend) ? Object.keys(extraStaticProps) : ["metadata", "renderer"];
+  const staticPropsToAdd = moveStaticStaticPropsToExtend
+    ? Object.keys(extraStaticProps)
+    : ["metadata", "renderer"];
 
   for (const propName of staticPropsToAdd) {
     if (extraStaticProps[propName]) {
@@ -48,25 +59,38 @@ export function convertClassToUI5Extend(path, node, classInfo, extraStaticProps,
 
   for (const member of node.body.body) {
     const memberName = member.key.name;
-    const memberExpression = member.static && t.memberExpression(classNameIdentifier, member.key);
+    const memberExpression =
+      member.static && t.memberExpression(classNameIdentifier, member.key);
     if (t.isClassMethod(member)) {
-      const func = t.functionExpression(member.key, member.params, member.body, member.generator, member.async);
+      const func = t.functionExpression(
+        member.key,
+        member.params,
+        member.body,
+        member.generator,
+        member.async
+      );
       if (member.static) {
         staticMembers.push(
           t.expressionStatement(
-            t.assignmentExpression("=", memberExpression, func))
+            t.assignmentExpression("=", memberExpression, func)
+          )
         );
-      }
-      else {
+      } else {
         propsByName[memberName] = func;
         func.generator = member.generator;
         func.async = member.async;
         if (member.kind === "get" || member.kind === "set") {
           extendProps.push(
-            t.objectMethod(member.kind, member.key, member.params, member.body, member.computed)
+            t.objectMethod(
+              member.kind,
+              member.key,
+              member.params,
+              member.body,
+              member.computed
+            )
           );
-        }
-        else { // method
+        } else {
+          // method
           if (memberName === CONSTRUCTOR) {
             constructorComments = member.leadingComments;
             constructor = func;
@@ -75,34 +99,25 @@ export function convertClassToUI5Extend(path, node, classInfo, extraStaticProps,
             }
           }
           func.id = path.scope.generateUidIdentifier(func.id.name); // Give the function a unique name
-          extendProps.push(
-            t.objectProperty(member.key, func)
-          );
+          extendProps.push(t.objectProperty(member.key, func));
         }
       }
-    }
-    else if (t.isClassProperty(member)) {
+    } else if (t.isClassProperty(member)) {
       if (!member.value) continue; // un-initialized static class prop (typescript)
       if (memberName === "metadata" || memberName === "renderer") {
         // Special handling for TypeScript limitation where metadata and renderer must be properties.
-        extendProps.unshift(
-          t.objectProperty(member.key, member.value)
-        );
-      }
-      else if (member.static) {
+        extendProps.unshift(t.objectProperty(member.key, member.value));
+      } else if (member.static) {
         if (moveStaticStaticPropsToExtend) {
-          extendProps.unshift(
-            t.objectProperty(member.key, member.value)
-          );
-        }
-        else {
+          extendProps.unshift(t.objectProperty(member.key, member.value));
+        } else {
           staticMembers.push(
             t.expressionStatement(
-              t.assignmentExpression("=", memberExpression, member.value))
+              t.assignmentExpression("=", memberExpression, member.value)
+            )
           );
         }
-      }
-      else {
+      } else {
         propsByName[memberName] = member.value;
         if (memberName === "constructor") {
           constructorComments = member.leadingComments;
@@ -111,13 +126,13 @@ export function convertClassToUI5Extend(path, node, classInfo, extraStaticProps,
             continue; // don't push to props yet
           }
         }
-        if (t.isArrowFunctionExpression(member.value) || ast.isThisExpressionUsed(member.value)) {
+        if (
+          t.isArrowFunctionExpression(member.value) ||
+          ast.isThisExpressionUsed(member.value)
+        ) {
           boundProps.push(member);
-        }
-        else {
-          extendProps.push(
-            t.objectProperty(member.key, member.value)
-          );
+        } else {
+          extendProps.push(t.objectProperty(member.key, member.value));
         }
       }
     }
@@ -129,29 +144,35 @@ export function convertClassToUI5Extend(path, node, classInfo, extraStaticProps,
   // Also move the constructor's statements to the onInit.
 
   const bindToConstructor = !moveControllerPropsToOnInit;
-  const bindToMethodName = moveControllerPropsToOnInit ? "onInit" : "constructor";
+  const bindToMethodName = moveControllerPropsToOnInit
+    ? "onInit"
+    : "constructor";
   const bindToId = t.identifier(bindToMethodName);
-  let bindMethod = moveControllerPropsToOnInit ? propsByName[bindToMethodName] : constructor; // avoid getting a prop named constructor as it may return {}'s
+  // avoid getting a prop named constructor as it may return {}'s
+  let bindMethod = moveControllerPropsToOnInit
+    ? propsByName[bindToMethodName]
+    : constructor;
   const constructorJsdoc = getTags(constructorComments);
   const keepConstructor = classInfo.keepConstructor || constructorJsdoc.keep;
 
-  const needsBindingMethod = boundProps.length || (moveControllerPropsToOnInit && constructor && !keepConstructor);
+  const needsBindingMethod =
+    boundProps.length ||
+    (moveControllerPropsToOnInit && constructor && !keepConstructor);
 
   // See if we need to inject the 'constructor' or 'onInit' method, depending which one we'll bind to.
   if (needsBindingMethod && !bindMethod) {
-    const bindMethodDeclaration = (bindToConstructor
+    const bindMethodDeclaration = bindToConstructor
       ? th.buildInheritingConstructor({
-        SUPER: t.identifier(superClassName)
-      })
+          SUPER: t.identifier(superClassName),
+        })
       : th.buildInheritingFunction({
-        NAME: bindToId,
-        SUPER: t.identifier(superClassName)
-      })
+          NAME: bindToId,
+          SUPER: t.identifier(superClassName),
+        });
+    bindMethod = ast.convertFunctionDeclarationToExpression(
+      bindMethodDeclaration
     );
-    bindMethod = ast.convertFunctionDeclarationToExpression(bindMethodDeclaration);
-    extendProps.unshift(
-      t.objectProperty(bindToId, bindMethod)
-    );
+    extendProps.unshift(t.objectProperty(bindToId, bindMethod));
   }
 
   if (moveControllerPropsToOnInit && constructor) {
@@ -159,12 +180,11 @@ export function convertClassToUI5Extend(path, node, classInfo, extraStaticProps,
       extendProps.unshift(
         t.objectProperty(t.identifier(CONSTRUCTOR), constructor)
       );
-    }
-    else {
+    } else {
       // Copy all except the super call from the constructor to the bindMethod (i.e. onInit)
       bindMethod.body.body.unshift(
-        ...(constructor.body.body
-          .filter(node => !ast.isSuperCallExpression(node.expression))
+        ...constructor.body.body.filter(
+          node => !ast.isSuperCallExpression(node.expression)
         )
       );
     }
@@ -177,27 +197,26 @@ export function convertClassToUI5Extend(path, node, classInfo, extraStaticProps,
     const mappedProps = boundProps.map(prop => {
       return th.buildThisAssignment({
         NAME: prop.key,
-        VALUE: prop.value
+        VALUE: prop.value,
       });
     });
 
-    const superIndex = bindMethod.body.body
-      .findIndex(node => (
+    const superIndex = bindMethod.body.body.findIndex(
+      node =>
         ast.isSuperCallExpression(node.expression) ||
-        ast.isSuperPrototypeCallOf(node.expression, superClassName, bindToMethodName)
-    ));
+        ast.isSuperPrototypeCallOf(
+          node.expression,
+          superClassName,
+          bindToMethodName
+        )
+    );
     if (superIndex === -1) {
       // If there's no super, just add the bound props at the start
       bindMethod.body.body.unshift(...mappedProps);
-    }
-    else {
+    } else {
       const upToSuper = bindMethod.body.body.slice(0, superIndex + 1);
       const afterSuper = bindMethod.body.body.slice(superIndex + 1);
-      bindMethod.body.body = [
-        ...upToSuper,
-        ...mappedProps,
-        ...afterSuper
-      ];
+      bindMethod.body.body = [...upToSuper, ...mappedProps, ...afterSuper];
     }
   }
 
@@ -205,13 +224,10 @@ export function convertClassToUI5Extend(path, node, classInfo, extraStaticProps,
     NAME: classNameIdentifier,
     SUPERNAME: superClass,
     FQN: t.stringLiteral(getFullyQualifiedName(classInfo)),
-    OBJECT: t.objectExpression(extendProps)
+    OBJECT: t.objectExpression(extendProps),
   });
 
-  return [
-    extendAssign,
-    ...staticMembers
-  ];
+  return [extendAssign, ...staticMembers];
 }
 
 /**
@@ -241,13 +257,14 @@ function getFullyQualifiedName(classInfo) {
 export function getClassInfo(path, node, parent, pluginOpts) {
   const defaults = {
     localName: node.id.name,
-    superClassName: (node.superClass && node.superClass.name),
-    namespace: getFileBaseNamespace(path, pluginOpts) || ""
+    superClassName: node.superClass && node.superClass.name,
+    namespace: getFileBaseNamespace(path, pluginOpts) || "",
   };
   const decoratorInfo = getDecoratorClassInfo(node);
   const jsDocInfo = getJsDocClassInfo(node, parent);
 
-  return assignDefined( // like Object.assign, but ignoring undefined values.
+  return assignDefined(
+    // like Object.assign, but ignoring undefined values.
     defaults,
     decoratorInfo,
     jsDocInfo
@@ -269,8 +286,7 @@ function getFileBaseNamespace(path, pluginOpts) {
       namespaceParts.unshift(pluginOpts.namespacePrefix);
     }
     return namespaceParts.join(".");
-  }
-  else {
+  } else {
     return undefined;
   }
 }

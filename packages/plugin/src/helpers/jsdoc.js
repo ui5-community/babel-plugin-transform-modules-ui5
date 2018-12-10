@@ -1,28 +1,19 @@
-
 import { types as t } from "@babel/core";
 import doctrine from "doctrine";
 import ignoreCase from "ignore-case";
 import { isCommentBlock } from "./ast";
 
-const classInfoValueTags = [
-  "alias",
-  "name",
-  "namespace"
-];
+const classInfoValueTags = ["alias", "name", "namespace"];
 
-const classInfoBoolTags = [
-  "nonUI5",
-  "controller",
-  "keepConstructor"
-];
+const classInfoBoolTags = ["nonUI5", "controller", "keepConstructor"];
 
 export function getJsDocClassInfo(node, parent) {
   if (node.leadingComments) {
-    return (node.leadingComments
+    return node.leadingComments
       .filter(isCommentBlock)
       .map(comment => {
         const docAST = doctrine.parse(comment.value, {
-          unwrap: true
+          unwrap: true,
         });
         const tags = docAST.tags || [];
         const info = {};
@@ -40,14 +31,12 @@ export function getJsDocClassInfo(node, parent) {
         }
         return info;
       })
-      .filter(notEmpty)
-      )[0];
+      .filter(notEmpty)[0];
   }
   // Else see if the JSDoc are on the return statement (i..e return class X extends SAPClass)
   else if (t.isClassExpression(node) && t.isReturnStatement(parent)) {
     return getJsDocClassInfo(parent);
-  }
-  else {
+  } else {
     return {};
   }
 }
@@ -65,7 +54,7 @@ export function getTags(comments) {
       continue;
     }
     const docAST = doctrine.parse(comment.value, {
-      unwrap: true
+      unwrap: true,
     });
     const tags = docAST.tags;
     if (!tags || !tags.length) {
@@ -100,13 +89,12 @@ export function hasJsdocGlobalExportFlag(node) {
   if (!node.leadingComments) {
     return false;
   }
-  return node.leadingComments
-  .filter(isCommentBlock)
-  .some(comment => {
-    return doctrine.parse(comment.value, {
-      unwrap: true,
-      tags: ["global"]
-    })
-    .tags.length > 0;
+  return node.leadingComments.filter(isCommentBlock).some(comment => {
+    return (
+      doctrine.parse(comment.value, {
+        unwrap: true,
+        tags: ["global"],
+      }).tags.length > 0
+    );
   });
 }

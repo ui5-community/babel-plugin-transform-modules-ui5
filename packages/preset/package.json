@@ -8,7 +8,11 @@
     "babel-plugin-transform-modules-ui5": "^7.0.0-rc.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.1.6"
+    "@babel/core": "^7.1.6",
+    "prettier": "^1.15.3"
+  },
+  "scripts": {
+    "format": "prettier  --write index.js"
   },
   "keywords": [
     "ui5",
@@ -23,6 +27,7 @@
     "import",
     "export",
     "typescript",
-    "ts"
+    "ts",
+    "preset"
   ]
 }

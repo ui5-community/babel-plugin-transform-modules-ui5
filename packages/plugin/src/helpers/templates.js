@@ -1,4 +1,3 @@
-
 import { template, types as t } from "@babel/core";
 
 const exportName = "__exports";
@@ -46,7 +45,7 @@ export function buildNamedExport(obj) {
   return buildAssign({
     OBJECT: exportsIdentifier,
     NAME: obj.key,
-    VALUE: obj.value
+    VALUE: obj.value,
   });
 }
 

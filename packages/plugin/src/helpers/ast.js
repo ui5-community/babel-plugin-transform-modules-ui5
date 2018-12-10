@@ -1,4 +1,3 @@
-
 import { types as t } from "@babel/core";
 import flatten from "array-flatten";
 
@@ -9,7 +8,12 @@ export function isObjectAssignOrExtendsExpression(node) {
 export function isObjectAssignExpression(node) {
   if (!t.isCallExpression(node)) return false;
   const callee = node && node.callee;
-  return !!(callee.object && callee.property && callee.object.name === "Object" && (callee.property.name === "assign"));
+  return !!(
+    callee.object &&
+    callee.property &&
+    callee.object.name === "Object" &&
+    callee.property.name === "assign"
+  );
 }
 
 export function isExtendsHelperExpression(node) {
@@ -45,23 +49,25 @@ export function isSuperCallExpression(expression) {
 // }
 
 export function findPropertiesOfNode(blockScopeNode, declaration) {
-  if (t.isFunctionDeclaration(declaration) || t.isArrowFunctionExpression(declaration)) {
+  if (
+    t.isFunctionDeclaration(declaration) ||
+    t.isArrowFunctionExpression(declaration)
+  ) {
     return null;
-  }
-  else if (t.isObjectExpression(declaration)) {
+  } else if (t.isObjectExpression(declaration)) {
     return declaration.properties;
-  }
-  else if (t.isClass(declaration)) {
+  } else if (t.isClass(declaration)) {
     return [
       ...getInternalStaticThingsOfClass(declaration),
-      ...getOtherPropertiesOfIdentifier(blockScopeNode, declaration.id.name)
+      ...getOtherPropertiesOfIdentifier(blockScopeNode, declaration.id.name),
     ];
-  }
-  else if (t.isIdentifier(declaration)) {
+  } else if (t.isIdentifier(declaration)) {
     return getOtherPropertiesOfIdentifier(blockScopeNode, declaration.name);
-  }
-  else if (isObjectAssignOrExtendsExpression(declaration)) {
-    return getPropertiesOfObjectAssignOrExtendHelper(declaration, blockScopeNode);
+  } else if (isObjectAssignOrExtendsExpression(declaration)) {
+    return getPropertiesOfObjectAssignOrExtendHelper(
+      declaration,
+      blockScopeNode
+    );
   }
   return null;
 }
@@ -81,50 +87,59 @@ export function getOtherPropertiesOfIdentifier(blockScopeNode, idName) {
   return flatten(
     blockScopeNode.body
       .map(node => {
-        if (t.isExpressionStatement(node)) { // ID = value | ID.key = value | ID.key.nested = value
+        if (t.isExpressionStatement(node)) {
+          // ID = value | ID.key = value | ID.key.nested = value
           const { left, right } = node.expression;
           if (t.isAssignmentExpression(node.expression)) {
-            if (t.isIdentifier(left) && left.name === idName) { // ID = value
-              if (t.isObjectExpression(right)) { // ID = {}
+            if (t.isIdentifier(left) && left.name === idName) {
+              // ID = value
+              if (t.isObjectExpression(right)) {
+                // ID = {}
                 return right.properties; // Array<ObjectProperty>
               }
-            }
-            else {
+            } else {
               const { object, property: key } = left;
-              if (t.isIdentifier(object) && object.name === idName) { // ID.key = value
+              if (t.isIdentifier(object) && object.name === idName) {
+                // ID.key = value
                 return { key, value: right }; // ObjectProperty-like (key, value)
               }
             }
           }
-        }
-        else if (t.isVariableDeclaration(node)) {
+        } else if (t.isVariableDeclaration(node)) {
           // console.log(require('util').inspect(node, { depth: 4 }));
           return node.declarations
             .filter(declaration => declaration.id.name === idName)
             .map(declaration => declaration.init)
             .filter(init => init)
-            .filter(init => (
-              t.isObjectExpression(init) || isObjectAssignOrExtendsExpression(init))
+            .filter(
+              init =>
+                t.isObjectExpression(init) ||
+                isObjectAssignOrExtendsExpression(init)
             )
-            .map(init => (
-              t.isObjectExpression(init) ?
-                init.properties :
-                getPropertiesOfObjectAssignOrExtendHelper(init, blockScopeNode)
-            ));
+            .map(init =>
+              t.isObjectExpression(init)
+                ? init.properties
+                : getPropertiesOfObjectAssignOrExtendHelper(
+                    init,
+                    blockScopeNode
+                  )
+            );
         }
       })
       .filter(item => item)
   );
 }
 
-export function getPropertiesOfObjectAssignOrExtendHelper(node, blockScopeNode) {
+export function getPropertiesOfObjectAssignOrExtendHelper(
+  node,
+  blockScopeNode
+) {
   // Check all the args and recursively try to get props of identifiers (although they may be imported)
   return flatten(
     node.arguments.map(arg => {
       if (t.isObjectExpression(arg)) {
         return arg.properties;
-      }
-      else if (t.isIdentifier(arg)) {
+      } else if (t.isIdentifier(arg)) {
         // Recursive, although props will be empty if arg is an imported object
         return getOtherPropertiesOfIdentifier(blockScopeNode, arg.name);
       }
@@ -137,28 +152,46 @@ export function getPropNames(props) {
 }
 
 export function groupPropertiesByName(properties) {
-  return properties && properties.reduce((accumulator, property) => {
-    accumulator[property.key.name] = property.value;
-    return accumulator;
-  }, {});
+  return (
+    properties &&
+    properties.reduce((accumulator, property) => {
+      accumulator[property.key.name] = property.value;
+      return accumulator;
+    }, {})
+  );
 }
 
 export function convertFunctionDeclarationToExpression(declaration) {
-  return t.functionExpression(declaration.id, declaration.params, declaration.body, declaration.generator, declaration.async);
+  return t.functionExpression(
+    declaration.id,
+    declaration.params,
+    declaration.body,
+    declaration.generator,
+    declaration.async
+  );
 }
 
 export function convertDeclarationToExpression(declaration) {
   if (t.isFunctionDeclaration(declaration)) {
     return convertFunctionDeclarationToExpression(declaration);
-  }
-  else {
+  } else {
     // console.log('-----', declaration.type)
     return declaration;
   }
 }
 
-export function isSuperPrototypeCallOf(expression, superClassName, superMethodName) {
-  return t.isCallExpression(expression) && isCallExpressionCalling(expression, `${superClassName}.prototype.${superMethodName}.apply`);
+export function isSuperPrototypeCallOf(
+  expression,
+  superClassName,
+  superMethodName
+) {
+  return (
+    t.isCallExpression(expression) &&
+    isCallExpressionCalling(
+      expression,
+      `${superClassName}.prototype.${superMethodName}.apply`
+    )
+  );
 }
 
 /**
@@ -175,7 +208,8 @@ export function isCallExpressionCalling(expression, dotNotationString) {
   let node = callee;
   for (const nextNamePart of parts.reverse()) {
     if (!node) return false;
-    const nodeName = node.name || (node.property && node.property.name); // property won't be there for an anonymous function
+    // property won't be there for an anonymous function
+    const nodeName = node.name || (node.property && node.property.name);
     if (nodeName !== nextNamePart) return false;
     node = node.object;
   }
@@ -201,15 +235,15 @@ export function isThisExpressionUsed(node) {
   }
   if (t.isThisExpression(node)) {
     return true;
-  }
-  else if (t.isCallExpression(node)) {
-    return isThisExpressionUsed(node.callee) || node.arguments.some(isThisExpressionUsed);
-  }
-  else if (t.isMemberExpression(node)) {
+  } else if (t.isCallExpression(node)) {
+    return (
+      isThisExpressionUsed(node.callee) ||
+      node.arguments.some(isThisExpressionUsed)
+    );
+  } else if (t.isMemberExpression(node)) {
     // TODO: instead of recursion, we could traverse the member expressions until the deepest object, and see if that's ThisExpression
     return isThisExpressionUsed(node.object);
-  }
-  else {
+  } else {
     return false;
   }
 }

@@ -10,5 +10,6 @@
     "sergiirocks",
     "sourceroot",
     "supername"
-  ]
+  ],
+  "editor.formatOnSave": true
 }

@@ -1,19 +1,16 @@
-
 const classInfoValueTags = [
   "alias",
   "name",
   "namespace",
   "metadata",
-  "renderer"
+  "renderer",
 ];
 
-const classInfoBoolTags = [
-  "nonUI5"
-];
+const classInfoBoolTags = ["nonUI5"];
 
 export function getDecoratorClassInfo(node) {
   const decorators = node.decorators;
-  if (!decorators  || !decorators.length) {
+  if (!decorators || !decorators.length) {
     return null;
   }
   const decoratorsByName = groupByName(decorators);
@@ -25,7 +22,7 @@ export function getDecoratorClassInfo(node) {
     }
   }
   for (const tagName of classInfoBoolTags) {
-    const value = !!(decoratorsByName[tagName.toLowerCase()]);
+    const value = !!decoratorsByName[tagName.toLowerCase()];
     if (value) {
       info[tagName] = value;
     }
@@ -36,7 +33,8 @@ export function getDecoratorClassInfo(node) {
 function groupByName(decorators) {
   return decorators.reduce((accumulator, decorator) => {
     const expression = decorator.expression;
-    const name = expression.name || expression.callee && expression.callee.name;
+    const name =
+      expression.name || (expression.callee && expression.callee.name);
     accumulator[name.toLowerCase()] = decorator;
     return accumulator;
   }, {});

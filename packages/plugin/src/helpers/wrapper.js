@@ -1,11 +1,9 @@
-
 import { types as t } from "@babel/core";
 import * as th from "./templates";
 import * as eh from "./exports";
 import * as ast from "./ast";
 
 export function wrap(visitor, programNode, opts) {
-
   let {
     defaultExport,
     exportGlobal,
@@ -25,13 +23,19 @@ export function wrap(visitor, programNode, opts) {
 
   // Before adding anything, see if the named exports can be collapsed into the default export.
   if (defaultExport && namedExports.length && opts.collapse) {
-
-    let { filteredExports, conflictingExports, newDefaultExportIdentifier } = eh.collapseNamedExports(programNode, defaultExport, namedExports, opts);
+    let {
+      filteredExports,
+      conflictingExports,
+      newDefaultExportIdentifier,
+    } = eh.collapseNamedExports(programNode, defaultExport, namedExports, opts);
 
     if (filteredExports.length && !opts.allowUnsafeMixedExports) {
-      throw new Error(`Unsafe mixing of conflicting default and named exports. The following named exports are conflicting: (${ast.getPropNames(conflictingExports).join(", ")}).`);
-    }
-    else {
+      throw new Error(
+        `Unsafe mixing of conflicting default and named exports. The following named exports are conflicting: (${ast
+          .getPropNames(conflictingExports)
+          .join(", ")}).`
+      );
+    } else {
       namedExports = filteredExports;
     }
 
@@ -55,8 +59,7 @@ export function wrap(visitor, programNode, opts) {
       }
       if (reachedFirstImport) {
         newBody.push(item);
-      }
-      else {
+      } else {
         preDefine.push(item);
       }
     }
@@ -77,9 +80,7 @@ export function wrap(visitor, programNode, opts) {
   if (!namedExports.length && defaultExport) {
     // If there's no named exports, return the default export
     body.push(t.returnStatement(defaultExport));
-  }
-  else if (namedExports.length) {
-
+  } else if (namedExports.length) {
     if (!extendAdded) {
       body.push(th.buildDeclareExports()); // i.e. const __exports = {__esModule: true};
     }
@@ -87,21 +88,16 @@ export function wrap(visitor, programNode, opts) {
     for (const namedExport of namedExports) {
       if (namedExport.all) {
         if (!allExportHelperAdded) {
-          body.push(
-            th.buildAllExportHelper()
-          );
+          body.push(th.buildAllExportHelper());
           allExportHelperAdded = true;
         }
         body.push(
           th.buildAllExport({
-            LOCAL: namedExport.value
+            LOCAL: namedExport.value,
           })
         );
-      }
-      else {
-        body.push(
-          th.buildNamedExport(namedExport)
-        );
+      } else {
+        body.push(th.buildNamedExport(namedExport));
       }
     }
 
@@ -109,7 +105,7 @@ export function wrap(visitor, programNode, opts) {
       body.push(
         th.buildNamedExport({
           key: t.identifier("default"),
-          value: defaultExport
+          value: defaultExport,
         })
       );
     }
@@ -122,24 +118,23 @@ export function wrap(visitor, programNode, opts) {
 
   programNode.body = [
     ...preDefine,
-    generateDefine(
-      body,
-      imports,
-      (exportGlobal || opts.exportAllGlobal)
-    )
+    generateDefine(body, imports, exportGlobal || opts.exportAllGlobal),
   ];
 }
 
 function hasUseStrict(node) {
-  return (node.directives || [])
-    .some(directive => directive.value.value === "use strict");
+  return (node.directives || []).some(
+    directive => directive.value.value === "use strict"
+  );
 }
 
 function generateDefine(body, imports, exportGlobal) {
   const defineOpts = {
     SOURCES: t.arrayExpression(imports.map(i => t.stringLiteral(i.src))),
     PARAMS: imports.map(i => t.identifier(i.tmpName)),
-    BODY: body
+    BODY: body,
   };
-  return exportGlobal ? th.buildDefineGlobal(defineOpts) : th.buildDefine(defineOpts);
+  return exportGlobal
+    ? th.buildDefineGlobal(defineOpts)
+    : th.buildDefine(defineOpts);
 }
