@@ -12,6 +12,7 @@
     "build": "npx babel src -d dist",
     "lint": "npx eslint src",
     "lint:fix": "npm run lint -- --fix",
+    "lint:staged": "lint-staged",
     "test": "npx jest __test__ --coverage=no",
     "test:watch": "npm test -- --watch",
     "prepare": "npm test && npm run build"
@@ -33,12 +34,6 @@
     "typescript",
     "ts"
   ],
-  "husky": {
-    "hooks": {
-      "prepare": "npm run clean & npm run build & npm run test",
-      "precommit": "lint-staged && npm run test"
-    }
-  },
   "author": "Ryan Murphy",
   "license": "MIT",
   "bugs": {
