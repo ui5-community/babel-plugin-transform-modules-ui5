@@ -1,30 +1,31 @@
+import X from "x";
 
-import X from "x"
-
-export const one = 1
+export const one = 1;
 export function two() {}
-export const three = 3
+export const three = 3;
 export function five() {}
 export function six() {}
 
-export const anotherConst = 9
+export const anotherConst = 9;
 export function otherFN() {}
 
 const O2 = {
-  six
-}
+  six,
+};
 
-const Utils = Object.assign({},
+const Utils = Object.assign(
+  {},
   X,
   {
     one,
-    two
-  }, {
-    five
+    two,
+  },
+  {
+    five,
   },
   O2 // recursion test
-)
+);
 
-Utils.three = 3
+Utils.three = 3;
 
-export default Utils
+export default Utils;

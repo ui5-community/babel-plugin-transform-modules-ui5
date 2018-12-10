@@ -8,12 +8,16 @@ import SAPClass from "sap/SAPClass";
  * @name Foo
  */
 export default class Foo extends SAPClass {
-    prop: number;
+  prop: number;
 }
 
 // let fooInstance: Foo = new Foo();
 // export fooInstance;
 
-export type MyObject = { /* ... */ }
+export type MyObject = {
+  /* ... */
+};
 
-export interface MyInterface { /* ... */ }
+export interface MyInterface {
+  /* ... */
+}

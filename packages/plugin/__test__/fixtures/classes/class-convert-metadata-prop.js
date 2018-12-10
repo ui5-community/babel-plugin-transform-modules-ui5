@@ -1,8 +1,7 @@
-
-import SAPClass from "sap/SAPClass"
+import SAPClass from "sap/SAPClass";
 
 const Formatter = {};
-const mdata = {}
+const mdata = {};
 
 /**
  * @name test.fixtures.classes.MyClass

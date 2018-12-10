@@ -1,6 +1,5 @@
-
-let one = 1
+let one = 1;
 export default () => {
-  return one + two
-}
-let two = 2
+  return one + two;
+};
+let two = 2;

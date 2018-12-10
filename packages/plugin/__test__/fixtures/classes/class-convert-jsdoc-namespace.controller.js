@@ -1,8 +1,6 @@
-
-import SAPClass from "sap/SAPClass"
+import SAPClass from "sap/SAPClass";
 
 /**
  * @namespace x.y
  */
-export default class MyClass extends SAPClass {
-}
+export default class MyClass extends SAPClass {}

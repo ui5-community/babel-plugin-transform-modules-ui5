@@ -1,16 +1,10 @@
 /**
  * This tests the autoConvertAllExtendClasses flag = true
  */
-import SAPClass from 'sap/class'
+import SAPClass from "sap/class";
 
-class MyClass extends SAPClass {
+class MyClass extends SAPClass {}
 
-}
+class BaseClass {}
 
-class BaseClass {
-
-}
-
-class MyError extends Error {
-    
-}
+class MyError extends Error {}

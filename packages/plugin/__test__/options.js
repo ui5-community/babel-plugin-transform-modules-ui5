@@ -1,4 +1,3 @@
-
 import { parse } from "path";
 
 const Options = {
@@ -11,43 +10,43 @@ const Options = {
   },
   files: {
     "class-convert-never.controller": {
-      neverConvertClass: true
+      neverConvertClass: true,
     },
     "class-controller-w-oninit": {
-      moveControllerPropsToOnInit: true
+      moveControllerPropsToOnInit: true,
     },
     "class-controller-wo-oninit": {
-      moveControllerPropsToOnInit: true
+      moveControllerPropsToOnInit: true,
     },
     "export-options-global": {
-      exportAllGlobal: true
+      exportAllGlobal: true,
     },
     "class-convert-controller-extend-static-assign": {
-      addControllerStaticPropsToExtend: true
+      addControllerStaticPropsToExtend: true,
     },
     "class-convert-controller-extend-static-prop": {
-      addControllerStaticPropsToExtend: true
+      addControllerStaticPropsToExtend: true,
     },
     "class-convert-all": {
-      autoConvertAllExtendClasses: true
+      autoConvertAllExtendClasses: true,
     },
   },
   dirs: {
     "min-wrap": {
-      noWrapBeforeImport: true
+      noWrapBeforeImport: true,
     },
-    "_private_": {
+    _private_: {
       noWrapBeforeImport: true,
       moveControllerPropsToOnInit: true,
       addControllerStaticPropsToExtend: true,
-    }
-  }
+    },
+  },
 };
 
 export function get(filePath) {
   const { name, dir: dirPath } = parse(filePath);
   const { base: dir } = parse(dirPath);
-  let options = {...Options.default};
+  let options = { ...Options.default };
   if (filePath.includes("prefix")) {
     options.namespacePrefix = "prefix";
   }
@@ -55,14 +54,14 @@ export function get(filePath) {
   if (fileOverrides) {
     options = {
       ...options,
-      ...fileOverrides
+      ...fileOverrides,
     };
   }
   const dirOverride = Options.dirs[dir];
   if (dirOverride) {
     options = {
       ...options,
-      ...dirOverride
+      ...dirOverride,
     };
   }
   return options;

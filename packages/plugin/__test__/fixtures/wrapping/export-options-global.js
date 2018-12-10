@@ -1,4 +1,4 @@
 /**
  * This test plugin opt to export global
  */
-export default {}
+export default {};

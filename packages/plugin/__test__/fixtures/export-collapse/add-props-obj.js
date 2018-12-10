@@ -1,4 +1,3 @@
-
 /**
 Tests that exports can be collapsed onto to an object using a variable.
   - Named export "one" can be ignored since it"s on X and as the same literal.
@@ -10,11 +9,11 @@ Tests that exports can be collapsed onto to an object using a variable.
 export function one() {}
 export function two() {}
 
-export { one as foo, two as bar }
+export { one as foo, two as bar };
 
 const X = {
   one,
   foo: one,
-}
+};
 
-export default X
+export default X;

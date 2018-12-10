@@ -1,4 +1,3 @@
+import * as G from "G";
 
-import * as G from "G"
-
-export default G
+export default G;

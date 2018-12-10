@@ -1,5 +1,4 @@
-
-import SAPController from "sap/SAPClass"
+import SAPController from "sap/SAPClass";
 
 const Formatter = {};
 

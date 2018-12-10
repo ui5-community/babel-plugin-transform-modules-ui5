@@ -1,4 +1,3 @@
-
 async function getItAA() {
   const SAPModule = await import("sap/SAPModule");
   return SAPModule.default;

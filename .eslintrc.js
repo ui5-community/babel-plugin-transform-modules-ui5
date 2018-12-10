@@ -1,5 +1,5 @@
 module.exports = {
-  extends: ["plugin:prettier/recommended"],
+  extends: ["plugin:prettier/recommended", "eslint:recommended"],
   parser: "babel-eslint",
   parserOptions: {
     ecmaVersion: 2018,
@@ -9,6 +9,7 @@ module.exports = {
     node: true,
   },
   rules: {
+    "prettier/prettier": "warn",
     "no-unused-vars": "warn",
   },
 };

@@ -1,5 +1,11 @@
 /* global test, expect, describe */
-import { writeFileSync, statSync, readdirSync, emptyDirSync, ensureDirSync } from "fs-extra";
+import {
+  writeFileSync,
+  statSync,
+  readdirSync,
+  emptyDirSync,
+  ensureDirSync,
+} from "fs-extra";
 import { join, resolve } from "path";
 import { transformFileSync } from "@babel/core";
 import { get as getOpts } from "./options";
@@ -19,7 +25,7 @@ function processDirectory(dir) {
       test(filename, () => {
         const filePath = join(dir, filename);
         let outputPath = filePath.replace(FIXTURE_DIR_NAME, OUT_DIR_NAME);
-        try  {
+        try {
           const opts = getOpts(filePath);
           const presets = [];
 
@@ -32,22 +38,25 @@ function processDirectory(dir) {
           }
 
           if (filePath.includes("preset-env")) {
-            presets.push(["@babel/preset-env", {
-              // default targets for preset-env is ES5
-            }]);
+            presets.push([
+              "@babel/preset-env",
+              {
+                // default targets for preset-env is ES5
+              },
+            ]);
           }
           const result = transformFileSync(filePath, {
             plugins: [
               "@babel/plugin-syntax-dynamic-import",
               "@babel/plugin-syntax-object-rest-spread",
-              ["@babel/plugin-syntax-decorators", { legacy: true } ],
-              ["@babel/plugin-syntax-class-properties", { useBuiltIns: true} ],
-              [plugin, opts]
+              ["@babel/plugin-syntax-decorators", { legacy: true }],
+              ["@babel/plugin-syntax-class-properties", { useBuiltIns: true }],
+              [plugin, opts],
             ],
             presets,
             sourceRoot: __dirname,
             comments: false,
-            babelrc: false
+            babelrc: false,
           }).code;
 
           ensureDirSync(dir.replace(FIXTURE_DIR_NAME, OUT_DIR_NAME)); // This is delayed for when we run with a filter.
@@ -62,16 +71,16 @@ function processDirectory(dir) {
           if (!filePath.includes("_private_")) {
             expect(result).toMatchSnapshot();
           }
-        }
-        catch (error) {
+        } catch (error) {
           if (filename.includes("error-")) {
-            const message = error.message.replace(filePath, "").replace(": ", "");
+            const message = error.message
+              .replace(filePath, "")
+              .replace(": ", "");
             outputPath = outputPath.replace(".js", ".txt");
             expect(message).toMatchSnapshot();
             ensureDirSync(dir.replace(FIXTURE_DIR_NAME, OUT_DIR_NAME)); // This is delayed for when we run with a filter.
             writeFileSync(outputPath, message); // For manual verification
-          }
-          else {
+          } else {
             throw error;
           }
         }
