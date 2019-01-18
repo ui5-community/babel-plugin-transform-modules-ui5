@@ -250,25 +250,22 @@ export function convertClassToUI5Extend(
 function getFullyQualifiedName(classInfo) {
   if (classInfo.alias) return classInfo.alias;
   if (classInfo.name) return classInfo.name;
-  const separator = classInfo.namespace ? "." : "";
-  return `${classInfo.namespace}${separator}${classInfo.localName}`;
+  const namespace = classInfo.namespace || classInfo.fileNamespace;
+  const separator = namespace ? "." : "";
+  return `${namespace}${separator}${classInfo.localName}`;
 }
 
 export function getClassInfo(path, node, parent, pluginOpts) {
   const defaults = {
     localName: node.id.name,
     superClassName: node.superClass && node.superClass.name,
-    namespace: getFileBaseNamespace(path, pluginOpts) || "",
+    fileNamespace: getFileBaseNamespace(path, pluginOpts) || "",
   };
   const decoratorInfo = getDecoratorClassInfo(node);
   const jsDocInfo = getJsDocClassInfo(node, parent);
 
-  return assignDefined(
-    // like Object.assign, but ignoring undefined values.
-    defaults,
-    decoratorInfo,
-    jsDocInfo
-  );
+  // like Object.assign, but ignoring undefined values.
+  return assignDefined(defaults, decoratorInfo, jsDocInfo);
 }
 
 /**

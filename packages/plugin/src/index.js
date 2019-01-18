@@ -340,12 +340,18 @@ module.exports = () => {
           return;
         }
 
-        let shouldConvert =
-          !!opts.autoConvertAllExtendClasses || // default false
-          (classInfo.name || classInfo.alias) ||
-          (/.*[.]controller[.]js$/.test(file.opts.filename) &&
-            opts.autoConvertControllerClass !== false); // default true
-
+        let shouldConvert = false;
+        if (opts.autoConvertAllExtendClasses == true) {
+          shouldConvert = true;
+        }
+        if (
+          classInfo.name ||
+          classInfo.alias ||
+          classInfo.controller ||
+          classInfo.namespace
+        ) {
+          shouldConvert = true;
+        }
         if (
           /.*[.]controller[.]js$/.test(file.opts.filename) &&
           opts.autoConvertControllerClass !== false

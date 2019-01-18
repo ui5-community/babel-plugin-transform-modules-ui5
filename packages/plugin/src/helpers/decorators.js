@@ -11,7 +11,7 @@ const classInfoBoolTags = ["nonUI5"];
 export function getDecoratorClassInfo(node) {
   const decorators = node.decorators;
   if (!decorators || !decorators.length) {
-    return null;
+    return {};
   }
   const decoratorsByName = groupByName(decorators);
   const info = {};

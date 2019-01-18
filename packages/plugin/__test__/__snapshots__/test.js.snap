@@ -267,6 +267,13 @@ exports[`classes class-convert-jsdoc-namespace.controller.js 1`] = `
 });"
 `;
 
+exports[`classes class-convert-jsdoc-namespace.js 1`] = `
+"sap.ui.define([\\"sap/SAPClass\\"], function (SAPClass) {
+  const MyClass = SAPClass.extend(\\"x.y.MyClass\\", {});
+  return MyClass;
+});"
+`;
+
 exports[`classes class-convert-jsdoc-nonui5.js 1`] = `
 "sap.ui.define([\\"sap/SAPClass\\"], function (SAPClass) {
   class MyClass extends SAPClass {}
@@ -382,18 +389,22 @@ exports[`classes class-convert-nonui5-return.js 1`] = `
 
 exports[`classes class-convert-options-namedonly.js 1`] = `
 "sap.ui.define([\\"other/OtherClass\\", \\"sap/SAPClass\\"], (OtherClass, SAPClass) => {
-  return class MyClass extends OtherClass {
+  class MyClass extends OtherClass {
     constructor() {
       super();
     }
 
-  };
+  }
+
   const MyUI5Class = SAPClass.extend(\\"my.app.MyUI5Class\\", {
     constructor: function _constructor() {
       SAPClass.prototype.constructor.call(this);
     }
   });
-  return MyUI5Class;
+  return {
+    MyClass,
+    MyUI5Class
+  };
 });"
 `;
 
