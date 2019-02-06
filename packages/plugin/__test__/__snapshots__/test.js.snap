@@ -10,6 +10,78 @@ exports[`classes class-convert-all.js 1`] = `
 });"
 `;
 
+exports[`classes class-convert-constructor-keep-annot.controller.js 1`] = `
+"sap.ui.define([\\"sap/ui/core/Controller\\"], function (Controller) {
+  const MyController = Controller.extend(\\"fixtures.classes.MyController\\", {
+    constructor: function constructor(arg) {
+      console.log(\\"before super\\");
+      Controller.prototype.constructor.call(this, arg);
+      console.log(\\"after super\\");
+      this.x = 1;
+    },
+    onInit: function onInit() {
+      this.ref = this.byId(\\"ref\\");
+
+      if (typeof Controller.prototype.onInit === 'function') {
+        Controller.prototype.onInit.apply(this, arguments);
+      }
+    },
+    other: 1,
+
+    get getter() {
+      return 1;
+    }
+
+  });
+  return MyController;
+});"
+`;
+
+exports[`classes class-convert-constructor-keep-default.controller.js 1`] = `
+"sap.ui.define([\\"sap/ui/core/Controller\\"], function (Controller) {
+  const MyController = Controller.extend(\\"fixtures.classes.MyController\\", {
+    constructor: function _constructor(arg) {
+      console.log(\\"before super\\");
+      Controller.prototype.constructor.call(this, arg);
+      this.ref = this.byId(\\"ref\\");
+      console.log(\\"after super\\");
+      this.x = 1;
+    },
+    other: 1,
+
+    get getter() {
+      return 1;
+    }
+
+  });
+  return MyController;
+});"
+`;
+
+exports[`classes class-convert-constructor-move.controller.js 1`] = `
+"sap.ui.define([\\"sap/ui/core/Controller\\"], function (Controller) {
+  const MyController = Controller.extend(\\"fixtures.classes.MyController\\", {
+    onInit: function onInit() {
+      this.ref = this.byId(\\"ref\\");
+      console.log(\\"before super\\");
+      console.log(\\"after super\\");
+      this.x = 1;
+
+      if (typeof Controller.prototype.onInit === 'function') {
+        Controller.prototype.onInit.apply(this, arguments);
+      }
+    },
+    other: 1,
+
+    get getter() {
+      return 1;
+    }
+
+  });
+  return MyController;
+});"
+`;
+
 exports[`classes class-convert-constructor-noargs.js 1`] = `
 "sap.ui.define([\\"sap/SAPClass\\"], SAPClass => {
   const MyClass = SAPClass.extend(\\"com.app.MyClass\\", {
@@ -279,25 +351,6 @@ exports[`classes class-convert-jsdoc-nonui5.js 1`] = `
   class MyClass extends SAPClass {}
 
   return MyClass;
-});"
-`;
-
-exports[`classes class-convert-keep-constructor.controller.js 1`] = `
-"sap.ui.define([\\"sap/ui/core/Controller\\"], function (Controller) {
-  const MyController = Controller.extend(\\"fixtures.classes.MyController\\", {
-    constructor: function _constructor(arg) {
-      console.log(\\"constructor\\");
-      Controller.prototype.constructor.call(this, arg);
-      this.x = 1;
-    },
-    other: 1,
-
-    get getter() {
-      return 1;
-    }
-
-  });
-  return MyController;
 });"
 `;
 

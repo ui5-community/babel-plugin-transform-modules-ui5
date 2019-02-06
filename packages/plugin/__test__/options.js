@@ -30,6 +30,12 @@ const Options = {
     "class-convert-all": {
       autoConvertAllExtendClasses: true,
     },
+    "class-convert-constructor-move.controller": {
+      moveControllerConstructorToOnInit: true,
+    },
+    "class-convert-constructor-keep-annot.controller": {
+      moveControllerConstructorToOnInit: true,
+    },
   },
   dirs: {
     "min-wrap": {

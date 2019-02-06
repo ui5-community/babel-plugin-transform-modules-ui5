@@ -1,4 +1,4 @@
-# babel-ui5 #
+# babel-ui5
 
 An unofficial Babel transformer plugin for SAP/Open UI5.
 
@@ -8,7 +8,7 @@ It allows you to develop SAP UI5 applications by using the latest [ECMAScript](h
 
 [![Build Status](https://travis-ci.org/r-murphy/babel-plugin-transform-modules-ui5.svg?branch=master)](https://travis-ci.org/r-murphy/babel-plugin-transform-modules-ui5)
 
-## Install ##
+## Install
 
 This repo contains both a preset and a plugin. It is recommended to use the preset.
 
@@ -22,9 +22,9 @@ or
 yarn add babel-preset-transform-ui5 --dev
 ```
 
-## Configure ##
+## Configure
 
-### .babelrc ###
+### .babelrc
 
 At a minimum, add `transform-modules-ui5` to the `plugins`.
 
@@ -50,7 +50,7 @@ At the time of writing, the babel version is 7.0, which does not natively suppor
 
 It is also recommended to use [@babel/preset-env](https://babeljs.io/docs/en/next/babel-preset-env.html) to control which ES version the final code is transformed to.
 
-## Features ##
+## Features
 
 There are 2 main feature categories of the plugin, and you can use both or one without the other.:
 
@@ -61,32 +61,32 @@ This only transforms the UI5 relevant things. It does not transform everything t
 
 A more detailed list includes:
 
-+ ES2015 Imports (default, named, and dynamic)
-+ ES2015 Exports (default and named)
-+ Class, using inheritance and `super` keyword
-  + Static methods and fields
-  + Class properties
-  + Class property arrow functions are bound correctly in the constructor.
-+ Existing `sap.ui.define` calls don't get wrapped but can still be converted.
-  + Fixes `constructor` shorthand method, if used.
-+ Various options to control the class name string used.
-  + JSDoc (name, namespace, alias)
-  + Decorators (name, namespace, alias)
-  + File path based namespace, including setting a prefix.
+- ES2015 Imports (default, named, and dynamic)
+- ES2015 Exports (default and named)
+- Class, using inheritance and `super` keyword
+  - Static methods and fields
+  - Class properties
+  - Class property arrow functions are bound correctly in the constructor.
+- Existing `sap.ui.define` calls don't get wrapped but can still be converted.
+  - Fixes `constructor` shorthand method, if used.
+- Various options to control the class name string used.
+  - JSDoc (name, namespace, alias)
+  - Decorators (name, namespace, alias)
+  - File path based namespace, including setting a prefix.
 
-### Converting ES modules (import/export) into sap.ui.define or sap.ui.require ###
+### Converting ES modules (import/export) into sap.ui.define or sap.ui.require
 
 The plugin will wrap any code having import/export statements in an sap.ui.define. If there is no import/export, it won't wrap.
 
-#### Static Import ####
+#### Static Import
 
 The plugin supports all of the ES import statements, and will convert them into sap.ui.define arguments.
 
 ```js
-import Default from 'module';
-import Default, { Named } from 'module';
-import { Named, Named2 } from 'module';
-import * as Name from 'module';
+import Default from "module";
+import Default, { Named } from "module";
+import { Named, Named2 } from "module";
+import * as Name from "module";
 ```
 
 The plugin uses a temporary name (as needed) for the initial imported variable, and then extracts the properties from it as needed.
@@ -95,8 +95,8 @@ This allows importing ES Modules which have a 'default' value, and also non-ES m
 This:
 
 ```js
-import Default, { Name1, Name2 } from 'app/File';
-import * as File from 'app/File';
+import Default, { Name1, Name2 } from "app/File";
+import * as File from "app/File";
 ```
 
 Becomes:
@@ -115,7 +115,7 @@ sap.ui.define(['app/file'], function(__File) {
 
 Also refer to the `noImportInteropPrefixes` option below.
 
-#### Dynamic Import ####
+#### Dynamic Import
 
 ECMAScript allows for dynamic imports calls like `import(path)` that return a Promise which resolves with an ES Module.
 
@@ -126,7 +126,7 @@ For JavaScript projects, this syntax doesn't provide much advantage over a small
 
 Also note that while the ES dynamic import specification requires a relative path, `sap.ui.require` works with absolute paths using a module prefix.
 
-#### Export ####
+#### Export
 
 The plugin also supports (most of) the ES modules export syntax.
 
@@ -147,13 +147,13 @@ Imagine a file like this:
 
 ```js
 export function two() {
-    return 2;
+  return 2;
 }
 export default {
-    one() {
-        return 1;
-    }
-}
+  one() {
+    return 1;
+  },
+};
 ```
 
 Which might create an exported module that looks like:
@@ -187,7 +187,7 @@ But in order to be usable in a standard `sap.ui.require` file, what we want is a
 
 This plugin's terminology for that is 'collapsing'.
 
-##### Export Collapsing to default export #####
+##### Export Collapsing to default export
 
 The export inter-op features do their best to only return the default export rather than returning an ES module.
 To do this, it determines if all the named exports already exist on the default export (with the same value reference), or whether they can be added to it if there is not a naming conflict.
@@ -196,74 +196,74 @@ If there is a naming conflict or other reason why the named export cannot be add
 
 In order to determine which properties the default export already has, the plugin checks a few locations, if applicable.
 
-+ In an object literal.
+- In an object literal.
 
 ```js
 export default {
-    prop: val
+  prop: val,
 };
 // plugin knows about prop
 ```
 
-+ In a variable declaration literal or assigned afterwards.
+- In a variable declaration literal or assigned afterwards.
 
 ```js
 const Module = {
-    prop1: val
+  prop1: val,
 };
 Module.prop2 = val2;
 export default Module;
 // plugin knows about prop1 and prop2
 ```
 
-+ In an Object.assign(..) or _extends(..)
-  + _extends is the named used by babel and typescript when compiling object spread.
-  + This includes a recursive search for any additional objects used in the assign/extend which are defined in the upper block scope.
+- In an Object.assign(..) or \_extends(..)
+  - \_extends is the named used by babel and typescript when compiling object spread.
+  - This includes a recursive search for any additional objects used in the assign/extend which are defined in the upper block scope.
 
 ```js
 const object1 = {
-    prop1: val
+  prop1: val,
 };
 const object2 = Object.assign({}, object1, {
-    prop2: val
+  prop2: val,
 });
 export default object2;
 // plugin knows about prop1 and prop2
 ```
 
-**CAUTION**: The plugin cannot check the properties on imported modules. So if they are used in Object.assign() or _extends(), the plugin will not be aware of its properties and may override them with a named export.
+**CAUTION**: The plugin cannot check the properties on imported modules. So if they are used in Object.assign() or \_extends(), the plugin will not be aware of its properties and may override them with a named export.
 
-##### Example non-solvable issues #####
+##### Example non-solvable issues
 
 The following are not solvable by the plugin, and result in an error by default.
 
 ```js
 export function one() {
-    return 1
+  return 1;
 }
 
 export function two() {
-    return 2
+  return 2;
 }
 
 function one_string() {
-    return "one"
+  return "one";
 }
 
 const MyUtil = {
-    // The plugin can't assign these to `exports` since the definition is not just a reference to the named export.
-    one: one_string,
-    two: () => "two"
-}
+  // The plugin can't assign these to `exports` since the definition is not just a reference to the named export.
+  one: one_string,
+  two: () => "two",
+};
 export default MyUtil;
 ```
 
-##### sap.ui.define global export flag #####
+##### sap.ui.define global export flag
 
 If you need the global export flag on sap.ui.define, add `@global` to the JSDoc on the export default statement.
 
 ```js
-const X = {}
+const X = {};
 
 /**
  * @global
@@ -274,19 +274,23 @@ export default X;
 Outputs:
 
 ```js
-sap.ui.define([], function() {
+sap.ui.define(
+  [],
+  function() {
     const X = {};
     return X;
-}, true);
+  },
+  true
+);
 ```
 
 Also refer to the option `exportAllGlobal` below.
 
-#### Minimal Wrapping ####
+#### Minimal Wrapping
 
 By default, the plugin will wrap everything in the file into the `sap.ui.define` factory function, if there is an import or an export.
 
-However sometimes you may want to have some code run prior to the generated  `sap.ui.define` call. In that case, set the property `noWrapBeforeImport` to true and the plugin will not wrap anything before the first `import`. If there are no imports, everything will still be wrapped.
+However sometimes you may want to have some code run prior to the generated `sap.ui.define` call. In that case, set the property `noWrapBeforeImport` to true and the plugin will not wrap anything before the first `import`. If there are no imports, everything will still be wrapped.
 
 There may be a future property to minimize wrapping in the case that there are no imports (i.e. only wrap the export).
 
@@ -294,33 +298,35 @@ Example:
 
 ```js
 const X = 1;
-import A from './a';
+import A from "./a";
 export default {
-    A, X
+  A,
+  X,
 };
 
 //////// Generates
-"use strict";
+("use strict");
 const X = 1;
-sap.ui.define(["./a"], (A) => {
-    return {
-        A, X
-    };
+sap.ui.define(["./a"], A => {
+  return {
+    A,
+    X,
+  };
 });
 ```
 
-### Converting ES classes into Control.extend(..) syntax ###
+### Converting ES classes into Control.extend(..) syntax
 
 By default, the plugin converts ES classes to Control.extend(..) syntax if the class extends from a class which has been imported.
 So a class without a parent will not be extended.
 
 There are a few options or some metadata you can use to control this.
 
-#### Configuring Name or Namespace ####
+#### Configuring Name or Namespace
 
 The plugin provides a few ways to set the class name or namespace used in the `SAPClass.extend(...)` call.
 
-##### File based namespace (default) #####
+##### File based namespace (default)
 
 The default behaviour if no JSDoc or Decorator overrides are given is to use the file path to determine the namespace to prefix the class name with.
 
@@ -344,7 +350,7 @@ In order to pass the namespace prefix, pass it as a plugin option, and not a top
 
 If the default file-based namespace does not work for you (perhaps the app name is not in the file hierarchy), there are a few way to override.
 
-##### JSDoc #####
+##### JSDoc
 
 The simplest way to override the names is to use JSDoc. This approach will also work well with classes output from TypeScript if you configure TypeScript to generate ES6 or higher, and don't enable removeComments.
 
@@ -381,7 +387,7 @@ const AController = SAPController.extend("my.app.AController", {
 });
 ```
 
-##### Decorators #####
+##### Decorators
 
 Alternatively, you can use decorators to override the namespace or name used. The same properties as JSDoc will work, but instead of a space, pass the string literal to the decorator function.
 
@@ -408,18 +414,18 @@ const AController = SAPController.extend("my.app.AController", {
 });
 ```
 
-### Don't convert class ###
+### Don't convert class
 
 If you have a class which extends from an import that you don't want to convert to .extend(..) syntax, you can add the `@nonui5` (case insensitive) jsdoc or decorator to it. Also see Options below for overriding the default behaviour.
 
-### Class Properties ###
+### Class Properties
 
 The plugin supports converting class properties, and there are a few scenarios.
 
-+ [proposal-class-public-fields](https://github.com/tc39/proposal-class-public-fields)
-+ [proposal-class-fields](https://github.com/tc39/proposal-class-fields)
+- [proposal-class-public-fields](https://github.com/tc39/proposal-class-public-fields)
+- [proposal-class-fields](https://github.com/tc39/proposal-class-fields)
 
-#### Static Class Props ####
+#### Static Class Props
 
 Static class props are always added to the extend object. It's recommended to always use static if you want the property as part of the extend object. Some examples of this are `metadata`, `renderer` and any formatters or factories you need in views.
 
@@ -435,7 +441,7 @@ class Controller extends SAPController {
 }
 ```
 
-#### Instance Class Props ####
+#### Instance Class Props
 
 Instance props either get added to the constructor or the onInit function (for controller), or get added to the extend object. However in v7, there will be a breaking change to always put instance props in either the constructor or the onInit, so if you want a prop in the extend object, it's best to use a static prop.
 
@@ -447,11 +453,11 @@ In the bind method (either constructor or onInit), the properties get added afte
 
 ```js
 class Controller extends SAPController {
-  A = 1;            // added to extend object in v6
-  B = Imported.B;   // added to extend object in v6
-  C = () => true;   // added to constructor or onInit
-  D = this.B.C;     // added to constructor or onInit
-  E = func(this);   // added to constructor or onInit
+  A = 1; // added to extend object in v6
+  B = Imported.B; // added to extend object in v6
+  C = () => true; // added to constructor or onInit
+  D = this.B.C; // added to constructor or onInit
+  E = func(this); // added to constructor or onInit
   F = func(this.A); // added to constructor or onInit
 
   onInit() {
@@ -463,7 +469,7 @@ class Controller extends SAPController {
 ```
 
 ```js
-const Controller = SAPController.extend('...', {
+const Controller = SAPController.extend("...", {
   A: 1,
   B: Imported.B,
   onInit: function onInit() {
@@ -475,11 +481,11 @@ const Controller = SAPController.extend('...', {
     this.E = func(this);
     this.F = func(this.A);
     doThing(this.A, this.D);
-  }
+  },
 });
 ```
 
-#### Special Class Property Handling for Controllers ####
+#### Special Class Property Handling for Controllers
 
 The default class property behaviour of babel is to move the property into the constructor. This plugin has a `moveControllerPropsToOnInit` option that moves them to the `onInit` function rather than the `constructor`. This is useful since the `onInit` method is called after the view's controls have been created (but not yet rendered).
 
@@ -493,14 +499,13 @@ This is mostly beneficial for TypeScript projects that want easy access to contr
  * @controller
  */
 class MyController extends Controller {
-    input: SAPInput = this.byId("input") as SAPInput;
+  input: SAPInput = this.byId("input") as SAPInput;
 
-    constructor() {
-        super();
-    }
+  constructor() {
+    super();
+  }
 
-    onInit(evt: sap.ui.base.Event) {
-    }
+  onInit(evt: sap.ui.base.Event) {}
 }
 ```
 
@@ -508,9 +513,9 @@ Results in:
 
 ```ts
 const MyController = Controller.extend("app.MyController", {
-    onInit(evt) {
-        this.input = this.byId("input");
-    }
+  onInit(evt) {
+    this.input = this.byId("input");
+  },
 });
 ```
 
@@ -522,15 +527,15 @@ Of course, the alternative would be to define and instantiate the property separ
  * @controller
  */
 class MyController extends Controller {
-    input: SAPInput;
+  input: SAPInput;
 
-    onInit(evt: sap.ui.base.Event) {
-        this.input = this.byId("input") as SAPInput;
-    }
+  onInit(evt: sap.ui.base.Event) {
+    this.input = this.byId("input") as SAPInput;
+  }
 }
 ```
 
-### Handling metadata and renderer ###
+### Handling metadata and renderer
 
 Because ES classes are not plain objects, you can't have an object property like 'metadata'.
 
@@ -589,77 +594,78 @@ const MyControl = SAPClass.extend('MyControl', {
 
 **CAUTION** The plugin does not currently search for 'metadata' or 'renderer' properties inside the constructor. So don't apply Babel's class property transform plugin before this one if you have metadata/renderer as instance properties (static properties are safe).
 
-## Options ##
+## Options
 
-### Imports ###
+### Imports
 
-+ `noImportInteropPrefixes` (Default `['sap/']`) A list of import path prefixes which never need an import inter-opt.
+- `noImportInteropPrefixes` (Default `['sap/']`) A list of import path prefixes which never need an import inter-opt.
 
-### Exports ###
+### Exports
 
-+ `allowUnsafeMixedExports` (Default: false) No errors for unsafe mixed exports (mix of named and default export where named cannot be collapsed*)
-+ `noExportCollapse` (Default: false) Skip collapsing* named exports to the default export.
-+ `noExportExtend` (Default: false) Skips assigning named exports to the default export.
-+ `exportAllGlobal` (Default: false) Adds the export flag to all sap.ui.define files.
+- `allowUnsafeMixedExports` (Default: false) No errors for unsafe mixed exports (mix of named and default export where named cannot be collapsed\*)
+- `noExportCollapse` (Default: false) Skip collapsing\* named exports to the default export.
+- `noExportExtend` (Default: false) Skips assigning named exports to the default export.
+- `exportAllGlobal` (Default: false) Adds the export flag to all sap.ui.define files.
 
-### Wrapping ###
+### Wrapping
 
-+ `noWrapBeforeImport` (Default: false) Does not wrap code before the first import (if there are imports).
+- `noWrapBeforeImport` (Default: false) Does not wrap code before the first import (if there are imports).
 
-### Class Conversion ###
+### Class Conversion
 
-+ `namespacePrefix` (Default: '') Prefix to apply to namespace derived from directory.
-+ `autoConvertAllExtendClasses` (Default false). Converts all classes by default, provided they extend from an imported class. Version 6 default behaviour.
-+ `autoConvertControllerClass` (Default true). Converts the classes in a `.controller.js` file by default, if it extends from an imported class. Use `@nonui5` if there are multiple classes in a controller file which extend from an import.
-+ `neverConvertClass` (Default: false) Never convert classes to SAPClass.extend() syntax.
-+ `moveControllerPropsToOnInit` (Default: false) Moves class props in a controller to the onInit method instead of constructor.
-+ `addControllerStaticPropsToExtend` (Default: false) Moves static props of a controller to the extends call. Useful for formatters.
+- `namespacePrefix` (Default: '') Prefix to apply to namespace derived from directory.
+- `autoConvertAllExtendClasses` (Default false). Converts all classes by default, provided they extend from an imported class. Version 6 default behaviour.
+- `autoConvertControllerClass` (Default true). Converts the classes in a `.controller.js` file by default, if it extends from an imported class. Use `@nonui5` if there are multiple classes in a controller file which extend from an import.
+- `neverConvertClass` (Default: false) Never convert classes to SAPClass.extend() syntax.
+- `moveControllerPropsToOnInit` (Default: false) Moves class props in a controller to the onInit method instead of constructor.
+- `moveControllerConstructorToOnInit` (Default: false) Moves existing constructor code in a controller to the onInit method. Enabling will auto-enable `moveControllerPropsToOnInit`.
+- `addControllerStaticPropsToExtend` (Default: false) Moves static props of a controller to the extends call. Useful for formatters.
 
 \* 'collapsing' named exports is a combination of simply ignoring them if their definition is the same as a property on the default export, and also assigning them to the default export.
 
-\** This plugin also makes use of babel's standard `sourceRoot` option.
+\*\* This plugin also makes use of babel's standard `sourceRoot` option.
 
 TODO: more options and better description.
 
-## Other Similar Plugins ##
+## Other Similar Plugins
 
 [sergiirocks babel-plugin-transform-ui5](https://github.com/sergiirocks/babel-plugin-transform-ui5) is a great choice if you use webpack. It allows you to configure which import paths to convert to sap.ui.define syntax and leaves the rest as ES2015 import statements, which allows webpack to load them in. This plugin will have that functionality soon. Otherwise this plugin handles more edge cases with named exports, class conversion, and typescript output support.
 
-## Example ##
+## Example
 
 [openui5-master-detail-app-ts](https://github.com/r-murphy/openui5-masterdetail-app-ts), which is my fork of SAP's openui5-master-detail-app converted to TypeScript.
 
-## Building with Webpack ##
+## Building with Webpack
 
 Take a look at [ui5-loader](https://github.com/MagicCube/ui5-loader) (I have not tried this).
 
-## Modularization / Preload ##
+## Modularization / Preload
 
 UI5 supports Modularization through a mechanism called `preload`, which can compile many JavaScript and xml files into just one preload file.
 
 Some preload plugins:
 
-+ Module/CLI: [openui5-preload](https://github.com/r-murphy/openui5-preload) (Mine)
-+ Gulp: [gulp-ui5-lib](https://github.com/MagicCube/gulp-ui5-lib) (MagicCube)
-+ Grunt: [grunt-openui5](https://github.com/SAP/grunt-openui5) (Official SAP)
+- Module/CLI: [openui5-preload](https://github.com/r-murphy/openui5-preload) (Mine)
+- Gulp: [gulp-ui5-lib](https://github.com/MagicCube/gulp-ui5-lib) (MagicCube)
+- Grunt: [grunt-openui5](https://github.com/SAP/grunt-openui5) (Official SAP)
 
-## Credits ##
+## Credits
 
-+ Thanks to MagicCube for the upstream initial work.
+- Thanks to MagicCube for the upstream initial work.
 
-## TODO ##
+## TODO
 
-+ libs support, like sergiirocks'
-+ See if we can export a live binding (getter?)
-+ Configuration options
-  + Export interop control
-  + Others..
+- libs support, like sergiirocks'
+- See if we can export a live binding (getter?)
+- Configuration options
+  - Export interop control
+  - Others..
 
 Contribute
 
 Please do! Open an issue, or file a PR.
 Issues also welcome for feature requests.
 
-## License ##
+## License
 
 MIT © 2017 Ryan Murphy

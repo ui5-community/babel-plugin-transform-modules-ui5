@@ -45,7 +45,7 @@
     "collectCoverage": true
   },
   "lint-staged": {
-    "lib/**/*.js": [
+    "src/**/*.js": [
       "eslint --fix",
       "git add"
     ]

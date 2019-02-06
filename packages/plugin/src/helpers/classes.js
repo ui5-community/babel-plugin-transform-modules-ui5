@@ -30,10 +30,16 @@ export function convertClassToUI5Extend(
   const className = classNameIdentifier.name;
   const superClass = node.superClass; // Identifier
   const superClassName = node.superClass.name;
+
   const isController =
     className.includes("Controller") || !!classInfo.controller;
+
+  const moveControllerConstructorToOnInit =
+    isController && !!opts.moveControllerConstructorToOnInit;
   const moveControllerPropsToOnInit =
-    isController && !!opts.moveControllerPropsToOnInit;
+    isController &&
+    (!!opts.moveControllerPropsToOnInit ||
+      !!opts.moveControllerConstructorToOnInit);
   const moveStaticStaticPropsToExtend =
     isController && !!opts.addControllerStaticPropsToExtend;
 
@@ -147,14 +153,22 @@ export function convertClassToUI5Extend(
   const bindToMethodName = moveControllerPropsToOnInit
     ? "onInit"
     : "constructor";
+
   const bindToId = t.identifier(bindToMethodName);
   // avoid getting a prop named constructor as it may return {}'s
+
   let bindMethod = moveControllerPropsToOnInit
     ? propsByName[bindToMethodName]
     : constructor;
-  const constructorJsdoc = getTags(constructorComments);
-  const keepConstructor = classInfo.keepConstructor || constructorJsdoc.keep;
 
+  const constructorJsdoc = getTags(constructorComments);
+
+  const keepConstructor =
+    !moveControllerConstructorToOnInit ||
+    classInfo.keepConstructor ||
+    constructorJsdoc.keep;
+
+  // See if we need either constructor or onInit
   const needsBindingMethod =
     boundProps.length ||
     (moveControllerPropsToOnInit && constructor && !keepConstructor);
@@ -175,7 +189,7 @@ export function convertClassToUI5Extend(
     extendProps.unshift(t.objectProperty(bindToId, bindMethod));
   }
 
-  if (moveControllerPropsToOnInit && constructor) {
+  if (constructor && moveControllerPropsToOnInit) {
     if (keepConstructor) {
       extendProps.unshift(
         t.objectProperty(t.identifier(CONSTRUCTOR), constructor)
@@ -229,23 +243,6 @@ export function convertClassToUI5Extend(
 
   return [extendAssign, ...staticMembers];
 }
-
-/**
- * Sees if a class prop references 'this'.
- * The logic is a bit limited, as it currently only looks at the
- * @param {*} classPropValue
- */
-// function doesClassPropUseThis(classPropValue) {
-//   if (t.isCallExpression(classProperty)) {
-
-//   }
-//   else if (t.isMemberExpression(classProperty)) {
-
-//   }
-//   else {
-//     return false
-//   }
-// }
 
 function getFullyQualifiedName(classInfo) {
   if (classInfo.alias) return classInfo.alias;
