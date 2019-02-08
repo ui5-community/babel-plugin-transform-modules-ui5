@@ -90,7 +90,8 @@ import * as Name from "module";
 ```
 
 The plugin uses a temporary name (as needed) for the initial imported variable, and then extracts the properties from it as needed.
-This allows importing ES Modules which have a 'default' value, and also non-ES modules which don't. The plugin also allows for merged imports statements from the same source path into a single require and then deconstructs it accordingly.
+This allows importing ES Modules which have a 'default' value, and also non-ES modules which don't.
+The plugin also allows for merged imports statements from the same source path into a single require and then deconstructs it accordingly.
 
 This:
 
@@ -102,7 +103,7 @@ import * as File from "app/File";
 Becomes:
 
 ```js
-sap.ui.define(['app/file'], function(__File) {
+sap.ui.define(['app/File'], function(__File) {
     function _interopRequireDefault(obj) {
         return (obj && obj.__esModule && (typeof obj.default !== "undefined")) ? obj.default : obj;
     }
@@ -120,9 +121,11 @@ Also refer to the `noImportInteropPrefixes` option below.
 ECMAScript allows for dynamic imports calls like `import(path)` that return a Promise which resolves with an ES Module.
 
 This plugin will convert that to an async `sap.ui.require` wrapped in a Promise.
-The resolved object will be a ES module or pseudo ES module having a 'default' property on it to reference the module by, to match the format used by `import()`. If the module is not a real ES module and already has a default property, the promise will be rejected with an error.
+The resolved object will be a ES module or pseudo ES module having a 'default' property on it to reference the module by, to match the format used by `import()`.
+If the module is not a real ES module and already has a default property, the promise will be rejected with an error.
 
-For JavaScript projects, this syntax doesn't provide much advantage over a small utility function and has the downside of not working if your module has a 'default' property. The main advantage of this syntax is with TypeScript projects, where the TypeScript compiler will know the type of the imported module, so there his no need to define a separate interface for it.
+For JavaScript projects, this syntax doesn't provide much advantage over a small utility function and has the downside of not working if your module has a 'default' property.
+The main advantage of this syntax is with TypeScript projects, where the TypeScript compiler will know the type of the imported module, so there is no need to define a separate interface for it.
 
 Also note that while the ES dynamic import specification requires a relative path, `sap.ui.require` works with absolute paths using a module prefix.
 
@@ -599,6 +602,7 @@ const MyControl = SAPClass.extend('MyControl', {
 ### Imports
 
 - `noImportInteropPrefixes` (Default `['sap/']`) A list of import path prefixes which never need an import inter-opt.
+- `modulesMap` (Default {}) Mapping for an import's path. Accepts object or function.
 
 ### Exports
 
@@ -661,7 +665,7 @@ Some preload plugins:
   - Export interop control
   - Others..
 
-Contribute
+## Contribute
 
 Please do! Open an issue, or file a PR.
 Issues also welcome for feature requests.

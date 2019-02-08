@@ -1041,6 +1041,34 @@ exports[`imports import-dynamic.js 1`] = `
 });"
 `;
 
+exports[`imports import-modules-map.js 1`] = `
+"sap.ui.define([\\"./vendor/browser-polyfill\\"], function (__X) {
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== \\"undefined\\" ? obj.default : obj;
+  }
+
+  const X = _interopRequireDefault(__X);
+
+  const Named1 = __X[\\"Named1\\"];
+  const Named2 = __X[\\"Named2\\"];
+  const X2 = __X;
+});"
+`;
+
+exports[`imports import-modules-map-fn.js 1`] = `
+"sap.ui.define([\\"./vendor/browser-polyfill\\"], function (__X) {
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== \\"undefined\\" ? obj.default : obj;
+  }
+
+  const X = _interopRequireDefault(__X);
+
+  const Named1 = __X[\\"Named1\\"];
+  const Named2 = __X[\\"Named2\\"];
+  const X2 = __X;
+});"
+`;
+
 exports[`imports import-multiple.js 1`] = `
 "sap.ui.define([\\"./../a/b\\", \\"path/having-dash\\", \\"A\\", \\"BC\\", \\"DEF\\", \\"G\\", \\"HI\\"], function (____a_b, __path_having_dash, __A, __BC, __D, G, __H) {
   function _interopRequireDefault(obj) {

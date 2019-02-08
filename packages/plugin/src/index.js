@@ -98,11 +98,17 @@ module.exports = () => {
 
       const name = cleanImportSource(src); // default to the src for import without named var
 
+      const { modulesMap = {} } = opts;
+      const mappedSrc =
+        (typeof modulesMap === "function"
+          ? modulesMap(src)
+          : modulesMap[src]) || src;
+
       // Note that existingImport may get mutated if there are multiple import lines from the same module.
-      const existingImport = this.imports.find(imp => imp.src === src);
+      const existingImport = this.imports.find(imp => imp.src === mappedSrc);
 
       const imp = existingImport || {
-        src, // url
+        src: mappedSrc, // url
         name,
         // isLib, // for future use separating UI5 imports from npm/webpack imports
         // isUi5Src, // not used yet

@@ -1,5 +1,8 @@
 import { parse } from "path";
 
+/**
+ * Provides the ability to set options per test file or directory.
+ */
 const Options = {
   default: {
     namespacePrefix: undefined,
@@ -35,6 +38,14 @@ const Options = {
     },
     "class-convert-constructor-keep-annot.controller": {
       moveControllerConstructorToOnInit: true,
+    },
+    "import-modules-map": {
+      modulesMap: {
+        ["@babel/polyfill"]: "./vendor/browser-polyfill",
+      },
+    },
+    "import-modules-map-fn": {
+      modulesMap: src => Options.files["import-modules-map"].modulesMap[src],
     },
   },
   dirs: {
