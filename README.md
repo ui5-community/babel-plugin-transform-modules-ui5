@@ -1,16 +1,16 @@
-# babel-ui5
+# babel transform-ui5
 
 An unofficial Babel transformer plugin for SAP/Open UI5.
 
 It allows you to develop SAP UI5 applications by using the latest [ECMAScript](http://babeljs.io/docs/learn-es2015/), including classes and modules, or even TypeScript.
 
-**WARNING Currently not compatible with @babel/preset-typescript**
+**WARNING Currently not fully compatible with @babel/preset-typescript**
 
 [![Build Status](https://travis-ci.org/r-murphy/babel-plugin-transform-modules-ui5.svg?branch=master)](https://travis-ci.org/r-murphy/babel-plugin-transform-modules-ui5)
 
 ## Install
 
-This repo contains both a preset and a plugin. It is recommended to use the preset.
+This repo contains both a preset and a plugin. It is recommended to use the preset, in case the plugin gets split up in the future.
 
 ```sh
 npm install babel-preset-transform-ui5 --save-dev
@@ -52,22 +52,22 @@ It is also recommended to use [@babel/preset-env](https://babeljs.io/docs/en/nex
 
 ## Features
 
-There are 2 main feature categories of the plugin, and you can use both or one without the other.:
+There are 2 main features of the plugin, and you can use both or one without the other:
 
 1. Converting ES modules (import/export) into sap.ui.define or sap.ui.require.
 2. Converting ES classes into Control.extend(..) syntax.
 
-This only transforms the UI5 relevant things. It does not transform everything to ES5 (for example it does not transform const/let to var). This makes it easier to use `babel-preset-env` to determine how to transform everything else.
+This only transforms the UI5 relevant things. It does not transform everything to ES5 (for example it does not transform const/let to var). This makes it easier to use `@babel/preset-env` to transform things correctly.
 
-A more detailed list includes:
+A more detailed feature list includes:
 
 - ES2015 Imports (default, named, and dynamic)
 - ES2015 Exports (default and named)
-- Class, using inheritance and `super` keyword
+- Classes, using inheritance and `super` keyword
   - Static methods and fields
   - Class properties
   - Class property arrow functions are bound correctly in the constructor.
-- Existing `sap.ui.define` calls don't get wrapped but can still be converted.
+- Existing `sap.ui.define` calls don't get wrapped but classes within can still be converted.
   - Fixes `constructor` shorthand method, if used.
 - Various options to control the class name string used.
   - JSDoc (name, namespace, alias)
@@ -76,7 +76,7 @@ A more detailed list includes:
 
 ### Converting ES modules (import/export) into sap.ui.define or sap.ui.require
 
-The plugin will wrap any code having import/export statements in an sap.ui.define. If there is no import/export, it won't wrap.
+The plugin will wrap any code having import/export statements in an sap.ui.define. If there is no import/export, it won't be wrapped.
 
 #### Static Import
 
@@ -85,13 +85,13 @@ The plugin supports all of the ES import statements, and will convert them into 
 ```js
 import Default from "module";
 import Default, { Named } from "module";
-import { Named, Named2 } from "module";
-import * as Name from "module";
+import { Named1, Named2 } from "module";
+import * as Namespace from "module";
 ```
 
-The plugin uses a temporary name (as needed) for the initial imported variable, and then extracts the properties from it as needed.
-This allows importing ES Modules which have a 'default' value, and also non-ES modules which don't.
-The plugin also allows for merged imports statements from the same source path into a single require and then deconstructs it accordingly.
+The plugin uses a temporary name (as needed) for the initial imported variable, and then extracts the properties from it.
+This allows importing ES Modules which have a 'default' value, and also non-ES modules which do not.
+The plugin also merges imports statements from the same source path into a single require and then deconstructs it accordingly.
 
 This:
 
@@ -144,7 +144,8 @@ export { X as default };
 export let v; v = 'v'; // NOTE that the value here is currently not a live binding (http://2ality.com/2015/07/es6-module-exports.html)
 ```
 
-Export is a bit trickier if you want your exported module to be imported by code that does not include the import inter-op. If the importing code has the inter-op logic inserted by this plugin, then you don't need to worry, and can disable the export inter-op features if desired.
+Export is a bit trickier if you want your exported module to be imported by code that does not include an import inter-op.
+If the importing code has an inter-op logic inserted by this plugin, then you don't need to worry and can disable the export inter-op features if desired.
 
 Imagine a file like this:
 
@@ -159,7 +160,7 @@ export default {
 };
 ```
 
-Which might create an exported module that looks like:
+Which might export a module that looks like:
 
 ```js
 {
@@ -205,7 +206,7 @@ In order to determine which properties the default export already has, the plugi
 export default {
   prop: val,
 };
-// plugin knows about prop
+// plugin knows about 'prop'
 ```
 
 - In a variable declaration literal or assigned afterwards.
@@ -216,10 +217,10 @@ const Module = {
 };
 Module.prop2 = val2;
 export default Module;
-// plugin knows about prop1 and prop2
+// plugin knows about 'prop1' and 'prop2'
 ```
 
-- In an Object.assign(..) or \_extends(..)
+- In an `Object.assign(..)` or `_extends(..)`
   - \_extends is the named used by babel and typescript when compiling object spread.
   - This includes a recursive search for any additional objects used in the assign/extend which are defined in the upper block scope.
 
@@ -231,10 +232,10 @@ const object2 = Object.assign({}, object1, {
   prop2: val,
 });
 export default object2;
-// plugin knows about prop1 and prop2
+// plugin knows about 'prop1' and 'prop2'
 ```
 
-**CAUTION**: The plugin cannot check the properties on imported modules. So if they are used in Object.assign() or \_extends(), the plugin will not be aware of its properties and may override them with a named export.
+**CAUTION**: The plugin cannot check the properties on imported modules. So if they are used in `Object.assign()` or `_extends()`, the plugin will not be aware of its properties and may override them with a named export.
 
 ##### Example non-solvable issues
 
@@ -254,7 +255,7 @@ function one_string() {
 }
 
 const MyUtil = {
-  // The plugin can't assign these to `exports` since the definition is not just a reference to the named export.
+  // The plugin can't assign 'one' or 'two' to `exports` since there is a collision with a different definition.
   one: one_string,
   two: () => "two",
 };
@@ -320,8 +321,8 @@ sap.ui.define(["./a"], A => {
 
 ### Converting ES classes into Control.extend(..) syntax
 
-By default, the plugin converts ES classes to Control.extend(..) syntax if the class extends from a class which has been imported.
-So a class without a parent will not be extended.
+By default, the plugin converts ES classes to `Control.extend(..)` syntax if the class extends from a class which has been imported.
+So a class without a parent will not be converted to .extend() syntax.
 
 There are a few options or some metadata you can use to control this.
 
@@ -672,4 +673,4 @@ Issues also welcome for feature requests.
 
 ## License
 
-MIT © 2017 Ryan Murphy
+MIT © 2019 Ryan Murphy
