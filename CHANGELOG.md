@@ -4,6 +4,12 @@
 
 The major version will be kept the same as babel's (currently 7.x.x).
 
+### 7.0.0-rc.4 (2019-02-07)
+
+#### Fixes
+
+- Handle @ sign in import names when creating local variable name
+
 ### 7.0.0-rc.3 (2019-02-06)
 
 #### Breaking

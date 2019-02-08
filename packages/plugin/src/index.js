@@ -17,7 +17,7 @@ AST Explorer: https://astexplorer.net/
 const CONSTRUCTOR = "constructor";
 const tempModuleName = name => `__${name}`;
 const cleanImportSource = src =>
-  src.replace(/(\/)|(-)/g, "_").replace(/\./g, "");
+  src.replace(/(\/)|(-)|(@)/g, "_").replace(/\./g, "");
 
 module.exports = () => {
   const ProgramVisitor = {
