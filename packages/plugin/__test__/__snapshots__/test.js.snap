@@ -965,7 +965,7 @@ exports[`imports import-all.js 1`] = `
 });"
 `;
 
-exports[`imports import-at-sign.js 1`] = `"sap.ui.define([\\"@babel/polyfill\\"], function (__@babel_polyfill) {});"`;
+exports[`imports import-at-sign.js 1`] = `"sap.ui.define([\\"@babel/polyfill\\", \\"dash-separated\\"], function (___babel_polyfill, __dash_separated) {});"`;
 
 exports[`imports import-duplicate-src-1.js 1`] = `
 "sap.ui.define([\\"X\\"], function (XA) {
