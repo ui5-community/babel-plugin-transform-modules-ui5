@@ -4,13 +4,11 @@ An unofficial Babel transformer plugin for SAP/Open UI5.
 
 It allows you to develop SAP UI5 applications by using the latest [ECMAScript](http://babeljs.io/docs/learn-es2015/), including classes and modules, or even TypeScript.
 
-**WARNING Currently not fully compatible with @babel/preset-typescript**
-
 [![Build Status](https://travis-ci.org/r-murphy/babel-plugin-transform-modules-ui5.svg?branch=master)](https://travis-ci.org/r-murphy/babel-plugin-transform-modules-ui5)
 
 ## Install
 
-This repo contains both a preset and a plugin. It is recommended to use the preset, in case the plugin gets split up in the future.
+This repo contains both a preset and a plugin. It is recommended to use the preset since the plugin will get split into two in the future.
 
 ```sh
 npm install babel-preset-transform-ui5 --save-dev
@@ -26,7 +24,7 @@ yarn add babel-preset-transform-ui5 --dev
 
 ### .babelrc
 
-At a minimum, add `transform-modules-ui5` to the `plugins`.
+At a minimum, add `transform-ui5` to the `presets`.
 
 ```js
 {
@@ -46,9 +44,25 @@ Or if you want to supply plugin options, use the array syntax.
 }
 ```
 
-At the time of writing, the babel version is 7.0, which does not natively support class property syntax. To use that syntax also add the plugin `@babel/plugin-syntax-class-properties`.
+At the time of writing the babel version is 7.3, which does not natively support class property syntax. To use that syntax also add the plugin `@babel/plugin-syntax-class-properties`.
 
 It is also recommended to use [@babel/preset-env](https://babeljs.io/docs/en/next/babel-preset-env.html) to control which ES version the final code is transformed to.
+
+The order of presets is important and `@babel/preset-env` should be higher in the array than this one. Babel applies them in reverse order for legacy reasons, so this preset will be applied first.
+
+```js
+{
+    "presets": [
+        ["@babel/preset-env", { // applied 3rd
+            ...presetEnvOpts
+        }],
+        ["transform-ui5", { // applied 2nd
+            ...pluginOpts
+        }],
+        "@babel/preset-typescript", // applied 1st
+    ]
+}
+```
 
 ## Features
 
@@ -56,6 +70,8 @@ There are 2 main features of the plugin, and you can use both or one without the
 
 1. Converting ES modules (import/export) into sap.ui.define or sap.ui.require.
 2. Converting ES classes into Control.extend(..) syntax.
+
+**NOTE:** The class transform will be split into its own plugin in the future.
 
 This only transforms the UI5 relevant things. It does not transform everything to ES5 (for example it does not transform const/let to var). This makes it easier to use `@babel/preset-env` to transform things correctly.
 

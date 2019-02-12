@@ -10,6 +10,7 @@
   "scripts": {
     "clean": "rimraf dist",
     "build": "babel src -d dist",
+    "build:watch": "babel src -d dist --watch",
     "lint": "eslint src",
     "lint:fix": "npm run lint -- --fix",
     "lint:staged": "lint-staged",

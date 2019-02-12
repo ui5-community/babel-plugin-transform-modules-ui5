@@ -41,7 +41,9 @@ function processDirectory(dir) {
             presets.push([
               "@babel/preset-env",
               {
-                // default targets for preset-env is ES5
+                targets: undefined, // default targets for preset-env is ES5
+                modules: false,
+                useBuiltIns: "usage",
               },
             ]);
           }
@@ -50,7 +52,7 @@ function processDirectory(dir) {
               "@babel/plugin-syntax-dynamic-import",
               "@babel/plugin-syntax-object-rest-spread",
               ["@babel/plugin-syntax-decorators", { legacy: true }],
-              ["@babel/plugin-syntax-class-properties", { useBuiltIns: true }],
+              // ["@babel/plugin-syntax-class-properties", { useBuiltIns: true }],
               [plugin, opts],
             ],
             presets,

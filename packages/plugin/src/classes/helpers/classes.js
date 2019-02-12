@@ -1,9 +1,11 @@
 import { types as t } from "@babel/core";
-import * as th from "./templates";
+
 import Path from "path";
 import assignDefined from "object-assign-defined";
 
-import * as ast from "./ast";
+import * as th from "../../utils/templates";
+import * as ast from "../../utils/ast";
+
 import { getJsDocClassInfo, getTags } from "./jsdoc";
 import { getDecoratorClassInfo } from "./decorators";
 

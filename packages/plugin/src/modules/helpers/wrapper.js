@@ -1,18 +1,27 @@
 import { types as t } from "@babel/core";
-import * as th from "./templates";
 import * as eh from "./exports";
-import * as ast from "./ast";
+import * as th from "../../utils/templates";
+import * as ast from "../../utils/ast";
 
 export function wrap(visitor, programNode, opts) {
   let {
     defaultExport,
     exportGlobal,
     firstImport,
-    injectDynamicImportHelper,
     imports,
     namedExports,
     ignoredImports,
+    injectDynamicImportHelper,
   } = visitor;
+
+  const needsWrap = !!(
+    defaultExport ||
+    imports.length ||
+    namedExports.length ||
+    injectDynamicImportHelper
+  );
+
+  if (!needsWrap) return;
 
   let { body } = programNode;
 
