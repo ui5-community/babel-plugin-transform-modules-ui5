@@ -30,15 +30,13 @@ export const buildTempExport = template(`
   const ${exportName} = VALUE;
 `);
 
+export const buildExportDefault = template(`
+  export default VALUE;
+`);
+
 export const buildReturnExports = template(`
   return ${exportName};
 `);
-
-// export const buildExportsModuleDeclaration = template(`
-//   Object.defineProperty(${exportString}, "__esModule", {
-//     value: true
-//   });
-// `)
 
 export function buildNamedExport(obj) {
   // console.log(obj);
@@ -116,12 +114,6 @@ export const buildExtendAssign = template(`
 export const buildThisAssignment = template(`
   this.NAME = VALUE;
 `);
-
-// export const buildDefaultConstructorFunction = template(`
-//   function constructor() {
-//     SUPER.prototype.constructor.apply(this, arguments);
-//   }
-// `)
 
 // This is use when there is not already the function, so always propagate arguments.
 export const buildInheritingFunction = template(`

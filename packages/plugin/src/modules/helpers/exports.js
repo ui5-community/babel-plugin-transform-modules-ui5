@@ -1,6 +1,6 @@
 import { types as t } from "@babel/core";
-import * as th from "./templates";
-import * as ast from "./ast";
+import * as th from "../../utils/templates";
+import * as ast from "../../utils/ast";
 
 /**
  * Collapse named exports onto the default export so that the default export can be returned directly,

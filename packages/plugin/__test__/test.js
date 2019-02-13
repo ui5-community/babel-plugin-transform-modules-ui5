@@ -41,7 +41,9 @@ function processDirectory(dir) {
             presets.push([
               "@babel/preset-env",
               {
-                // default targets for preset-env is ES5
+                targets: undefined, // default targets for preset-env is ES5
+                modules: false,
+                useBuiltIns: "usage",
               },
             ]);
           }

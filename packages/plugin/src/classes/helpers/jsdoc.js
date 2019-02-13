@@ -1,10 +1,8 @@
 import { types as t } from "@babel/core";
 import doctrine from "doctrine";
 import ignoreCase from "ignore-case";
-import { isCommentBlock } from "./ast";
 
 const classInfoValueTags = ["alias", "name", "namespace"];
-
 const classInfoBoolTags = ["nonUI5", "controller", "keepConstructor"];
 
 export function getJsDocClassInfo(node, parent) {
@@ -33,8 +31,12 @@ export function getJsDocClassInfo(node, parent) {
       })
       .filter(notEmpty)[0];
   }
-  // Else see if the JSDoc are on the return statement (i..e return class X extends SAPClass)
-  else if (t.isClassExpression(node) && t.isReturnStatement(parent)) {
+  // Else see if the JSDoc are on the return statement (eg. return class X extends SAPClass)
+  // or export statement (eg. export default class X extends SAPClass)
+  else if (
+    (t.isClassExpression(node) && t.isReturnStatement(parent)) ||
+    (t.isClassDeclaration(node) && t.isExportDefaultDeclaration(parent))
+  ) {
     return getJsDocClassInfo(parent);
   } else {
     return {};
@@ -97,4 +99,9 @@ export function hasJsdocGlobalExportFlag(node) {
       }).tags.length > 0
     );
   });
+}
+
+// This doesn't exist on babel-types
+function isCommentBlock(node) {
+  return node && node.type === "CommentBlock";
 }

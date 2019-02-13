@@ -1173,10 +1173,8 @@ exports[`no-wrap skip-iffe.js 1`] = `
 })();"
 `;
 
-exports[`presets with-preset-env.js 1`] = `
-"\\"use strict\\";
-
-sap.ui.define([\\"sap/class\\"], function (SAPClass) {
+exports[`preset-env preset-env-class.js 1`] = `
+"sap.ui.define([\\"sap/class\\"], function (SAPClass) {
   var MyClass = SAPClass.extend(\\"my.MyClass\\", {
     x: 1,
     fn: function _fn() {
@@ -1189,6 +1187,22 @@ sap.ui.define([\\"sap/class\\"], function (SAPClass) {
   });
   MyClass.X = 1;
   return MyClass;
+});"
+`;
+
+exports[`preset-env preset-env-usage.js 1`] = `
+"sap.ui.define([\\"sap/SAPClass\\", \\"core-js/modules/es6.promise\\", \\"core-js/modules/es6.string.includes\\", \\"core-js/modules/es7.array.includes\\"], function (SAPClass, __core_js_modules_es6promise, __core_js_modules_es6stringincludes, __core_js_modules_es7arrayincludes) {
+  var AClass = SAPClass.extend(\\"my.MyClass\\", {
+    delay: function _delay() {
+      return new Promise(function (resolve) {
+        setTimeout(resolve);
+      });
+    },
+    includes: function _includes(str) {
+      return str.includes(\\"thing\\");
+    }
+  });
+  return AClass;
 });"
 `;
 
@@ -1208,7 +1222,7 @@ exports[`typescript ts-class-props.ts 1`] = `
 exports[`typescript ts-export-interface.ts 1`] = `
 "sap.ui.define([], function () {
   const MY_CONSTANT = \\"constant\\";
-  let MyEnum;
+  var MyEnum;
 
   (function (MyEnum) {
     MyEnum[MyEnum[\\"A\\"] = 0] = \\"A\\";
