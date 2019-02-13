@@ -4,6 +4,18 @@
 
 The major version will be kept the same as babel's (currently 7.x.x).
 
+### 7.0.0-rc.6 (2019-02-13)
+
+#### Enhancements
+
+- Deferred module wrapping to support imports and helpers added by other plugins (#15 & #17)
+
+### 7.0.0-rc5 (2019-02-08)
+
+#### Enhancements
+
+- `modulesMap` option (#16)
+
 ### 7.0.0-rc.4 (2019-02-07)
 
 #### Fixes
