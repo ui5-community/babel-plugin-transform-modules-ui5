@@ -52,7 +52,7 @@ function processDirectory(dir) {
               "@babel/plugin-syntax-dynamic-import",
               "@babel/plugin-syntax-object-rest-spread",
               ["@babel/plugin-syntax-decorators", { legacy: true }],
-              // ["@babel/plugin-syntax-class-properties", { useBuiltIns: true }],
+              ["@babel/plugin-syntax-class-properties", { useBuiltIns: true }],
               [plugin, opts],
             ],
             presets,
