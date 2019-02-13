@@ -1,6 +1,6 @@
 {
   "name": "babel-plugin-transform-classes-ui5",
-  "version": "7.0.0-rc.5",
+  "version": "7.0.0-rc.6",
   "description": "An unofficial babel plugin for SAP UI5.",
   "main": "src/index.js",
   "repository": "https://github.com/r-murphy/babel-plugin-ui5/tree/master/packages/plugin-transform-classes",
@@ -13,7 +13,5 @@
   "bugs": {
     "url": "https://github.com/r-murphy/babel-plugin-transform-modules-ui5/issues"
   },
-  "homepage": "https://github.com/r-murphy/babel-plugin-transform-modules-ui5#readme",
-  "dependencies": {},
-  "devDependencies": {}
+  "homepage": "https://github.com/r-murphy/babel-plugin-transform-modules-ui5#readme"
 }
