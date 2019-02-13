@@ -39,9 +39,9 @@
   "author": "Ryan Murphy",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/r-murphy/babel-plugin-ui5/issues"
+    "url": "https://github.com/r-murphy/babel-plugin-transform-modules-ui5/issues"
   },
-  "homepage": "https://github.com/r-murphy/babel-plugin-ui5#readme",
+  "homepage": "https://github.com/r-murphy/babel-plugin-transform-modules-ui5#readme",
   "jest": {
     "collectCoverage": true
   },
