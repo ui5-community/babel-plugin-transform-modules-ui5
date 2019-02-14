@@ -21,7 +21,6 @@ export function convertClassToUI5Extend(
   extraStaticProps,
   opts
 ) {
-  // eslint-disable-line no-unused-vars
   if (!(t.isClassDeclaration(node) || t.isClassExpression(node))) {
     return node;
   }
@@ -30,8 +29,8 @@ export function convertClassToUI5Extend(
 
   const classNameIdentifier = node.id;
   const className = classNameIdentifier.name;
-  const superClass = node.superClass; // Identifier
-  const superClassName = node.superClass.name;
+  const superClass = node.superClass; // Identifier node.
+  const superClassName = superClass.name;
 
   const isController =
     className.includes("Controller") || !!classInfo.controller;
@@ -238,7 +237,7 @@ export function convertClassToUI5Extend(
 
   const extendAssign = th.buildExtendAssign({
     NAME: classNameIdentifier,
-    SUPERNAME: superClass,
+    SUPER: superClass, // Needs Identifier node
     FQN: t.stringLiteral(getFullyQualifiedName(classInfo)),
     OBJECT: t.objectExpression(extendProps),
   });
@@ -268,7 +267,7 @@ export function getClassInfo(path, node, parent, pluginOpts) {
 }
 
 /**
- * Reads the namespace from the file path, but not the name
+ * Reads the namespace from the file path (but not the name).
  */
 function getFileBaseNamespace(path, pluginOpts) {
   const opts = path.hub.file.opts;

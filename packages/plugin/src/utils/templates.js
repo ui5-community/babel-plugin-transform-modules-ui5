@@ -107,7 +107,7 @@ export const buildNamedImportDestructor = template(`
 `);
 
 export const buildExtendAssign = template(`
-  const NAME = SUPERNAME.extend(FQN, OBJECT);
+  const NAME = SUPER.extend(FQN, OBJECT);
 `);
 
 // TODO: get this one to use buildAssign

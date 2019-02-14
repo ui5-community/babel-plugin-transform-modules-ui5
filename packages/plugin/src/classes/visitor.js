@@ -9,26 +9,6 @@ export const ClassTransformVisitor = {
   ImportDefaultSpecifier(path) {
     this.importNames.push(path.node.local.name);
   },
-  /*!
-   * Visits function calls.
-   */
-  CallExpression(path) {
-    const { node } = path;
-    const { callee } = node;
-    // If the file already has sap.ui.define, get the names of variables it creates to use for the class logic.
-    if (ast.isCallExpressionCalling(node, "sap.ui.define")) {
-      this.importNames.push(
-        ...getRequiredParamsOfSAPUIDefine(path, node).map(req => req.name)
-      );
-      return;
-    } else if (this.superClassName) {
-      if (t.isSuper(callee)) {
-        replaceConstructorSuperCall(path, node, this.superClassName);
-      } else if (t.isSuper(callee.object)) {
-        replaceObjectSuperCall(path, node, this.superClassName);
-      }
-    }
-  },
   /**
    * ClassDeclaration visitor.
    * Use both enter() and exit() to track when the visitor is inside a UI5 class,
@@ -46,43 +26,23 @@ export const ClassTransformVisitor = {
         // If it doesn't extend from an import, treat it as plain ES2015 class.
         return;
       }
+
       // If the super class is one of the imports, we'll assume it's a UI5 managed class,
       // and therefore may need to be transformed to .extend() syntax.
-      const { name } = node.id;
       const classInfo = classes.getClassInfo(path, node, path.parent, opts);
-      if (classInfo.nonUI5) {
+
+      if (!shouldConvertClass(file, node, opts, classInfo)) {
         return;
       }
 
-      let shouldConvert = false;
-      if (opts.autoConvertAllExtendClasses == true) {
-        shouldConvert = true;
-      }
-      if (
-        classInfo.name ||
-        classInfo.alias ||
-        classInfo.controller ||
-        classInfo.namespace
-      ) {
-        shouldConvert = true;
-      }
-      if (
-        /.*[.]controller[.]js$/.test(file.opts.filename) &&
-        opts.autoConvertControllerClass !== false
-      ) {
-        shouldConvert = true;
-      }
-
-      if (!shouldConvert) {
-        return;
-      }
-
+      // Save super class name for converting super calls
       this.superClassName = classInfo.superClassName;
 
-      // Find the Block scoped parent (Program or Function body) and search for assigned properties within that.
+      // Find the Block scoped parent (Program or Function body) and search for assigned properties within that (eg. MyClass.X = "X").
+      const { name: className } = node.id;
       const blockParent = path.findParent(path => path.isBlock()).node;
       const staticProps = ast.groupPropertiesByName(
-        ast.getOtherPropertiesOfIdentifier(blockParent, name)
+        ast.getOtherPropertiesOfIdentifier(blockParent, className)
       );
       // TODO: flag metadata and renderer for removal if applicable
       const ui5ExtendClass = classes.convertClassToUI5Extend(
@@ -121,6 +81,26 @@ export const ClassTransformVisitor = {
     exit() {
       this.superClassName = null;
     },
+  },
+  /*!
+   * Visits function calls.
+   */
+  CallExpression(path) {
+    const { node } = path;
+    const { callee } = node;
+    // If the file already has sap.ui.define, get the names of variables it creates to use for the class logic.
+    if (ast.isCallExpressionCalling(node, "sap.ui.define")) {
+      this.importNames.push(
+        ...getRequiredParamsOfSAPUIDefine(path, node).map(req => req.name)
+      );
+      return;
+    } else if (this.superClassName) {
+      if (t.isSuper(callee)) {
+        replaceConstructorSuperCall(path, node, this.superClassName);
+      } else if (t.isSuper(callee.object)) {
+        replaceObjectSuperCall(path, node, this.superClassName);
+      }
+    }
   },
   /**
    * Convert object method constructor() to constructor: function constructor(),
@@ -186,4 +166,28 @@ function replaceSuperNamedCall(path, node, superClassName, methodName) {
 function doesClassExtendFromImport(node, imports) {
   const superClass = node.superClass;
   return superClass && imports.some(imported => imported === superClass.name);
+}
+
+function shouldConvertClass(file, node, opts, classInfo) {
+  if (classInfo.nonUI5) {
+    return false;
+  }
+  if (opts.autoConvertAllExtendClasses == true) {
+    return true;
+  }
+  if (
+    classInfo.name ||
+    classInfo.alias ||
+    classInfo.controller ||
+    classInfo.namespace
+  ) {
+    return true;
+  }
+  if (
+    /.*[.]controller[.]js$/.test(file.opts.filename) &&
+    opts.autoConvertControllerClass !== false
+  ) {
+    return true;
+  }
+  return false;
 }
