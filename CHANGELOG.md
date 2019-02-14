@@ -4,6 +4,12 @@
 
 The major version will be kept the same as babel's (currently 7.x.x).
 
+### 7.0.0-rc.7 (2019-02-13)
+
+#### Fixes
+
+- Better recursive detection of 'this' used on class properties (Fixes #18)
+
 ### 7.0.0-rc.6 (2019-02-13)
 
 #### Enhancements

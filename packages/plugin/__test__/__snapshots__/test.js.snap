@@ -461,6 +461,41 @@ exports[`classes class-convert-options-namedonly.js 1`] = `
 });"
 `;
 
+exports[`classes class-convert-this-binding.js 1`] = `
+"sap.ui.define([\\"./lib/util\\", \\"sap/ui/core/mvc/Controller\\"], function (Util, Controller) {
+  const AppController = Controller.extend(\\"app.AppController\\", {
+    constructor: function constructor() {
+      Controller.prototype.constructor.apply(this, arguments);
+      this.control = this.byId(\\"control\\");
+      this.controlCopy = this.control;
+      this.boundSomething = this.something.bind(this);
+      this.boundSomething2 = this.something.bind(null, this);
+      this.boundSomething3 = Util.something.bind(this);
+
+      this.arrowFunctionMember = () => {
+        this.something();
+      };
+
+      this.arrowFunctionArgument = () => {
+        Object.something(1, this);
+      };
+
+      this.arrowFunctionNested = Util.debounce(100, () => {
+        setTimeout(() => {
+          this.something();
+        });
+      });
+    },
+    metadata: {},
+    No: \\"not this\\",
+    No2: Util.callback(function () {
+      this.notThis();
+    })
+  });
+  return AppController;
+});"
+`;
+
 exports[`classes class-convert-with-existing-define-defer-return.js 1`] = `
 "sap.ui.define([\\"sap/SAPClass\\"], SAPClass => {
   const MyClass = SAPClass.extend(\\"com.app.MyClass\\", {

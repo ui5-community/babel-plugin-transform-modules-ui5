@@ -218,7 +218,7 @@ export function isCallExpressionCalling(expression, dotNotationString) {
 
 /**
  * Recursively search through some parts of a node's for use of 'this'.
- * It checks the callee and the arguments but does not traverse into blocks.
+ * It checks the callee and the arguments and traverses into arrow functions.
  *
  * True scenarios include:
  *  - this            (ThisExpression)
@@ -226,6 +226,15 @@ export function isCallExpressionCalling(expression, dotNotationString) {
  *  - this.thing()    (CallExpression > callee > MemberExpression > ThisExpression)
  *  - method(this)    (CallExpression > arguments > ThisExpression)
  *  - method(this.a)  (CallExpression > arguments > MemberExpression > ThisExpression)
+ *  - () => this
+ *  - () => this()
+ *  - () => fn(this)
+ *  - fn1(() => this)
+ *  - fn1(() => this())
+ *  - fn1(() => fn(this))
+ *
+ * Exits w/ false if a non-arrow function is encountered even if 'this' is used within.
+ * - fn1(function() { this.fn2(); })
  *
  * @param {*} node
  */
@@ -233,17 +242,24 @@ export function isThisExpressionUsed(node) {
   if (!node) {
     return false;
   }
+  if (Array.isArray(node)) {
+    return node.some(isThisExpressionUsed);
+  }
   if (t.isThisExpression(node)) {
     return true;
-  } else if (t.isCallExpression(node)) {
-    return (
-      isThisExpressionUsed(node.callee) ||
-      node.arguments.some(isThisExpressionUsed)
-    );
-  } else if (t.isMemberExpression(node)) {
-    // TODO: instead of recursion, we could traverse the member expressions until the deepest object, and see if that's ThisExpression
-    return isThisExpressionUsed(node.object);
-  } else {
+  }
+  if (t.isFunctionExpression(node)) {
     return false;
   }
+  const traversableProps = [
+    "body",
+    "callee",
+    "arguments",
+    "expression",
+    "object",
+    "property",
+  ];
+  return traversableProps.some(
+    prop => node[prop] && isThisExpressionUsed(node[prop])
+  );
 }
