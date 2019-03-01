@@ -4,11 +4,17 @@
 
 The major version will be kept the same as babel's (currently 7.x.x).
 
+### 7.0.0-rc.9 (2019-03-01)
+
+### Fixes
+
+- #20 (Typescript) declare the \_\_exports variable for anonymous exports at time of declaration rather than at end of program, so that Typescript plugin can strip types on it.
+
 ### 7.0.0-rc.8 (2019-02-28)
 
 ### Breaking
 
-- Move all instance class props to constructor or onInit by default. Added option `onlyMoveClassPropsUsingThis` for old behaviour.
+- Move all instance class props to constructor or onInit by default. Added option `onlyMoveClassPropsUsingThis` for old behaviour. See #16.
 
 ### 7.0.0-rc.7 (2019-02-13)
 
