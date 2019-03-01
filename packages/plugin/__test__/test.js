@@ -24,7 +24,10 @@ function processDirectory(dir) {
     .forEach(filename => {
       test(filename, () => {
         const filePath = join(dir, filename);
-        let outputPath = filePath.replace(FIXTURE_DIR_NAME, OUT_DIR_NAME);
+        let outputPath = filePath
+          .replace(FIXTURE_DIR_NAME, OUT_DIR_NAME)
+          .replace(/.ts$/, ".js");
+
         try {
           const opts = getOpts(filePath);
           const presets = [];
