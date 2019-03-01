@@ -13,7 +13,7 @@ export const ModuleTransformVisitor = {
   /*!
    * Removes the ES6 import and adds the details to the import array in our state.
    */
-  ImportDeclaration(path, { opts = {} }) {
+  ImportDeclaration(path, { opts = {}, ...state }) {
     const { node } = path;
 
     if (node.importKind === "type") return; // flow-type
@@ -29,6 +29,7 @@ export const ModuleTransformVisitor = {
       path.remove();
       return;
     }
+
     //const testSrc = (opts.libs || ["^sap/"]).concat(opts.files || []);
     // const isUi5SrcRE = testSrc.length && new RegExp(`(${testSrc.join("|")})`);
     // const isUi5Src = isUi5SrcRE.test(src);
@@ -40,8 +41,17 @@ export const ModuleTransformVisitor = {
 
     const { modulesMap = {} } = opts;
     const mappedSrc =
-      (typeof modulesMap === "function" ? modulesMap(src) : modulesMap[src]) ||
-      src;
+      (typeof modulesMap === "function"
+        ? modulesMap(src, {
+            node,
+            opts,
+            cwd: state.cwd,
+            filename: state.filename,
+            file: {
+              opts: state.file.opts,
+            },
+          })
+        : modulesMap[src]) || src;
 
     // Note that existingImport may get mutated if there are multiple import lines from the same module.
     const existingImport = this.imports.find(imp => imp.src === mappedSrc);
