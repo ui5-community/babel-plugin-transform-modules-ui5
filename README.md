@@ -641,6 +641,7 @@ const MyControl = SAPClass.extend('MyControl', {
 - `moveControllerPropsToOnInit` (Default: false) Moves class props in a controller to the onInit method instead of constructor.
 - `moveControllerConstructorToOnInit` (Default: false) Moves existing constructor code in a controller to the onInit method. Enabling will auto-enable `moveControllerPropsToOnInit`.
 - `addControllerStaticPropsToExtend` (Default: false) Moves static props of a controller to the extends call. Useful for formatters.
+- `onlyMoveClassPropsUsingThis` (Default: false) Set to use old behaviour where only instance class props referencing `this` would be moved to the constructor or onInit. New default is to always move instance props.
 
 \* 'collapsing' named exports is a combination of simply ignoring them if their definition is the same as a property on the default export, and also assigning them to the default export.
 

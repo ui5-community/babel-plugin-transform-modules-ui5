@@ -20,13 +20,13 @@ exports[`classes class-convert-constructor-keep-annot.controller.js 1`] = `
       this.x = 1;
     },
     onInit: function onInit() {
+      this.other = 1;
       this.ref = this.byId(\\"ref\\");
 
       if (typeof Controller.prototype.onInit === 'function') {
         Controller.prototype.onInit.apply(this, arguments);
       }
     },
-    other: 1,
 
     get getter() {
       return 1;
@@ -43,11 +43,11 @@ exports[`classes class-convert-constructor-keep-default.controller.js 1`] = `
     constructor: function _constructor(arg) {
       console.log(\\"before super\\");
       Controller.prototype.constructor.call(this, arg);
+      this.other = 1;
       this.ref = this.byId(\\"ref\\");
       console.log(\\"after super\\");
       this.x = 1;
     },
-    other: 1,
 
     get getter() {
       return 1;
@@ -62,6 +62,7 @@ exports[`classes class-convert-constructor-move.controller.js 1`] = `
 "sap.ui.define([\\"sap/ui/core/Controller\\"], function (Controller) {
   const MyController = Controller.extend(\\"fixtures.classes.MyController\\", {
     onInit: function onInit() {
+      this.other = 1;
       this.ref = this.byId(\\"ref\\");
       console.log(\\"before super\\");
       console.log(\\"after super\\");
@@ -71,7 +72,6 @@ exports[`classes class-convert-constructor-move.controller.js 1`] = `
         Controller.prototype.onInit.apply(this, arguments);
       }
     },
-    other: 1,
 
     get getter() {
       return 1;
@@ -155,12 +155,12 @@ exports[`classes class-convert-controller-multi.controller.js 1`] = `
 exports[`classes class-convert-controller-w-oninit.controller.js 1`] = `
 "sap.ui.define([\\"sap/ui/core/Controller\\"], function (Controller) {
   const MyController = Controller.extend(\\"test.fixtures.classes.MyController\\", {
-    prop: 1,
-    prop3: X.y,
     constructor: function _constructor(arg) {
       console.log(\\"constructor\\");
       Controller.prototype.constructor.call(this, arg);
+      this.prop = 1;
       this.prop2 = this.a.b;
+      this.prop3 = X.y;
       this.control = this.byId(\\"control\\");
       this.other = getThing(this.prop);
 
@@ -187,12 +187,12 @@ exports[`classes class-convert-controller-wo-oninit.controller.js 1`] = `
     constructor: function _constructor(arg) {
       console.log(\\"constructor\\");
       Controller.prototype.constructor.call(this, arg);
+      this.prop = 1;
 
       this.prop_func = () => true;
 
       this.x = 1;
     },
-    prop: 1,
 
     get getter() {
       return 1;
@@ -253,6 +253,7 @@ exports[`classes class-convert-extend-managed.js 1`] = `
     constructor: function _constructor(arg) {
       console.log(\\"constructor\\");
       SAPClass.prototype.constructor.call(this, arg);
+      this.property_value = 1;
 
       this.property_arrow_function = () => 1;
 
@@ -276,8 +277,7 @@ exports[`classes class-convert-extend-managed.js 1`] = `
     },
     async_shorthand_function: async function _async_shorthand_function(arg) {
       return await 1;
-    },
-    property_value: 1
+    }
   });
 
   MyClass.static_shorthand_function = function static_shorthand_function() {
@@ -389,8 +389,11 @@ exports[`classes class-convert-metadata-prop.js 1`] = `
   const Formatter = {};
   const mdata = {};
   const MyClass = SAPClass.extend(\\"test.fixtures.classes.MyClass\\", {
-    metadata: mdata,
-    myFormatter: Formatter
+    constructor: function constructor() {
+      SAPClass.prototype.constructor.apply(this, arguments);
+      this.myFormatter = Formatter;
+    },
+    metadata: mdata
   });
   return MyClass;
 });"
@@ -440,28 +443,7 @@ exports[`classes class-convert-nonui5-return.js 1`] = `
 });"
 `;
 
-exports[`classes class-convert-options-namedonly.js 1`] = `
-"sap.ui.define([\\"other/OtherClass\\", \\"sap/SAPClass\\"], (OtherClass, SAPClass) => {
-  class MyClass extends OtherClass {
-    constructor() {
-      super();
-    }
-
-  }
-
-  const MyUI5Class = SAPClass.extend(\\"my.app.MyUI5Class\\", {
-    constructor: function _constructor() {
-      SAPClass.prototype.constructor.call(this);
-    }
-  });
-  return {
-    MyClass,
-    MyUI5Class
-  };
-});"
-`;
-
-exports[`classes class-convert-this-binding.js 1`] = `
+exports[`classes class-convert-only-move-this-binding.js 1`] = `
 "sap.ui.define([\\"./lib/util\\", \\"sap/ui/core/mvc/Controller\\"], function (Util, Controller) {
   const AppController = Controller.extend(\\"app.AppController\\", {
     constructor: function constructor() {
@@ -493,6 +475,27 @@ exports[`classes class-convert-this-binding.js 1`] = `
     })
   });
   return AppController;
+});"
+`;
+
+exports[`classes class-convert-options-namedonly.js 1`] = `
+"sap.ui.define([\\"other/OtherClass\\", \\"sap/SAPClass\\"], (OtherClass, SAPClass) => {
+  class MyClass extends OtherClass {
+    constructor() {
+      super();
+    }
+
+  }
+
+  const MyUI5Class = SAPClass.extend(\\"my.app.MyUI5Class\\", {
+    constructor: function _constructor() {
+      SAPClass.prototype.constructor.call(this);
+    }
+  });
+  return {
+    MyClass,
+    MyUI5Class
+  };
 });"
 `;
 
@@ -1211,7 +1214,10 @@ exports[`no-wrap skip-iffe.js 1`] = `
 exports[`preset-env preset-env-class.js 1`] = `
 "sap.ui.define([\\"sap/class\\"], function (SAPClass) {
   var MyClass = SAPClass.extend(\\"my.MyClass\\", {
-    x: 1,
+    constructor: function constructor() {
+      SAPClass.prototype.constructor.apply(this, arguments);
+      this.x = 1;
+    },
     fn: function _fn() {
       var _this = this;
 
@@ -1242,6 +1248,22 @@ exports[`preset-env preset-env-usage.js 1`] = `
 `;
 
 exports[`typescript ts-class-props.ts 1`] = `
+"sap.ui.define([\\"sap/Class\\"], function (SAPClass) {
+  const MyClass = SAPClass.extend(\\"MyClass\\", {
+    constructor: function constructor() {
+      SAPClass.prototype.constructor.apply(this, arguments);
+      this.S = \\"S\\";
+      this.PS = \\"PS\\";
+      this.PRS = \\"PRS\\";
+    }
+  });
+  MyClass.SS = \\"SS\\";
+  MyClass.PSS = \\"PSS\\";
+  MyClass.PSRS = \\"PSRS\\";
+});"
+`;
+
+exports[`typescript ts-class-props-only-move-this.ts 1`] = `
 "sap.ui.define([\\"sap/Class\\"], function (SAPClass) {
   const MyClass = SAPClass.extend(\\"MyClass\\", {
     S: \\"S\\",

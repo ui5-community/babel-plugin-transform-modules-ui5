@@ -47,6 +47,12 @@ const Options = {
     "import-modules-map-fn": {
       modulesMap: src => Options.files["import-modules-map"].modulesMap[src],
     },
+    "ts-class-props-only-move-this": {
+      onlyMoveClassPropsUsingThis: true,
+    },
+    "class-convert-only-move-this-binding": {
+      onlyMoveClassPropsUsingThis: true,
+    },
   },
   dirs: {
     "min-wrap": {

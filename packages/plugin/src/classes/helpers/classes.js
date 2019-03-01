@@ -43,6 +43,7 @@ export function convertClassToUI5Extend(
       !!opts.moveControllerConstructorToOnInit);
   const moveStaticStaticPropsToExtend =
     isController && !!opts.addControllerStaticPropsToExtend;
+  const alwaysMoveInstanceProps = !opts.onlyMoveClassPropsUsingThis;
 
   const extendProps = [];
   const boundProps = [];
@@ -134,6 +135,7 @@ export function convertClassToUI5Extend(
           }
         }
         if (
+          alwaysMoveInstanceProps ||
           t.isArrowFunctionExpression(member.value) ||
           ast.isThisExpressionUsed(member.value)
         ) {

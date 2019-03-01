@@ -4,6 +4,12 @@
 
 The major version will be kept the same as babel's (currently 7.x.x).
 
+### 7.0.0-rc.8 (2019-02-28)
+
+### Breaking
+
+- Move all instance class props to constructor or onInit by default. Added option `onlyMoveClassPropsUsingThis` for old behaviour.
+
 ### 7.0.0-rc.7 (2019-02-13)
 
 #### Fixes
