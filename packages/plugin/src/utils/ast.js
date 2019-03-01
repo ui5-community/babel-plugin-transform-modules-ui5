@@ -106,7 +106,6 @@ export function getOtherPropertiesOfIdentifier(blockScopeNode, idName) {
             }
           }
         } else if (t.isVariableDeclaration(node)) {
-          // console.log(require('util').inspect(node, { depth: 4 }));
           return node.declarations
             .filter(declaration => declaration.id.name === idName)
             .map(declaration => declaration.init)
@@ -175,7 +174,6 @@ export function convertDeclarationToExpression(declaration) {
   if (t.isFunctionDeclaration(declaration)) {
     return convertFunctionDeclarationToExpression(declaration);
   } else {
-    // console.log('-----', declaration.type)
     return declaration;
   }
 }

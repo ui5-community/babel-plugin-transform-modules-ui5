@@ -212,14 +212,9 @@ export const ModuleTransformVisitor = {
     }
   },
 
-  /*!
-   * Replaces the ES6 export with sap.ui.define by using the state.imports array built up when
-   * visiting ImportDeclaration.
-   * Only a single 'export default' is supported.
-   */
   ExportDefaultDeclaration(path) {
     const { node } = path;
-    const { declaration } = node;
+    let { declaration } = node;
     const declarationName = ast.getIdName(declaration);
     if (hasGlobalExportFlag(node)) {
       // check for jsdoc @export
@@ -230,22 +225,26 @@ export const ModuleTransformVisitor = {
       // Leave the declaration in-line and preserve the identifier for the return statement.
       path.replaceWith(declaration);
       this.defaultExport = t.identifier(declarationName);
+    } else if (t.isIdentifier(declaration)) {
+      this.defaultExport = declaration;
+      path.remove();
     } else {
-      // Identifier, ObjectExpression or anonymous FunctionDeclaration
-      // Safe to move to the end and return directly
+      // anonymous ObjectExpression or anonymous FunctionDeclaration
       if (t.isFunctionDeclaration(declaration)) {
         const { params, body, generator, async: isAsync } = declaration;
-        this.defaultExport = t.functionExpression(
+        declaration = t.functionExpression(
           null,
           params,
           body,
           generator,
           isAsync
         );
-      } else {
-        this.defaultExport = declaration;
       }
-      path.remove();
+      const exportDeclaration = th.buildTempExport({
+        VALUE: declaration,
+      });
+      path.replaceWith(exportDeclaration);
+      this.defaultExport = th.exportsIdentifier;
     }
   },
 
@@ -267,7 +266,7 @@ export const ModuleTransformVisitor = {
   },
 
   /*!
-   * Visits function calls.
+   * Visits function calls to handle for dynamic imports.
    */
   CallExpression(path) {
     const { node } = path;

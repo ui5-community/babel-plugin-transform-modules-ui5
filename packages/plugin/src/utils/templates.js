@@ -39,7 +39,6 @@ export const buildReturnExports = template(`
 `);
 
 export function buildNamedExport(obj) {
-  // console.log(obj);
   return buildAssign({
     OBJECT: exportsIdentifier,
     NAME: obj.key,

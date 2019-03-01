@@ -635,10 +635,11 @@ exports[`examples Utils.js 1`] = `
     return a + b;
   }
 
-  return {
+  const __exports = {
     multiply,
     add
   };
+  return __exports;
 });"
 `;
 
@@ -658,10 +659,13 @@ exports[`export-collapse _extends-literal.js 1`] = `
   const O2 = {
     three
   };
-  return _extends({}, X, O2, {
+
+  const __exports = _extends({}, X, O2, {
     one,
     two
   });
+
+  return __exports;
 });"
 `;
 
@@ -789,12 +793,11 @@ exports[`export-error error-obj-prop.js 1`] = `"Unsafe mixing of conflicting def
 
 exports[`export-mixed export-mixed-anon-func.js 1`] = `
 "sap.ui.define([], function () {
-  const named = {};
-
   const __exports = function () {
     console.log(\\"I am the default\\");
   };
 
+  const named = {};
   __exports.named = named;
   return __exports;
 });"
@@ -802,12 +805,11 @@ exports[`export-mixed export-mixed-anon-func.js 1`] = `
 
 exports[`export-mixed export-mixed-arrow.js 1`] = `
 "sap.ui.define([], function () {
-  const two = 2;
-
   const __exports = () => {
     return 1;
   };
 
+  const two = 2;
   __exports.two = two;
   return __exports;
 });"
@@ -817,11 +819,11 @@ exports[`export-mixed export-mixed-literal.js 1`] = `
 "sap.ui.define([], function () {
   const a = 1;
   const b = 2;
-  const c = 3;
   const __exports = {
     a,
     x: a
   };
+  const c = 3;
   __exports.b = b;
   __exports.y = b;
   __exports.c = c;
@@ -879,20 +881,26 @@ exports[`exports export-class-extend-native.js 1`] = `
 exports[`exports export-default-anon-function.js 1`] = `
 "sap.ui.define([], function () {
   let one = 1;
-  let two = 2;
-  return async function () {
+
+  const __exports = async function () {
     return (await one) + two;
   };
+
+  let two = 2;
+  return __exports;
 });"
 `;
 
 exports[`exports export-default-arrow-function.js 1`] = `
 "sap.ui.define([], function () {
   let one = 1;
-  let two = 2;
-  return () => {
+
+  const __exports = () => {
     return one + two;
   };
+
+  let two = 2;
+  return __exports;
 });"
 `;
 
@@ -983,10 +991,11 @@ exports[`exports export-obj.js 1`] = `
     return 2;
   }
 
-  return {
+  const __exports = {
     foo: getFoo(),
     bar
   };
+  return __exports;
 });"
 `;
 
@@ -1276,6 +1285,54 @@ exports[`typescript ts-class-props-only-move-this.ts 1`] = `
 });"
 `;
 
+exports[`typescript ts-export-default-typed-anon-fn-only-default.ts 1`] = `
+"sap.ui.define([], function () {
+  const __exports = function (date) {
+    return \\"\\";
+  };
+
+  return __exports;
+});"
+`;
+
+exports[`typescript ts-export-default-typed-anon-obj.ts 1`] = `
+"sap.ui.define([], function () {
+  const __exports = {
+    x: 1
+  };
+  return __exports;
+});"
+`;
+
+exports[`typescript ts-export-default-typed-arrow-fn-only-default.ts 1`] = `
+"sap.ui.define([], function () {
+  const fn = date => {
+    return \\"\\";
+  };
+
+  const __exports = date => {
+    return \\"\\";
+  };
+
+  return __exports;
+});"
+`;
+
+exports[`typescript ts-export-default-typed-arrow-fn-with-named.1.ts 1`] = `
+"sap.ui.define([], function () {
+  const fn = date => {
+    return \\"\\";
+  };
+
+  const __exports = date => {
+    return \\"\\";
+  };
+
+  __exports.fn = fn;
+  return __exports;
+});"
+`;
+
 exports[`typescript ts-export-interface.ts 1`] = `
 "sap.ui.define([], function () {
   const MY_CONSTANT = \\"constant\\";
@@ -1306,18 +1363,21 @@ exports[`wrapping export-const.js 1`] = `
 
 exports[`wrapping export-jsdoc-global.js 1`] = `
 "sap.ui.define([], function () {
-  return {};
+  const __exports = {};
+  return __exports;
 }, true);"
 `;
 
 exports[`wrapping export-literal.js 1`] = `
 "sap.ui.define([], function () {
-  return {};
+  const __exports = {};
+  return __exports;
 });"
 `;
 
 exports[`wrapping export-options-global.js 1`] = `
 "sap.ui.define([], function () {
-  return {};
+  const __exports = {};
+  return __exports;
 }, true);"
 `;
