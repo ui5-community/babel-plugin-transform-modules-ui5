@@ -4,6 +4,12 @@
 
 The major version will be kept the same as babel's (currently 7.x.x).
 
+### 7.0.0-rc.10 (2019-03-04)
+
+### Fixes
+
+- #21 Computed class props moved correctly.
+
 ### 7.0.0-rc.9 (2019-03-01)
 
 ### Fixes
