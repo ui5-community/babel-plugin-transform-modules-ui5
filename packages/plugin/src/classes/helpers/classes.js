@@ -78,22 +78,13 @@ export function convertClassToUI5Extend(
       );
       if (member.static) {
         staticMembers.push(
-          t.expressionStatement(
-            t.assignmentExpression(
-              "=",
-              t.memberExpression(
-                classNameIdentifier,
-                member.key,
-                member.computed
-              ),
-              func
-            )
-          )
+          buildMemberAssignmentStatement(classNameIdentifier, {
+            ...member,
+            value: func,
+          })
         );
       } else {
         propsByName[memberName] = func;
-        func.generator = member.generator;
-        func.async = member.async;
         if (member.kind === "get" || member.kind === "set") {
           extendProps.push(
             t.objectMethod(
@@ -114,21 +105,22 @@ export function convertClassToUI5Extend(
             }
           }
           func.id = path.scope.generateUidIdentifier(func.id.name); // Give the function a unique name
-          extendProps.push(t.objectProperty(member.key, func, member.computed));
+          extendProps.push(
+            buildObjectProperty({
+              ...member,
+              value: func,
+            })
+          );
         }
       }
     } else if (t.isClassProperty(member)) {
       if (!member.value) continue; // un-initialized static class prop (typescript)
       if (memberName === "metadata" || memberName === "renderer") {
         // Special handling for TypeScript limitation where metadata and renderer must be properties.
-        extendProps.unshift(
-          t.objectProperty(member.key, member.value, member.computed)
-        );
+        extendProps.unshift(buildObjectProperty(member));
       } else if (member.static) {
         if (moveStaticStaticPropsToExtend) {
-          extendProps.unshift(
-            t.objectProperty(member.key, member.value, member.computed)
-          );
+          extendProps.unshift(buildObjectProperty(member));
         } else {
           staticMembers.push(
             buildMemberAssignmentStatement(classNameIdentifier, member)
@@ -150,9 +142,7 @@ export function convertClassToUI5Extend(
         ) {
           boundProps.push(member);
         } else {
-          extendProps.push(
-            t.objectProperty(member.key, member.value, member.computed)
-          );
+          extendProps.push(buildObjectProperty(member));
         }
       }
     }
@@ -294,6 +284,9 @@ function getFileBaseNamespace(path, pluginOpts) {
     return undefined;
   }
 }
+
+const buildObjectProperty = member =>
+  t.objectProperty(member.key, member.value, member.computed);
 
 const buildMemberAssignmentStatement = (objectIdentifier, member) =>
   t.expressionStatement(
