@@ -1,5 +1,38 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`classes class-computed-prop.js 1`] = `
+"sap.ui.define([\\"sap/class\\"], function (Controller) {
+  const name = Symbol(\\"_name\\");
+  const Test = Controller.extend(\\"my.TestController\\", {
+    constructor: function constructor() {
+      Controller.prototype.constructor.apply(this, arguments);
+      this[name] = null;
+      this[name] = 1;
+
+      this[name] = function () {};
+
+      this[name] = async function () {};
+
+      this[name] = () => {};
+
+      this[name] = async () => {};
+    }
+  });
+  Test[name] = null;
+  Test[name] = 2;
+
+  Test[name] = () => {};
+
+  Test[name] = function () {};
+
+  Test[name] = async () => {};
+
+  Test[name] = async function () {};
+
+  return Test;
+});"
+`;
+
 exports[`classes class-convert-all.js 1`] = `
 "sap.ui.define([\\"sap/class\\"], function (SAPClass) {
   const MyClass = SAPClass.extend(\\"fixtures.classes.MyClass\\", {});

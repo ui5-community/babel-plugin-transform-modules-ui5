@@ -67,8 +67,7 @@ export function convertClassToUI5Extend(
 
   for (const member of node.body.body) {
     const memberName = member.key.name;
-    const memberExpression =
-      member.static && t.memberExpression(classNameIdentifier, member.key);
+
     if (t.isClassMethod(member)) {
       const func = t.functionExpression(
         member.key,
@@ -79,14 +78,13 @@ export function convertClassToUI5Extend(
       );
       if (member.static) {
         staticMembers.push(
-          t.expressionStatement(
-            t.assignmentExpression("=", memberExpression, func)
-          )
+          buildMemberAssignmentStatement(classNameIdentifier, {
+            ...member,
+            value: func,
+          })
         );
       } else {
         propsByName[memberName] = func;
-        func.generator = member.generator;
-        func.async = member.async;
         if (member.kind === "get" || member.kind === "set") {
           extendProps.push(
             t.objectMethod(
@@ -107,22 +105,25 @@ export function convertClassToUI5Extend(
             }
           }
           func.id = path.scope.generateUidIdentifier(func.id.name); // Give the function a unique name
-          extendProps.push(t.objectProperty(member.key, func));
+          extendProps.push(
+            buildObjectProperty({
+              ...member,
+              value: func,
+            })
+          );
         }
       }
     } else if (t.isClassProperty(member)) {
       if (!member.value) continue; // un-initialized static class prop (typescript)
       if (memberName === "metadata" || memberName === "renderer") {
         // Special handling for TypeScript limitation where metadata and renderer must be properties.
-        extendProps.unshift(t.objectProperty(member.key, member.value));
+        extendProps.unshift(buildObjectProperty(member));
       } else if (member.static) {
         if (moveStaticStaticPropsToExtend) {
-          extendProps.unshift(t.objectProperty(member.key, member.value));
+          extendProps.unshift(buildObjectProperty(member));
         } else {
           staticMembers.push(
-            t.expressionStatement(
-              t.assignmentExpression("=", memberExpression, member.value)
-            )
+            buildMemberAssignmentStatement(classNameIdentifier, member)
           );
         }
       } else {
@@ -141,7 +142,7 @@ export function convertClassToUI5Extend(
         ) {
           boundProps.push(member);
         } else {
-          extendProps.push(t.objectProperty(member.key, member.value));
+          extendProps.push(buildObjectProperty(member));
         }
       }
     }
@@ -157,9 +158,7 @@ export function convertClassToUI5Extend(
     ? "onInit"
     : "constructor";
 
-  const bindToId = t.identifier(bindToMethodName);
   // avoid getting a prop named constructor as it may return {}'s
-
   let bindMethod = moveControllerPropsToOnInit
     ? propsByName[bindToMethodName]
     : constructor;
@@ -176,8 +175,9 @@ export function convertClassToUI5Extend(
     boundProps.length ||
     (moveControllerPropsToOnInit && constructor && !keepConstructor);
 
-  // See if we need to inject the 'constructor' or 'onInit' method, depending which one we'll bind to.
+  // See if we need to create a new 'constructor' or 'onInit' method, depending which one we'll bind to.
   if (needsBindingMethod && !bindMethod) {
+    const bindToId = t.identifier(bindToMethodName);
     const bindMethodDeclaration = bindToConstructor
       ? th.buildInheritingConstructor({
           SUPER: t.identifier(superClassName),
@@ -211,12 +211,9 @@ export function convertClassToUI5Extend(
     // We need to inject the bound props into the bind method (constructor or onInit),
     // but not until after the super call (if applicable)
 
-    const mappedProps = boundProps.map(prop => {
-      return th.buildThisAssignment({
-        NAME: prop.key,
-        VALUE: prop.value,
-      });
-    });
+    const mappedProps = boundProps.map(member =>
+      buildThisMemberAssignmentStatement(member)
+    );
 
     const superIndex = bindMethod.body.body.findIndex(
       node =>
@@ -287,3 +284,20 @@ function getFileBaseNamespace(path, pluginOpts) {
     return undefined;
   }
 }
+
+const buildObjectProperty = member =>
+  t.objectProperty(member.key, member.value, member.computed);
+
+const buildMemberAssignmentStatement = (objectIdentifier, member) =>
+  t.expressionStatement(
+    t.assignmentExpression(
+      "=",
+      t.memberExpression(objectIdentifier, member.key, member.computed),
+      member.value
+    )
+  );
+
+const buildThisMemberAssignmentStatement = buildMemberAssignmentStatement.bind(
+  null,
+  t.thisExpression()
+);

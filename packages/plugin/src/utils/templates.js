@@ -109,11 +109,6 @@ export const buildExtendAssign = template(`
   const NAME = SUPER.extend(FQN, OBJECT);
 `);
 
-// TODO: get this one to use buildAssign
-export const buildThisAssignment = template(`
-  this.NAME = VALUE;
-`);
-
 // This is use when there is not already the function, so always propagate arguments.
 export const buildInheritingFunction = template(`
   function NAME() {
