@@ -4,6 +4,29 @@
 
 The major version will be kept the same as babel's (currently 7.x.x).
 
+### 7.0.0 (2019-03-20)
+
+There are no changes between 7.0.0 and 7.0.0-rc.10.
+
+### Breaking
+
+- #16 Move all instance class props to constructor or onInit by default. Added option `onlyMoveClassPropsUsingThis` for old behaviour.
+- Default behaviour is now similar to previous `onlyConvertNamedClass=true`, but also with logic to convert `*.controller.js` classes automatically.
+  - Added option `autoConvertAllExtendClasses` to restore version 6 behaviour.
+- Added option `autoConvertControllerClass` to disable new `*.controller.js` behaviour (enabled by default)
+
+#### Enhancements
+
+- #16 `modulesMap` option
+- #15/#17 Deferred module wrapping to support imports and helpers added by other plugins
+
+### Fixes
+
+- #18 Better recursive detection of 'this' used on class properties
+- #21 Computed class props moved correctly.
+- #20 (Typescript) declare the \_\_exports variable for anonymous exports at time of declaration rather than at end of program, so that Typescript plugin can strip types on it.
+- Handle @ sign in import names when creating local variable name
+
 ### 7.0.0-rc.10 (2019-03-04)
 
 ### Fixes
@@ -20,25 +43,25 @@ The major version will be kept the same as babel's (currently 7.x.x).
 
 ### Breaking
 
-- Move all instance class props to constructor or onInit by default. Added option `onlyMoveClassPropsUsingThis` for old behaviour. See #16.
+- #16 Move all instance class props to constructor or onInit by default. Added option `onlyMoveClassPropsUsingThis` for old behaviour.
 
 ### 7.0.0-rc.7 (2019-02-13)
 
 #### Fixes
 
-- Better recursive detection of 'this' used on class properties (Fixes #18)
+- #18 Better recursive detection of 'this' used on class properties
 
 ### 7.0.0-rc.6 (2019-02-13)
 
 #### Enhancements
 
-- Deferred module wrapping to support imports and helpers added by other plugins (#15 & #17)
+- #15/#17 Deferred module wrapping to support imports and helpers added by other plugins
 
 ### 7.0.0-rc5 (2019-02-08)
 
 #### Enhancements
 
-- `modulesMap` option (#16)
+- #16 `modulesMap` option
 
 ### 7.0.0-rc.4 (2019-02-07)
 
