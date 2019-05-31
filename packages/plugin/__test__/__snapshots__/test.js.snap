@@ -668,7 +668,7 @@ exports[`examples Utils.js 1`] = `
     return a + b;
   }
 
-  const __exports = {
+  var __exports = {
     multiply,
     add
   };
@@ -693,7 +693,7 @@ exports[`export-collapse _extends-literal.js 1`] = `
     three
   };
 
-  const __exports = _extends({}, X, O2, {
+  var __exports = _extends({}, X, O2, {
     one,
     two
   });
@@ -766,7 +766,7 @@ exports[`export-collapse object.assign-literal.js 1`] = `
   const anotherN = 0;
   const anotherS = \\"s\\";
 
-  const __exports = Object.assign({}, X, {
+  var __exports = Object.assign({}, X, {
     one: 1,
     two: \\"2\\",
     foo
@@ -826,7 +826,7 @@ exports[`export-error error-obj-prop.js 1`] = `"Unsafe mixing of conflicting def
 
 exports[`export-mixed export-mixed-anon-func.js 1`] = `
 "sap.ui.define([], function () {
-  const __exports = function () {
+  var __exports = function () {
     console.log(\\"I am the default\\");
   };
 
@@ -838,7 +838,7 @@ exports[`export-mixed export-mixed-anon-func.js 1`] = `
 
 exports[`export-mixed export-mixed-arrow.js 1`] = `
 "sap.ui.define([], function () {
-  const __exports = () => {
+  var __exports = () => {
     return 1;
   };
 
@@ -852,7 +852,7 @@ exports[`export-mixed export-mixed-literal.js 1`] = `
 "sap.ui.define([], function () {
   const a = 1;
   const b = 2;
-  const __exports = {
+  var __exports = {
     a,
     x: a
   };
@@ -915,7 +915,7 @@ exports[`exports export-default-anon-function.js 1`] = `
 "sap.ui.define([], function () {
   let one = 1;
 
-  const __exports = async function () {
+  var __exports = async function () {
     return (await one) + two;
   };
 
@@ -928,7 +928,7 @@ exports[`exports export-default-arrow-function.js 1`] = `
 "sap.ui.define([], function () {
   let one = 1;
 
-  const __exports = () => {
+  var __exports = () => {
     return one + two;
   };
 
@@ -974,7 +974,7 @@ exports[`exports export-multiple.js 1`] = `
   laterLet = \\"now\\";
   var laterVar;
   laterVar = \\"var\\";
-  const __exports = {
+  var __exports = {
     __esModule: true
   };
   __exports.thing1 = thing1;
@@ -993,7 +993,7 @@ exports[`exports export-multiple.js 1`] = `
 exports[`exports export-named-as-default.js 1`] = `
 "sap.ui.define([], function () {
   const one = 1;
-  const __exports = {
+  var __exports = {
     __esModule: true
   };
   __exports.default = one;
@@ -1003,7 +1003,7 @@ exports[`exports export-named-as-default.js 1`] = `
 
 exports[`exports export-named-from.js 1`] = `
 "sap.ui.define([\\"A\\", \\"path/having-dash\\"], function (__A, __path_having_dash) {
-  const __exports = {
+  var __exports = {
     __esModule: true
   };
   __exports.A = __A.A;
@@ -1024,7 +1024,7 @@ exports[`exports export-obj.js 1`] = `
     return 2;
   }
 
-  const __exports = {
+  var __exports = {
     foo: getFoo(),
     bar
   };
@@ -1215,7 +1215,7 @@ sap.ui.define([\\"./foo\\"], function (__Foo) {
 
 exports[`mixed mixed-import-export.js 1`] = `
 "sap.ui.define([\\"1\\", \\"2\\", \\"3\\", \\"4\\", \\"5\\"], function (__1, __2, __3, __4, __5) {
-  const __exports = {
+  var __exports = {
     __esModule: true
   };
 
@@ -1320,7 +1320,7 @@ exports[`typescript ts-class-props-only-move-this.ts 1`] = `
 
 exports[`typescript ts-export-default-typed-anon-fn-only-default.ts 1`] = `
 "sap.ui.define([], function () {
-  const __exports = function (date) {
+  var __exports = function (date) {
     return \\"\\";
   };
 
@@ -1330,7 +1330,7 @@ exports[`typescript ts-export-default-typed-anon-fn-only-default.ts 1`] = `
 
 exports[`typescript ts-export-default-typed-anon-obj.ts 1`] = `
 "sap.ui.define([], function () {
-  const __exports = {
+  var __exports = {
     x: 1
   };
   return __exports;
@@ -1343,7 +1343,7 @@ exports[`typescript ts-export-default-typed-arrow-fn-only-default.ts 1`] = `
     return \\"\\";
   };
 
-  const __exports = date => {
+  var __exports = date => {
     return \\"\\";
   };
 
@@ -1357,7 +1357,7 @@ exports[`typescript ts-export-default-typed-arrow-fn-with-named.1.ts 1`] = `
     return \\"\\";
   };
 
-  const __exports = date => {
+  var __exports = date => {
     return \\"\\";
   };
 
@@ -1378,7 +1378,7 @@ exports[`typescript ts-export-interface.ts 1`] = `
   })(MyEnum || (MyEnum = {}));
 
   ;
-  const __exports = {
+  var __exports = {
     __esModule: true
   };
   __exports.MY_CONSTANT = MY_CONSTANT;
@@ -1396,21 +1396,21 @@ exports[`wrapping export-const.js 1`] = `
 
 exports[`wrapping export-jsdoc-global.js 1`] = `
 "sap.ui.define([], function () {
-  const __exports = {};
+  var __exports = {};
   return __exports;
 }, true);"
 `;
 
 exports[`wrapping export-literal.js 1`] = `
 "sap.ui.define([], function () {
-  const __exports = {};
+  var __exports = {};
   return __exports;
 });"
 `;
 
 exports[`wrapping export-options-global.js 1`] = `
 "sap.ui.define([], function () {
-  const __exports = {};
+  var __exports = {};
   return __exports;
 }, true);"
 `;

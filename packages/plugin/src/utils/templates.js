@@ -20,14 +20,16 @@ export const buildDefineGlobal = template(`
   }, true);
 `);
 
+// Uses 'var' since it gets added during wrap
 export const buildDeclareExports = template(`
-  const ${exportName} = {
+  var ${exportName} = {
     __esModule: true
   };
 `);
 
+// Uses 'var' since it gets added during wrap
 export const buildTempExport = template(`
-  const ${exportName} = VALUE;
+  var ${exportName} = VALUE;
 `);
 
 export const buildExportDefault = template(`
