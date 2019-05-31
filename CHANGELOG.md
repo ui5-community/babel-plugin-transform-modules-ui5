@@ -4,6 +4,12 @@
 
 The major version will be kept the same as babel's (currently 7.x.x).
 
+### 7.0.1 (2019-05-31)
+
+### Fixes
+
+- #24 Use `var` instead of `const` for `__exports` since no other transforms are applied after wrapping.
+
 ### 7.0.0 (2019-03-20)
 
 There are no changes between 7.0.0 and 7.0.0-rc.10.
