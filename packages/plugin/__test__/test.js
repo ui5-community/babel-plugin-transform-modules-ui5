@@ -47,6 +47,7 @@ function processDirectory(dir) {
                 targets: undefined, // default targets for preset-env is ES5
                 modules: false,
                 useBuiltIns: "usage",
+                corejs: 2,
               },
             ]);
           }

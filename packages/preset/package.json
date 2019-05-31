@@ -8,8 +8,8 @@
     "babel-plugin-transform-modules-ui5": "^7.0.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.2.2",
-    "prettier": "^1.16.4"
+    "@babel/core": "^7.4.5",
+    "prettier": "^1.17.1"
   },
   "scripts": {
     "format": "prettier  --write index.js"

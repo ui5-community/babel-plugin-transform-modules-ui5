@@ -1274,7 +1274,7 @@ exports[`preset-env preset-env-class.js 1`] = `
 `;
 
 exports[`preset-env preset-env-usage.js 1`] = `
-"sap.ui.define([\\"sap/SAPClass\\", \\"core-js/modules/es6.promise\\", \\"core-js/modules/es6.string.includes\\", \\"core-js/modules/es7.array.includes\\"], function (SAPClass, __core_js_modules_es6promise, __core_js_modules_es6stringincludes, __core_js_modules_es7arrayincludes) {
+"sap.ui.define([\\"sap/SAPClass\\", \\"core-js/modules/es6.object.to-string\\", \\"core-js/modules/es6.promise\\", \\"core-js/modules/es6.string.includes\\", \\"core-js/modules/es7.array.includes\\"], function (SAPClass, __core_js_modules_es6objectto_string, __core_js_modules_es6promise, __core_js_modules_es6stringincludes, __core_js_modules_es7arrayincludes) {
   var AClass = SAPClass.extend(\\"my.MyClass\\", {
     delay: function _delay() {
       return new Promise(function (resolve) {
