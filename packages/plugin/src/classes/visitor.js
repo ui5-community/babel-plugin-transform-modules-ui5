@@ -66,7 +66,7 @@ export const ClassTransformVisitor = {
           path.replaceWithMultiple(ui5ExtendClass);
         }
       } else if (path.isClassExpression()) {
-        //e.g.  return class X {}
+        //e.g. return class X {}
         if (t.isReturnStatement(parent)) {
           // Add the return statement back before calling replace
           ui5ExtendClass.push(
