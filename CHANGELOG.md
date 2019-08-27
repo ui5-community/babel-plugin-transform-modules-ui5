@@ -4,6 +4,12 @@
 
 The major version will be kept the same as babel's (currently 7.x.x).
 
+### 7.0.2 (2019-08-27)
+
+### Fixes
+
+- Moving prettier to devDeps and upgrade devDeps
+
 ### 7.0.1 (2019-05-31)
 
 ### Fixes
