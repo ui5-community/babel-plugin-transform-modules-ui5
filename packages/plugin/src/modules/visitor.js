@@ -43,14 +43,14 @@ export const ModuleTransformVisitor = {
     const mappedSrc =
       (typeof modulesMap === "function"
         ? modulesMap(src, {
-            node,
-            opts,
-            cwd: state.cwd,
-            filename: state.filename,
-            file: {
-              opts: state.file.opts,
-            },
-          })
+          node,
+          opts,
+          cwd: state.cwd,
+          filename: state.filename,
+          file: {
+            opts: state.file.opts,
+          },
+        })
         : modulesMap[src]) || src;
 
     // Note that existingImport may get mutated if there are multiple import lines from the same module.
@@ -181,6 +181,7 @@ export const ModuleTransformVisitor = {
           "TypeAlias",
           "InterfaceDeclaration",
           "TSInterfaceDeclaration",
+          "TSTypeAliasDeclaration",
         ].includes(declaration.type)
       )
         return; // TS or Flow-types
