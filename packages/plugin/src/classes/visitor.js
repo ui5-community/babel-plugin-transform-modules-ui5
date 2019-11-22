@@ -99,6 +99,8 @@ export const ClassTransformVisitor = {
         replaceConstructorSuperCall(path, node, this.superClassName);
       } else if (t.isSuper(callee.object)) {
         replaceObjectSuperCall(path, node, this.superClassName);
+      } else if (isSuperApply(callee)) {
+        replaceSuperApplyCall(path, node, this.superClassName);
       }
     }
   },
@@ -126,6 +128,10 @@ export const ClassTransformVisitor = {
   },
 };
 
+function isSuperApply(callee) {
+  return t.isIdentifier(callee.property, { "name": "apply" }) && t.isSuper(callee.object.object);
+}
+
 function getRequiredParamsOfSAPUIDefine(path, node) {
   const defineArgs = node.arguments;
   const callbackNode = defineArgs.find(argNode => t.isFunction(argNode));
@@ -144,6 +150,19 @@ function replaceConstructorSuperCall(path, node, superClassName) {
  */
 function replaceObjectSuperCall(path, node, superClassName) {
   replaceSuperNamedCall(path, node, superClassName, node.callee.property.name);
+}
+
+/**
+ * Replace super.method.apply() call
+ */
+function replaceSuperApplyCall(path, node, superClassName) {
+  const methodName = node.callee.object.property.name;
+  path.replaceWith(
+    t.callExpression(
+      t.identifier(`${superClassName}.prototype.${methodName}.apply`),
+      node.arguments
+    )
+  );
 }
 
 function replaceSuperNamedCall(path, node, superClassName, methodName) {
