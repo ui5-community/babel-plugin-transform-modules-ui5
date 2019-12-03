@@ -1404,6 +1404,18 @@ exports[`typescript ts-export-interface.ts 1`] = `
 });"
 `;
 
+exports[`typescript ts-export-type.ts 1`] = `
+"sap.ui.define([], function () {
+  class Class {}
+
+  var __exports = {
+    __esModule: true
+  };
+  __exports.Class = Class;
+  return __exports;
+});"
+`;
+
 exports[`wrapping export-const.js 1`] = `
 "sap.ui.define([], function () {
   const X = {};
