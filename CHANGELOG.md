@@ -4,15 +4,22 @@
 
 The major version will be kept the same as babel's (currently 7.x.x).
 
+### 7.0.3 (2019-12-03)
+
+#### Fixes
+
+- #26 - `export type` being transpiled, but should be removed
+- #27 - super.X.apply not transpiling correctly
+
 ### 7.0.2 (2019-08-27)
 
-### Fixes
+#### Fixes
 
 - Moving prettier to devDeps and upgrade devDeps
 
 ### 7.0.1 (2019-05-31)
 
-### Fixes
+#### Fixes
 
 - #24 Use `var` instead of `const` for `__exports` since no other transforms are applied after wrapping.
 
@@ -20,7 +27,7 @@ The major version will be kept the same as babel's (currently 7.x.x).
 
 There are no changes between 7.0.0 and 7.0.0-rc.10.
 
-### Breaking
+#### Breaking
 
 - #16 Move all instance class props to constructor or onInit by default. Added option `onlyMoveClassPropsUsingThis` for old behaviour.
 - Default behaviour is now similar to previous `onlyConvertNamedClass=true`, but also with logic to convert `*.controller.js` classes automatically.
@@ -32,7 +39,7 @@ There are no changes between 7.0.0 and 7.0.0-rc.10.
 - #16 `modulesMap` option
 - #15/#17 Deferred module wrapping to support imports and helpers added by other plugins
 
-### Fixes
+#### Fixes
 
 - #18 Better recursive detection of 'this' used on class properties
 - #21 Computed class props moved correctly.
@@ -41,19 +48,19 @@ There are no changes between 7.0.0 and 7.0.0-rc.10.
 
 ### 7.0.0-rc.10 (2019-03-04)
 
-### Fixes
+#### Fixes
 
 - #21 Computed class props moved correctly.
 
 ### 7.0.0-rc.9 (2019-03-01)
 
-### Fixes
+#### Fixes
 
 - #20 (Typescript) declare the \_\_exports variable for anonymous exports at time of declaration rather than at end of program, so that Typescript plugin can strip types on it.
 
 ### 7.0.0-rc.8 (2019-02-28)
 
-### Breaking
+#### Breaking
 
 - #16 Move all instance class props to constructor or onInit by default. Added option `onlyMoveClassPropsUsingThis` for old behaviour.
 
