@@ -43,6 +43,23 @@ exports[`classes class-convert-all.js 1`] = `
 });"
 `;
 
+exports[`classes class-convert-calling-super-apply.controller.js 1`] = `
+"sap.ui.define([\\"sap/ui/core/Controller\\"], function (Controller) {
+  const MyController = Controller.extend(\\"fixtures.classes.MyController\\", {
+    constructor: function _constructor(arg) {
+      console.log(\\"before super\\");
+      Controller.prototype.constructor.call(this, arg);
+      console.log(\\"after super\\");
+      this.x = 1;
+    },
+    method: function _method(args) {
+      Controller.prototype.init.apply(this, args);
+    }
+  });
+  return MyController;
+});"
+`;
+
 exports[`classes class-convert-constructor-keep-annot.controller.js 1`] = `
 "sap.ui.define([\\"sap/ui/core/Controller\\"], function (Controller) {
   const MyController = Controller.extend(\\"fixtures.classes.MyController\\", {
