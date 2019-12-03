@@ -833,13 +833,13 @@ exports[`export-collapse object.assign-variable.js 1`] = `
 });"
 `;
 
-exports[`export-error error-assign-var.js 1`] = `"Unsafe mixing of conflicting default and named exports. The following named exports are conflicting(foo)."`;
+exports[`export-error error-assign-var.js 1`] = `"Unsafe mixing of conflicting default and named exports. The following named exports are conflicting: (foo)."`;
 
-exports[`export-error error-assign-var-recurs.js 1`] = `"Unsafe mixing of conflicting default and named exports. The following named exports are conflicting(foo)."`;
+exports[`export-error error-assign-var-recurs.js 1`] = `"Unsafe mixing of conflicting default and named exports. The following named exports are conflicting: (foo)."`;
 
-exports[`export-error error-obj-method.js 1`] = `"Unsafe mixing of conflicting default and named exports. The following named exports are conflicting(a)."`;
+exports[`export-error error-obj-method.js 1`] = `"Unsafe mixing of conflicting default and named exports. The following named exports are conflicting: (a)."`;
 
-exports[`export-error error-obj-prop.js 1`] = `"Unsafe mixing of conflicting default and named exports. The following named exports are conflicting(a)."`;
+exports[`export-error error-obj-prop.js 1`] = `"Unsafe mixing of conflicting default and named exports. The following named exports are conflicting: (a)."`;
 
 exports[`export-mixed export-mixed-anon-func.js 1`] = `
 "sap.ui.define([], function () {
