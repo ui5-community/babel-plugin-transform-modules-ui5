@@ -209,7 +209,8 @@ export const ModuleTransformVisitor = {
       }
       path.replaceWith(declaration);
     } else {
-      throw path.buildCodeFrameError("Unknown ExportNamedDeclaration shape.");
+      path.remove();
+      return;
     }
   },
 
