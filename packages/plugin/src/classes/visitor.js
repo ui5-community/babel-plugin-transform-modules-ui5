@@ -35,6 +35,20 @@ export const ClassTransformVisitor = {
         return;
       }
 
+      if (classInfo.metadata) {
+        const identifier = t.identifier("MetadataObject");
+        const importDefaultSpecifier = t.importDefaultSpecifier(identifier);
+        const importDeclaration = t.importDeclaration(
+          [importDefaultSpecifier],
+          t.stringLiteral(
+            classInfo.metadata.replace(new RegExp("\\.", "g"), "/")
+          )
+        );
+        path
+          .findParent(path => path.isBlock())
+          .unshiftContainer("body", importDeclaration);
+      }
+
       // Save super class name for converting super calls
       this.superClassName = classInfo.superClassName;
 
@@ -129,7 +143,10 @@ export const ClassTransformVisitor = {
 };
 
 function isSuperApply(callee) {
-  return t.isIdentifier(callee.property, { "name": "apply" }) && t.isSuper(callee.object.object);
+  return (
+    t.isIdentifier(callee.property, { name: "apply" }) &&
+    t.isSuper(callee.object.object)
+  );
 }
 
 function getRequiredParamsOfSAPUIDefine(path, node) {

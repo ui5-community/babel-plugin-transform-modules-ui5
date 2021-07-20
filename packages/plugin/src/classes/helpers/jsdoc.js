@@ -2,7 +2,7 @@ import { types as t } from "@babel/core";
 import doctrine from "doctrine";
 import ignoreCase from "ignore-case";
 
-const classInfoValueTags = ["alias", "name", "namespace"];
+const classInfoValueTags = ["alias", "name", "namespace", "metadata"];
 const classInfoBoolTags = ["nonUI5", "controller", "keepConstructor"];
 
 export function getJsDocClassInfo(node, parent) {

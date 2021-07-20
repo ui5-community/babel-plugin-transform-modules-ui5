@@ -234,12 +234,23 @@ export function convertClassToUI5Extend(
     }
   }
 
-  const extendAssign = th.buildExtendAssign({
-    NAME: classNameIdentifier,
-    SUPER: superClass, // Needs Identifier node
-    FQN: t.stringLiteral(getFullyQualifiedName(classInfo)),
-    OBJECT: t.objectExpression(extendProps),
-  });
+  let extendAssign;
+  if (classInfo) {
+    extendAssign = th.buildExtendAssignWithMD({
+      NAME: classNameIdentifier,
+      SUPER: superClass, // Needs Identifier node
+      FQN: t.stringLiteral(getFullyQualifiedName(classInfo)),
+      OBJECT: t.objectExpression(extendProps),
+      FN_META_IMPL: "MetadataObject",
+    });
+  } else {
+    extendAssign = th.buildExtendAssign({
+      NAME: classNameIdentifier,
+      SUPER: superClass, // Needs Identifier node
+      FQN: t.stringLiteral(getFullyQualifiedName(classInfo)),
+      OBJECT: t.objectExpression(extendProps),
+    });
+  }
 
   return [extendAssign, ...staticMembers];
 }
