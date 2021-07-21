@@ -271,7 +271,9 @@ export function getClassInfo(path, node, parent, pluginOpts) {
 function getFileBaseNamespace(path, pluginOpts) {
   const opts = path.hub.file.opts;
   const filename = Path.resolve(opts.filename);
-  const sourceRoot = opts.sourceRoot || process.cwd();
+  const sourceRoot = opts.sourceRoot
+    ? Path.resolve(process.cwd(), opts.sourceRoot)
+    : process.cwd();
   if (filename.startsWith(sourceRoot)) {
     const filenameRelative = Path.relative(sourceRoot, filename);
     const { dir } = Path.parse(filenameRelative);
