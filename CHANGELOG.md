@@ -4,6 +4,18 @@
 
 The major version will be kept the same as babel's (currently 7.x.x).
 
+### 7.0.5 (2021-07-21)
+
+#### Fixes
+
+- #38 / #55 - Fixes sourceRoot resolution
+
+### 7.0.4 (2021-07-03)
+
+#### Fixes
+
+- #52 / #53 - Fixes unknown ExportNamedDeclaration caused by babel 7.14.4
+
 ### 7.0.3 (2019-12-03)
 
 #### Fixes
