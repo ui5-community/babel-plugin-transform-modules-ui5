@@ -235,7 +235,7 @@ export function convertClassToUI5Extend(
   }
 
   let extendAssign;
-  if (classInfo) {
+  if (classInfo.metadata) {
     extendAssign = th.buildExtendAssignWithMD({
       NAME: classNameIdentifier,
       SUPER: superClass, // Needs Identifier node
