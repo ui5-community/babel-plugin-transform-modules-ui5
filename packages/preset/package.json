@@ -1,11 +1,11 @@
 {
   "name": "babel-preset-transform-ui5",
-  "version": "7.0.3",
+  "version": "7.0.5",
   "main": "index.js",
   "license": "MIT",
   "repository": "https://github.com/r-murphy/babel-plugin-ui5/tree/master/packages/preset",
   "dependencies": {
-    "babel-plugin-transform-modules-ui5": "^7.0.3"
+    "babel-plugin-transform-modules-ui5": "^7.0.5"
   },
   "devDependencies": {
     "@babel/core": "^7.7.4",
