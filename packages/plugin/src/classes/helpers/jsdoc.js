@@ -9,7 +9,7 @@ export function getJsDocClassInfo(node, parent) {
   if (node.leadingComments) {
     return node.leadingComments
       .filter(isCommentBlock)
-      .map(comment => {
+      .map((comment) => {
         const docAST = doctrine.parse(comment.value, {
           unwrap: true,
         });
@@ -80,18 +80,18 @@ function getJsDocTagValue(tags, name) {
 }
 
 function getJsDocTag(tags, name) {
-  return tags.find(t => ignoreCase.equals(name, t.title));
+  return tags.find((t) => ignoreCase.equals(name, t.title));
 }
 
 function notEmpty(obj) {
-  return Object.values(obj).some(value => value);
+  return Object.values(obj).some((value) => value);
 }
 
 export function hasJsdocGlobalExportFlag(node) {
   if (!node.leadingComments) {
     return false;
   }
-  return node.leadingComments.filter(isCommentBlock).some(comment => {
+  return node.leadingComments.filter(isCommentBlock).some((comment) => {
     return (
       doctrine.parse(comment.value, {
         unwrap: true,

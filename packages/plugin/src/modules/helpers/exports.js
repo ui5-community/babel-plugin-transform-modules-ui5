@@ -35,10 +35,10 @@ export function collapseNamedExports(
     };
   }
 
-  if (namedExports.some(exp => exp.conflict)) {
+  if (namedExports.some((exp) => exp.conflict)) {
     return {
       filteredExports: namedExports,
-      conflictingExports: namedExports.filter(exp => exp.conflict),
+      conflictingExports: namedExports.filter((exp) => exp.conflict),
       newDefaultExportIdentifier: null,
     };
   }
@@ -99,7 +99,7 @@ function filterOutExportsWhichAlreadyMatchPropsOnDefault(
         continue;
       }
       const matchingNamedExportIndex = namedExports.findIndex(
-        namedExport => namedExport.key.name === defaultExportProperty.key.name
+        (namedExport) => namedExport.key.name === defaultExportProperty.key.name
       ); // get the index for splicing
       const matchingNamedExport = namedExports[matchingNamedExportIndex];
       if (matchingNamedExport && !matchingNamedExport.conflict) {

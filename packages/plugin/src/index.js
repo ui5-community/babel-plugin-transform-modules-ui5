@@ -32,7 +32,7 @@ module.exports = () => {
         this.namespacePrefix = opts.namespacePrefix;
         this.noImportInteropPrefixes = opts.noImportInteropPrefixes || ["sap/"];
         this.noImportInteropPrefixesRegexp = new RegExp(
-          this.noImportInteropPrefixes.map(p => `(^${p}.*)`).join("|")
+          this.noImportInteropPrefixes.map((p) => `(^${p}.*)`).join("|")
         );
 
         // Properties for Module Transform
