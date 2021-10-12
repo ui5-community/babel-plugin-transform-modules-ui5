@@ -15,7 +15,7 @@ const FIXTURE_DIR_NAME = "fixtures";
 const OUT_DIR_NAME = "__output__";
 
 const IGNORED = [
-  "preset-env-usage.js" // Failing in new babel version due to change in order of plugin processing
+  "preset-env-usage.js", // Failing in new babel version due to change in order of plugin processing
 ];
 
 emptyDirSync(join(__dirname, OUT_DIR_NAME));
@@ -105,7 +105,6 @@ function runSingleTest(directory, filename) {
     }
 
     expect(transformOutput).toMatchSnapshot();
-
   } catch (error) {
     if (filename.includes("error-")) {
       const message = error.message.replace(filePath, "").replace(": ", "");
