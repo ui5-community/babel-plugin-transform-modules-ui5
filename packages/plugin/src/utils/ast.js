@@ -178,6 +178,14 @@ export function convertDeclarationToExpression(declaration) {
   }
 }
 
+/**
+ * Checks if a node is an 'apply' call expression to a given method on the given prototype.
+ *  e.g. ${superClassName}.prototype.${superMethodName}.apply(...)
+ *
+ * @param {import("@babel/core").Node} expression - Node to check. Should be a {CallExpression}
+ * @param {String} superClassName - Name of class to check for
+ * @param {String} superMethodName - Name of method to check for
+ */
 export function isSuperPrototypeCallOf(
   expression,
   superClassName,
@@ -194,7 +202,6 @@ export function isSuperPrototypeCallOf(
 
 /**
  * Helper to see if a call expression is calling a given method such as sap.ui.define().
- * The AST is structured in reverse (defined > ui > sap) so we reverse the method call to compare.
  *
  * @param {CallExpression} expression
  * @param {String} dotNotationString For example, sap.ui.define or Class.prototype.method.apply
@@ -204,7 +211,8 @@ export function isCallExpressionCalling(expression, dotNotationString) {
   const callee = expression.callee;
   const parts = dotNotationString.split(".");
   let node = callee;
-  for (const nextNamePart of parts.reverse()) {
+  let reversed = parts.reverse(); // The AST is structured in reverse (defined > ui > sap) so we reverse the method call to compare
+  for (const nextNamePart of reversed) {
     if (!node) return false;
     // property won't be there for an anonymous function
     const nodeName = node.name || (node.property && node.property.name);
@@ -215,7 +223,7 @@ export function isCallExpressionCalling(expression, dotNotationString) {
 }
 
 /**
- * Recursively search through some parts of a node's for use of 'this'.
+ * Recursively search through some parts of a node for use of 'this'.
  * It checks the callee and the arguments and traverses into arrow functions.
  *
  * True scenarios include:

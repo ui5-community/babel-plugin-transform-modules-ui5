@@ -1,5 +1,5 @@
 // This conversion will be run with preset env set to ie >= 11.
-// In general, we want to ensure that the class transform does not get applied before out own.
+// We want to ensure that the class transform does not get applied before our own.
 
 import SAPClass from "sap/class";
 
