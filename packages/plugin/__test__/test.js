@@ -8,7 +8,7 @@ import {
 } from "fs-extra";
 import { join, resolve } from "path";
 import { transformFileSync } from "@babel/core";
-import { get as getOpts } from "./options";
+import { get as getOptions } from "./options";
 import plugin from "../src";
 
 const FIXTURE_DIR_NAME = "fixtures";
@@ -20,95 +20,103 @@ const IGNORED = [
 
 emptyDirSync(join(__dirname, OUT_DIR_NAME));
 
-function processDirectory(dir) {
-  const items = readdirSync(dir);
+function processDirectory(directory) {
+  const items = readdirSync(directory);
+  const files = items.filter(
+    (item) => item.endsWith(".js") || item.endsWith(".ts")
+  );
+  const directories = items
+    .map((name) => ({ name, path: join(directory, name) }))
+    .filter((item) => statSync(item.path).isDirectory());
+
   // Process Files first
-  items
-    .filter(item => item.endsWith(".js") || item.endsWith(".ts"))
-    .forEach(filename => {
-      test(filename, () => {
-        if (IGNORED.includes(filename)) {
-          return;
-        }
-        const filePath = join(dir, filename);
-        let outputPath = filePath
-          .replace(FIXTURE_DIR_NAME, OUT_DIR_NAME)
-          .replace(/.ts$/, ".js");
-
-        try {
-          const opts = getOpts(filePath);
-          const presets = [];
-
-          if (filePath.endsWith(".ts")) {
-            presets.push(["@babel/preset-typescript"]);
-          }
-
-          if (filePath.includes("flow")) {
-            presets.push(["@babel/preset-flow"]);
-          }
-
-          if (filePath.includes("preset-env")) {
-            presets.push([
-              "@babel/preset-env",
-              {
-                targets: undefined, // default targets for preset-env is ES5
-                modules: false,
-                useBuiltIns: "usage",
-                corejs: 2,
-              },
-            ]);
-          }
-          const result = transformFileSync(filePath, {
-            plugins: [
-              "@babel/plugin-syntax-dynamic-import",
-              "@babel/plugin-syntax-object-rest-spread",
-              ["@babel/plugin-syntax-decorators", { legacy: true }],
-              ["@babel/plugin-syntax-class-properties", { useBuiltIns: true }],
-              [plugin, opts],
-            ],
-            presets,
-            sourceRoot: __dirname,
-            comments: false,
-            babelrc: false,
-          }).code;
-
-          ensureDirSync(dir.replace(FIXTURE_DIR_NAME, OUT_DIR_NAME)); // This is delayed for when we run with a filter.
-          writeFileSync(outputPath, result); // For manual verification
-
-          if (filePath.includes("-error-")) {
-            throw new Error(`Expected ${filename} to throw error`);
-          }
-          // if (!opts.allowMixedExports && result.includes(`"__esModule"`)) {
-          //   throw new Error(`Unexpected __esModule declaration in ${filename}`)
-          // }
-          if (!filePath.includes("_private_")) {
-            expect(result).toMatchSnapshot();
-          }
-        } catch (error) {
-          if (filename.includes("error-")) {
-            const message = error.message
-              .replace(filePath, "")
-              .replace(": ", "");
-            outputPath = outputPath.replace(".js", ".txt");
-            expect(message).toMatchSnapshot();
-            ensureDirSync(dir.replace(FIXTURE_DIR_NAME, OUT_DIR_NAME)); // This is delayed for when we run with a filter.
-            writeFileSync(outputPath, message); // For manual verification
-          } else {
-            throw error;
-          }
-        }
-      });
+  files.forEach((filename) => {
+    test(filename, () => {
+      runSingleTest(directory, filename);
     });
+  });
 
   // Recurse into directories
-  items
-    .map(name => ({ name, path: join(dir, name) }))
-    .filter(item => statSync(item.path).isDirectory())
-    .forEach(item => {
-      describe(item.name, () => {
-        processDirectory(item.path);
-      });
+  directories.forEach((item) => {
+    describe(item.name, () => {
+      processDirectory(item.path);
     });
+  });
+}
+
+function runSingleTest(directory, filename) {
+  if (IGNORED.includes(filename)) {
+    return;
+  }
+  const filePath = join(directory, filename);
+  let outputPath = filePath
+    .replace(FIXTURE_DIR_NAME, OUT_DIR_NAME)
+    .replace(/.ts$/, ".js");
+
+  try {
+    const opts = getOptions(filePath);
+    const presets = [];
+
+    if (filePath.endsWith(".ts")) {
+      presets.push(["@babel/preset-typescript"]);
+    }
+
+    if (filePath.includes("flow")) {
+      presets.push(["@babel/preset-flow"]);
+    }
+
+    if (filePath.includes("preset-env")) {
+      presets.push([
+        "@babel/preset-env",
+        {
+          targets: undefined, // default targets for preset-env is ES5
+          modules: false,
+          useBuiltIns: "usage",
+          corejs: 2,
+        },
+      ]);
+    }
+
+    const transformResult = transformFileSync(filePath, {
+      plugins: [
+        "@babel/plugin-syntax-dynamic-import",
+        "@babel/plugin-syntax-object-rest-spread",
+        ["@babel/plugin-syntax-decorators", { legacy: true }],
+        ["@babel/plugin-syntax-class-properties", { useBuiltIns: true }],
+        [plugin, opts],
+      ],
+      presets,
+      sourceRoot: __dirname,
+      comments: false,
+      babelrc: false,
+    });
+    const transformOutput = transformResult.code;
+
+    ensureDirSync(directory.replace(FIXTURE_DIR_NAME, OUT_DIR_NAME)); // This is delayed for when we run with a filter.
+    writeFileSync(outputPath, transformOutput); // For manual verification
+
+    if (filePath.includes("_private_")) {
+      // no snapshots for private client code
+      return;
+    }
+
+    if (filePath.includes("-error-")) {
+      throw new Error(`Expected ${filename} to throw error`);
+    }
+
+    expect(transformOutput).toMatchSnapshot();
+
+  } catch (error) {
+    if (filename.includes("error-")) {
+      const message = error.message.replace(filePath, "").replace(": ", "");
+      outputPath = outputPath.replace(".js", ".txt");
+      expect(message).toMatchSnapshot();
+      ensureDirSync(directory.replace(FIXTURE_DIR_NAME, OUT_DIR_NAME)); // This is delayed for when we run with a filter.
+      writeFileSync(outputPath, message); // For manual verification
+    } else {
+      throw error;
+    }
+  }
 }
 
 (() => {
