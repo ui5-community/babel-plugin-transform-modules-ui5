@@ -1,5 +1,5 @@
 import { types as t } from "@babel/core";
-import flatten from "array-flatten";
+import { flatten } from "array-flatten";
 
 export function isObjectAssignOrExtendsExpression(node) {
   return isObjectAssignExpression(node) || isExtendsHelperExpression(node);
