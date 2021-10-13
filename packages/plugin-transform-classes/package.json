@@ -1,5 +1,5 @@
 {
-  "name": "babel-plugin-transform-classes-ui5",
+  "name": "@dx4babel/babel-plugin-transform-classes-ui5",
   "version": "7.0.2",
   "description": "An unofficial babel plugin for SAP UI5.",
   "main": "src/index.js",
