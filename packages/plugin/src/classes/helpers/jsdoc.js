@@ -31,11 +31,12 @@ export function getJsDocClassInfo(node, parent) {
       })
       .filter(notEmpty)[0];
   }
-  // Else see if the JSDoc are on the return statement (eg. return class X extends SAPClass)
-  // or export statement (eg. export default class X extends SAPClass)
+  // Else see if the JSDoc are on the return statement (eg. 'return class X extends SAPClass')
+  // or export statement (eg. 'export default class X extends SAPClass' or 'export class X extends SAPClass')
   else if (
     (t.isClassExpression(node) && t.isReturnStatement(parent)) ||
-    (t.isClassDeclaration(node) && t.isExportDefaultDeclaration(parent))
+    (t.isClassDeclaration(node) && t.isExportDefaultDeclaration(parent)) ||
+    (t.isClassDeclaration(node) && t.isExportNamedDeclaration(parent))
   ) {
     return getJsDocClassInfo(parent);
   } else {

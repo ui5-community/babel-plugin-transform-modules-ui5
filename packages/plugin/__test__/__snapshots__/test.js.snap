@@ -382,6 +382,13 @@ exports[`classes class-convert-jsdoc-name.js 1`] = `
 });"
 `;
 
+exports[`classes class-convert-jsdoc-named-and-default-export.js 1`] = `
+"sap.ui.define([\\"sap/SAPClass\\"], function (SAPClass) {
+  const MyClass = SAPClass.extend(\\"x.y.MyClass\\", {});
+  return MyClass;
+});"
+`;
+
 exports[`classes class-convert-jsdoc-namespace.controller.js 1`] = `
 "sap.ui.define([\\"sap/SAPClass\\"], function (SAPClass) {
   const MyClass = SAPClass.extend(\\"x.y.MyClass\\", {});
