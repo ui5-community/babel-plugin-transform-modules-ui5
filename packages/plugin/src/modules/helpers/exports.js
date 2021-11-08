@@ -28,6 +28,7 @@ export function collapseNamedExports(
     defaultExport,
     namedExports
   );
+  namedExports = filterOutDesignTimeOnlyNamedExports(namedExports);
   if (!namedExports.length || opts.noExportExtend) {
     return {
       filteredExports: namedExports,
@@ -113,6 +114,10 @@ function filterOutExportsWhichAlreadyMatchPropsOnDefault(
   }
 
   return namedExports;
+}
+
+function filterOutDesignTimeOnlyNamedExports(namedExports) {
+  return namedExports.filter(namedExport => !namedExport.annotations || !namedExport.annotations.designTimeOnly);
 }
 
 function areSame(defaultExportProperty, matchingNamedExport) {

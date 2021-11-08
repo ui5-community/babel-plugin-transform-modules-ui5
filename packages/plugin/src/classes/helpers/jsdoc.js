@@ -101,6 +101,20 @@ export function hasJsdocGlobalExportFlag(node) {
   });
 }
 
+export function hasJsdocDesigntimeOnlyExportFlag(node) {
+  if (!node.leadingComments) {
+    return false;
+  }
+  return node.leadingComments.filter(isCommentBlock).some(comment => {
+    return (
+      doctrine.parse(comment.value, {
+        unwrap: true,
+        tags: ["ui5designtimeonlyexport"],
+      }).tags.length > 0
+    );
+  });
+}
+
 // This doesn't exist on babel-types
 function isCommentBlock(node) {
   return node && node.type === "CommentBlock";

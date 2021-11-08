@@ -2,12 +2,13 @@ import { types as t } from "@babel/core";
 import * as th from "../utils/templates";
 import * as ast from "../utils/ast";
 
-import { hasJsdocGlobalExportFlag } from "../classes/helpers/jsdoc";
+import { hasJsdocGlobalExportFlag, hasJsdocDesigntimeOnlyExportFlag } from "../classes/helpers/jsdoc";
 
 const tempModuleName = name => `__${name}`;
 const cleanImportSource = src =>
   src.replace(/(\/)|(-)|(@)/g, "_").replace(/\./g, "");
 const hasGlobalExportFlag = node => hasJsdocGlobalExportFlag(node);
+const hasDesigntimeOnlyExportFlag = node => hasJsdocDesigntimeOnlyExportFlag(node);
 
 export const ModuleTransformVisitor = {
   /*!
@@ -171,6 +172,7 @@ export const ModuleTransformVisitor = {
         this.namedExports.push({
           key: specifier.exported,
           value: t.identifier(`${fromSource}${specifier.local.name}`),
+          annotations: { designTimeOnly: hasDesigntimeOnlyExportFlag(node) }
         });
       }
       path.remove();
