@@ -2,16 +2,16 @@
   "name": "babel-ui5",
   "private": true,
   "devDependencies": {
-    "eslint-config-prettier": "^6.1.0",
-    "eslint-plugin-prettier": "^3.1.0",
-    "husky": "^3.0.4",
-    "lerna": "^3.16.4",
-    "prettier": "^1.18.2"
+    "@babel/eslint-parser": "^7.19.1",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "husky": "^8.0.3",
+    "lerna": "^6.4.1",
+    "prettier": "^2.8.3"
   },
-  "husky": {
-    "hooks": {
-      "prepare": "lerna run clean && lerna run lint && lerna run build && lerna run test",
-      "precommit": "lerna run lint:staged && lerna run test"
-    }
+  "scripts": {
+    "prepare": "node ./.husky/skip.js || husky install",
+    "hooks:prepare": "lerna run clean && lerna run lint && lerna run build && lerna run test",
+    "hooks:pre-commit": "lerna run lint:staged && lerna run test"
   }
 }

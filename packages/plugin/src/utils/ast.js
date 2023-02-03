@@ -1,5 +1,5 @@
 import { types as t } from "@babel/core";
-import flatten from "array-flatten";
+import { flatten } from "array-flatten";
 
 export function isObjectAssignOrExtendsExpression(node) {
   return isObjectAssignExpression(node) || isExtendsHelperExpression(node);
@@ -73,7 +73,7 @@ export function findPropertiesOfNode(blockScopeNode, declaration) {
 }
 
 export function getInternalStaticThingsOfClass(classNode) {
-  return classNode.body.body.filter(item => item.static);
+  return classNode.body.body.filter((item) => item.static);
 }
 
 /**
@@ -86,7 +86,7 @@ export function getInternalStaticThingsOfClass(classNode) {
 export function getOtherPropertiesOfIdentifier(blockScopeNode, idName) {
   return flatten(
     blockScopeNode.body
-      .map(node => {
+      .map((node) => {
         if (t.isExpressionStatement(node)) {
           // ID = value | ID.key = value | ID.key.nested = value
           const { left, right } = node.expression;
@@ -107,15 +107,15 @@ export function getOtherPropertiesOfIdentifier(blockScopeNode, idName) {
           }
         } else if (t.isVariableDeclaration(node)) {
           return node.declarations
-            .filter(declaration => declaration.id.name === idName)
-            .map(declaration => declaration.init)
-            .filter(init => init)
+            .filter((declaration) => declaration.id.name === idName)
+            .map((declaration) => declaration.init)
+            .filter((init) => init)
             .filter(
-              init =>
+              (init) =>
                 t.isObjectExpression(init) ||
                 isObjectAssignOrExtendsExpression(init)
             )
-            .map(init =>
+            .map((init) =>
               t.isObjectExpression(init)
                 ? init.properties
                 : getPropertiesOfObjectAssignOrExtendHelper(
@@ -125,7 +125,7 @@ export function getOtherPropertiesOfIdentifier(blockScopeNode, idName) {
             );
         }
       })
-      .filter(item => item)
+      .filter((item) => item)
   );
 }
 
@@ -135,7 +135,7 @@ export function getPropertiesOfObjectAssignOrExtendHelper(
 ) {
   // Check all the args and recursively try to get props of identifiers (although they may be imported)
   return flatten(
-    node.arguments.map(arg => {
+    node.arguments.map((arg) => {
       if (t.isObjectExpression(arg)) {
         return arg.properties;
       } else if (t.isIdentifier(arg)) {
@@ -147,7 +147,7 @@ export function getPropertiesOfObjectAssignOrExtendHelper(
 }
 
 export function getPropNames(props) {
-  return props.map(prop => prop.key.name);
+  return props.map((prop) => prop.key.name);
 }
 
 export function groupPropertiesByName(properties) {
@@ -258,6 +258,6 @@ export function isThisExpressionUsed(node) {
     "property",
   ];
   return traversableProps.some(
-    prop => node[prop] && isThisExpressionUsed(node[prop])
+    (prop) => node[prop] && isThisExpressionUsed(node[prop])
   );
 }
