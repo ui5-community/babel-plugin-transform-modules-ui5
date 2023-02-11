@@ -9,7 +9,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.12",
-    "prettier": "^2.8.3"
+    "prettier": "^2.8.4"
   },
   "scripts": {
     "format": "prettier  --write index.js"

@@ -201,7 +201,7 @@ export function convertClassToUI5Extend(
       // Copy all except the super call from the constructor to the bindMethod (i.e. onInit)
       bindMethod.body.body.unshift(
         ...constructor.body.body.filter(
-          node => !ast.isSuperCallExpression(node.expression)
+          (node) => !ast.isSuperCallExpression(node.expression)
         )
       );
     }
@@ -211,12 +211,12 @@ export function convertClassToUI5Extend(
     // We need to inject the bound props into the bind method (constructor or onInit),
     // but not until after the super call (if applicable)
 
-    const mappedProps = boundProps.map(member =>
+    const mappedProps = boundProps.map((member) =>
       buildThisMemberAssignmentStatement(member)
     );
 
     const superIndex = bindMethod.body.body.findIndex(
-      node =>
+      (node) =>
         ast.isSuperCallExpression(node.expression) ||
         ast.isSuperPrototypeCallOf(
           node.expression,
@@ -287,7 +287,7 @@ function getFileBaseNamespace(path, pluginOpts) {
   }
 }
 
-const buildObjectProperty = member =>
+const buildObjectProperty = (member) =>
   t.objectProperty(member.key, member.value, member.computed);
 
 const buildMemberAssignmentStatement = (objectIdentifier, member) =>

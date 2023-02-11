@@ -40,7 +40,7 @@ export const ClassTransformVisitor = {
 
       // Find the Block scoped parent (Program or Function body) and search for assigned properties within that (eg. MyClass.X = "X").
       const { name: className } = node.id;
-      const blockParent = path.findParent(path => path.isBlock()).node;
+      const blockParent = path.findParent((path) => path.isBlock()).node;
       const staticProps = ast.groupPropertiesByName(
         ast.getOtherPropertiesOfIdentifier(blockParent, className)
       );
@@ -91,7 +91,7 @@ export const ClassTransformVisitor = {
     // If the file already has sap.ui.define, get the names of variables it creates to use for the class logic.
     if (ast.isCallExpressionCalling(node, "sap.ui.define")) {
       this.importNames.push(
-        ...getRequiredParamsOfSAPUIDefine(path, node).map(req => req.name)
+        ...getRequiredParamsOfSAPUIDefine(path, node).map((req) => req.name)
       );
       return;
     } else if (this.superClassName) {
@@ -129,12 +129,15 @@ export const ClassTransformVisitor = {
 };
 
 function isSuperApply(callee) {
-  return t.isIdentifier(callee.property, { "name": "apply" }) && t.isSuper(callee.object.object);
+  return (
+    t.isIdentifier(callee.property, { name: "apply" }) &&
+    t.isSuper(callee.object.object)
+  );
 }
 
 function getRequiredParamsOfSAPUIDefine(path, node) {
   const defineArgs = node.arguments;
-  const callbackNode = defineArgs.find(argNode => t.isFunction(argNode));
+  const callbackNode = defineArgs.find((argNode) => t.isFunction(argNode));
   return callbackNode.params; // Identifier
 }
 
@@ -184,7 +187,7 @@ function replaceSuperNamedCall(path, node, superClassName, methodName) {
 
 function doesClassExtendFromImport(node, imports) {
   const superClass = node.superClass;
-  return superClass && imports.some(imported => imported === superClass.name);
+  return superClass && imports.some((imported) => imported === superClass.name);
 }
 
 function shouldConvertClass(file, node, opts, classInfo) {
