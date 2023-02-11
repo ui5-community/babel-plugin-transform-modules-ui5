@@ -127,6 +127,13 @@ export const ModuleTransformVisitor = {
       }
     }
 
+    // this is the very first import in noWrapBeforeImport mode and there are sibling nodes before this import
+    if (opts.noWrapBeforeImport && !this.firstImportMarked && path.inList && path.key > 0) {
+      // mark the direct predecessor as the last one to exclude from wrapping
+      path.getSibling(path.key - 1).node.lastBeforeWrapping = true;
+      this.firstImportMarked = true;
+    }
+
     path.replaceWithMultiple(deconstructors);
 
     if (deconstructors.length) {
@@ -135,11 +142,6 @@ export const ModuleTransformVisitor = {
     }
 
     imp.deconstructors = imp.deconstructors.concat(deconstructors);
-
-    // TODO: now that we're saving deconstructors on the import, dynamically determine firstImport if needed.
-    if (!this.firstImport && imp.deconstructors[0]) {
-      this.firstImport = imp.deconstructors[0];
-    }
 
     if (!existingImport) {
       this.imports.push(imp);

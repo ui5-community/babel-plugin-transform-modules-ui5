@@ -7,7 +7,7 @@ export function wrap(visitor, programNode, opts) {
   let {
     defaultExport,
     exportGlobal,
-    firstImport,
+    firstImportMarked,
     imports,
     namedExports,
     ignoredImports,
@@ -59,18 +59,19 @@ export function wrap(visitor, programNode, opts) {
   const preDefine = [...ignoredImports];
   // If the noWrapBeforeImport opt is set, split any code before the first import and afterwards into separate arrays.
   // This should be done before any interops or other vars are injected.
-  if (opts.noWrapBeforeImport && firstImport) {
+  if (opts.noWrapBeforeImport && firstImportMarked) {
     let reachedFirstImport = false;
     const fullBody = body;
     const newBody = [];
+
     for (const item of fullBody) {
-      if (item === firstImport) {
-        reachedFirstImport = true;
-      }
       if (reachedFirstImport) {
         newBody.push(item);
       } else {
         preDefine.push(item);
+      }
+      if (item.lastBeforeWrapping) {
+        reachedFirstImport = true;
       }
     }
     if (preDefine.length && !hasUseStrict(programNode)) {

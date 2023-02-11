@@ -1241,6 +1241,16 @@ sap.ui.define([\\"./foo\\"], function (__Foo) {
 });"
 `;
 
+exports[`min-wrap min-wrap-ui5.js 1`] = `
+"\\"use strict\\";
+
+const x = 1;
+sap.ui.define([\\"sap/m/Button\\"], function (Button) {
+  const b = new Button();
+  return b;
+});"
+`;
+
 exports[`mixed mixed-import-export.js 1`] = `
 "sap.ui.define([\\"1\\", \\"2\\", \\"3\\", \\"4\\", \\"5\\"], function (__1, __2, __3, __4, __5) {
   var __exports = {
