@@ -20,7 +20,7 @@
     "clean": "lerna run clean",
     "build": "lerna run build",
     "lint": "lerna run lint",
-    "lint:commit": "#commitlint -e",
+    "lint:commit": "commitlint -e",
     "test": "lerna run test"
   }
 }
