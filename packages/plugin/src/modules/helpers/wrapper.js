@@ -33,11 +33,8 @@ export function wrap(visitor, programNode, opts) {
 
   // Before adding anything, see if the named exports can be collapsed into the default export.
   if (defaultExport && namedExports.length && opts.collapse) {
-    let {
-      filteredExports,
-      conflictingExports,
-      newDefaultExportIdentifier,
-    } = eh.collapseNamedExports(programNode, defaultExport, namedExports, opts);
+    let { filteredExports, conflictingExports, newDefaultExportIdentifier } =
+      eh.collapseNamedExports(programNode, defaultExport, namedExports, opts);
 
     if (filteredExports.length && !opts.allowUnsafeMixedExports) {
       throw new Error(
@@ -123,7 +120,7 @@ export function wrap(visitor, programNode, opts) {
     body.push(th.buildReturnExports());
   }
 
-  if (imports.some(imp => imp.interop)) {
+  if (imports.some((imp) => imp.interop)) {
     body.unshift(th.buildDefaultImportInterop());
   }
 
@@ -135,14 +132,14 @@ export function wrap(visitor, programNode, opts) {
 
 function hasUseStrict(node) {
   return (node.directives || []).some(
-    directive => directive.value.value === "use strict"
+    (directive) => directive.value.value === "use strict"
   );
 }
 
 function generateDefine(body, imports, exportGlobal) {
   const defineOpts = {
-    SOURCES: t.arrayExpression(imports.map(i => t.stringLiteral(i.src))),
-    PARAMS: imports.map(i => t.identifier(i.tmpName)),
+    SOURCES: t.arrayExpression(imports.map((i) => t.stringLiteral(i.src))),
+    PARAMS: imports.map((i) => t.identifier(i.tmpName)),
     BODY: body,
   };
   return exportGlobal

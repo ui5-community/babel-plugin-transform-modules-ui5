@@ -4,10 +4,10 @@ import * as ast from "../utils/ast";
 
 import { hasJsdocGlobalExportFlag } from "../classes/helpers/jsdoc";
 
-const tempModuleName = name => `__${name}`;
-const cleanImportSource = src =>
+const tempModuleName = (name) => `__${name}`;
+const cleanImportSource = (src) =>
   src.replace(/(\/)|(-)|(@)/g, "_").replace(/\./g, "");
-const hasGlobalExportFlag = node => hasJsdocGlobalExportFlag(node);
+const hasGlobalExportFlag = (node) => hasJsdocGlobalExportFlag(node);
 
 export const ModuleTransformVisitor = {
   /*!
@@ -43,18 +43,18 @@ export const ModuleTransformVisitor = {
     const mappedSrc =
       (typeof modulesMap === "function"
         ? modulesMap(src, {
-          node,
-          opts,
-          cwd: state.cwd,
-          filename: state.filename,
-          file: {
-            opts: state.file.opts,
-          },
-        })
+            node,
+            opts,
+            cwd: state.cwd,
+            filename: state.filename,
+            file: {
+              opts: state.file.opts,
+            },
+          })
         : modulesMap[src]) || src;
 
     // Note that existingImport may get mutated if there are multiple import lines from the same module.
-    const existingImport = this.imports.find(imp => imp.src === mappedSrc);
+    const existingImport = this.imports.find((imp) => imp.src === mappedSrc);
 
     const imp = existingImport || {
       src: mappedSrc, // url
