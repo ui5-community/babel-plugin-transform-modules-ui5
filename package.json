@@ -2,14 +2,14 @@
   "name": "babel-ui5",
   "private": true,
   "devDependencies": {
-    "@commitlint/cli": "^17.4.2",
-    "@commitlint/config-conventional": "^17.4.2",
+    "@commitlint/cli": "^17.4.3",
+    "@commitlint/config-conventional": "^17.4.3",
     "cz-conventional-changelog": "^3.3.0",
     "@babel/eslint-parser": "^7.19.1",
     "eslint-config-prettier": "^8.6.0",
     "eslint-plugin-prettier": "^4.2.1",
     "husky": "^8.0.3",
-    "lerna": "^6.4.1",
+    "lerna": "^6.5.1",
     "prettier": "^2.8.4"
   },
   "scripts": {

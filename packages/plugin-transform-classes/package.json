@@ -3,7 +3,11 @@
   "version": "7.0.2",
   "description": "An unofficial babel plugin for SAP UI5.",
   "main": "src/index.js",
-  "repository": "https://github.com/r-murphy/babel-plugin-ui5/tree/master/packages/plugin-transform-classes",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ui5-community/babel-plugin-transform-modules-ui5.git",
+    "directory": "packages/plugin-transform-classes"
+  },
   "engines": {
     "node": ">=6"
   },
