@@ -169,8 +169,8 @@ exports[`classes class-convert-controller-extend-static-prop.controller.js 1`] =
 `;
 
 exports[`classes class-convert-controller-extension-static-prop.controller.js 1`] = `
-"sap.ui.define([\\"sap/ui/core/mvc/ControllerExtension\\"], function (ControllerExtension) {
-  const MyExtension = ControllerExtension.extend(\\"fixtures.classes.MyExtension\\", {
+"sap.ui.define(["sap/ui/core/mvc/ControllerExtension"], function (ControllerExtension) {
+  const MyExtension = ControllerExtension.extend("fixtures.classes.MyExtension", {
     overrides: {
       onPageReady: function () {}
     }
@@ -1108,10 +1108,10 @@ sap.ui.define(["./foo"], function (__Foo) {
 `;
 
 exports[`min-wrap min-wrap-ui5.js 1`] = `
-"\\"use strict\\";
+""use strict";
 
 const x = 1;
-sap.ui.define([\\"sap/m/Button\\"], function (Button) {
+sap.ui.define(["sap/m/Button"], function (Button) {
   const b = new Button();
   return b;
 });"
