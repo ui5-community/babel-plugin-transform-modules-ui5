@@ -2,25 +2,29 @@
   "name": "babel-ui5",
   "private": true,
   "devDependencies": {
-    "@commitlint/cli": "^17.4.3",
-    "@commitlint/config-conventional": "^17.4.3",
-    "cz-conventional-changelog": "^3.3.0",
     "@babel/eslint-parser": "^7.19.1",
+    "@commitlint/cli": "^17.4.4",
+    "@commitlint/config-conventional": "^17.4.4",
+    "cz-conventional-changelog": "^3.3.0",
+    "eslint": "^8.34.0",
     "eslint-config-prettier": "^8.6.0",
     "eslint-plugin-prettier": "^4.2.1",
     "husky": "^8.0.3",
-    "lerna": "^6.5.1",
-    "prettier": "^2.8.4"
+    "lerna": "^6.5.1"
   },
   "scripts": {
-    "prepare": "node ./.husky/skip.js || husky install",
-    "hooks:prepare": "lerna run clean && lerna run lint && lerna run build && lerna run test",
+    "prepare": "npm run prepare:husky && npm run prepare:workspace",
+    "prepare:husky": "node ./.husky/skip.js || husky install",
+    "prepare:workspace": "lerna bootstrap && lerna run clean && lerna run lint && lerna run build && lerna run test",
     "hooks:pre-commit": "lerna run lint:staged && lerna run test",
     "hooks:pre-push": "npm run lint:commit",
     "clean": "lerna run clean",
     "build": "lerna run build",
     "lint": "lerna run lint",
     "lint:commit": "commitlint -e",
-    "test": "lerna run test"
+    "test": "lerna run test",
+    "release:version": "lerna version",
+    "release:publish": "lerna publish from-git --yes --no-verify-access",
+    "release:publish-manual": "lerna publish from-package --yes --no-verify-access"
   }
 }
