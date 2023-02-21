@@ -13,14 +13,18 @@
     "prettier": "^2.8.4"
   },
   "scripts": {
-    "prepare": "node ./.husky/skip.js || husky install",
-    "hooks:prepare": "lerna run clean && lerna run lint && lerna run build && lerna run test",
+    "prepare": "npm run prepare:husky && npm run prepare:workspace",
+    "prepare:husky": "node ./.husky/skip.js || husky install",
+    "prepare:workspace": "lerna run clean && lerna run lint && lerna run build && lerna run test",
     "hooks:pre-commit": "lerna run lint:staged && lerna run test",
     "hooks:pre-push": "npm run lint:commit",
     "clean": "lerna run clean",
     "build": "lerna run build",
     "lint": "lerna run lint",
     "lint:commit": "commitlint -e",
-    "test": "lerna run test"
+    "test": "lerna run test",
+    "release:version": "lerna version",
+    "release:publish": "lerna publish from-git --yes --no-verify-access",
+    "release:publish-manual": "lerna publish from-package --yes --no-verify-access"
   }
 }
