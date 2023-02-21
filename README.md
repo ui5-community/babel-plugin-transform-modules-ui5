@@ -1,10 +1,8 @@
 # babel transform-ui5
 
-An unofficial Babel transformer plugin for SAP/Open UI5.
+A community-driven Babel transformer plugin for SAPUI5/OpenUI5.
 
-It allows you to develop SAP UI5 applications by using the latest [ECMAScript](http://babeljs.io/docs/learn-es2015/), including classes and modules, or even TypeScript.
-
-[![Build Status](https://travis-ci.org/r-murphy/babel-plugin-transform-modules-ui5.svg?branch=master)](https://travis-ci.org/r-murphy/babel-plugin-transform-modules-ui5)
+It allows you to develop SAPUI5 applications by using the latest [ECMAScript](http://babeljs.io/docs/learn-es2015/), including classes and modules, or even TypeScript.
 
 ## Install
 
@@ -690,4 +688,4 @@ Issues also welcome for feature requests.
 
 ## License
 
-MIT © 2019 Ryan Murphy
+MIT © 2019 Ryan Murphy and contributors
