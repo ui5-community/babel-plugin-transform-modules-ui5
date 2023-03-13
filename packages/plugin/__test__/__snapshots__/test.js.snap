@@ -179,6 +179,17 @@ exports[`classes class-convert-controller-extension-static-prop.controller.js 1`
 });"
 `;
 
+exports[`classes class-convert-controller-extension-static-prop-compatibility.controller.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/ControllerExtension"], function (ControllerExtension) {
+  const MyExtension = ControllerExtension.extend("fixtures.classes.MyExtension", {
+    override: {
+      onPageReady: function () {}
+    }
+  });
+  return MyExtension;
+});"
+`;
+
 exports[`classes class-convert-controller-multi.controller.js 1`] = `
 "sap.ui.define(["sap/ui/core/Controller", "other"], function (SAPController, __Other) {
   function _interopRequireDefault(obj) {

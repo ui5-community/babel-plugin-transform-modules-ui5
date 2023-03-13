@@ -115,8 +115,12 @@ export function convertClassToUI5Extend(
       }
     } else if (t.isClassProperty(member)) {
       if (!member.value) continue; // un-initialized static class prop (typescript)
-      if (memberName === "metadata" || memberName === "renderer" || memberName === "overrides") {
-        // Special handling for TypeScript limitation where metadata, renderer and overrides must be properties.
+
+      // Special handling for TypeScript limitation where metadata, renderer and overrides must be properties.
+      if (["metadata", "renderer", "overrides"].includes(memberName)) {
+        if (opts.overridesToOverride && member.key.name === "overrides") {
+          member.key.name = "override";
+        }
         extendProps.unshift(buildObjectProperty(member));
       } else if (member.static) {
         if (moveStaticStaticPropsToExtend) {
@@ -180,12 +184,12 @@ export function convertClassToUI5Extend(
     const bindToId = t.identifier(bindToMethodName);
     const bindMethodDeclaration = bindToConstructor
       ? th.buildInheritingConstructor({
-        SUPER: t.identifier(superClassName),
-      })
+          SUPER: t.identifier(superClassName),
+        })
       : th.buildInheritingFunction({
-        NAME: bindToId,
-        SUPER: t.identifier(superClassName),
-      });
+          NAME: bindToId,
+          SUPER: t.identifier(superClassName),
+        });
     bindMethod = ast.convertFunctionDeclarationToExpression(
       bindMethodDeclaration
     );
