@@ -60,13 +60,16 @@ export function convertClassToUI5Extend(
   for (const propName of staticPropsToAdd) {
     if (extraStaticProps[propName]) {
       extendProps.push(
-        t.objectProperty(t.identifier(propName), extraStaticProps[propName])
+        t.objectProperty(
+          t.identifier(propName === "overrides" ? "override" : propName),
+          extraStaticProps[propName]
+        )
       );
     }
   }
 
   for (const member of node.body.body) {
-    const memberName = member.key.name;
+    let memberName = member.key.name;
 
     if (t.isClassMethod(member)) {
       const func = t.functionExpression(
@@ -115,8 +118,15 @@ export function convertClassToUI5Extend(
       }
     } else if (t.isClassProperty(member)) {
       if (!member.value) continue; // un-initialized static class prop (typescript)
-      if (memberName === "metadata" || memberName === "renderer" || memberName === "overrides") {
+      if (
+        memberName === "metadata" ||
+        memberName === "renderer" ||
+        memberName === "overrides"
+      ) {
         // Special handling for TypeScript limitation where metadata, renderer and overrides must be properties.
+        /*if (member.key.name === "overrides") {
+          member.key.name = "override";
+        }*/
         extendProps.unshift(buildObjectProperty(member));
       } else if (member.static) {
         if (moveStaticStaticPropsToExtend) {
@@ -180,12 +190,12 @@ export function convertClassToUI5Extend(
     const bindToId = t.identifier(bindToMethodName);
     const bindMethodDeclaration = bindToConstructor
       ? th.buildInheritingConstructor({
-        SUPER: t.identifier(superClassName),
-      })
+          SUPER: t.identifier(superClassName),
+        })
       : th.buildInheritingFunction({
-        NAME: bindToId,
-        SUPER: t.identifier(superClassName),
-      });
+          NAME: bindToId,
+          SUPER: t.identifier(superClassName),
+        });
     bindMethod = ast.convertFunctionDeclarationToExpression(
       bindMethodDeclaration
     );
