@@ -559,8 +559,6 @@ Because ES classes are not plain objects, you can't have an object property like
 
 This plugin allows you to configure `metadata` and `renderer` as class properties (static or not) and the plugin will convert it to object properties for the extend call.
 
-This:
-
 ```js
 class MyControl extends SAPClass {
     static renderer = MyControlRenderer;
@@ -570,7 +568,7 @@ class MyControl extends SAPClass {
 }
 ```
 
-Becomes:
+is converted to
 
 ```js
 const MyControl = SAPClass.extend('MyControl', {
@@ -579,6 +577,27 @@ const MyControl = SAPClass.extend('MyControl', {
         ...
     }
 });
+```
+It additionally supports the usage of the new `overrides` class property required for a `ControllerExtension`.
+(For backward compatibility, you can use `overridesToOverride: true`)
+```js
+class MyExtension extends ControllerExtension {
+
+  static overrides = {
+    onPageReady: function () { }
+  }
+}
+```
+is converted to
+
+```js
+const MyExtension = ControllerExtension.extend("MyExtension", {
+    overrides: {
+      onPageReady: function () {}
+    }
+  });
+  return MyExtension;
+});"
 ```
 
 Since class properties are an early ES proposal, TypeScript's compiler (like babel's class properties transform) moves static properties outside the class definition, and moves instance properties inside the constructor (even if TypeScript is configured to output ESNext).
@@ -639,7 +658,8 @@ const MyControl = SAPClass.extend('MyControl', {
 - `moveControllerPropsToOnInit` (Default: false) Moves class props in a controller to the onInit method instead of constructor.
 - `moveControllerConstructorToOnInit` (Default: false) Moves existing constructor code in a controller to the onInit method. Enabling will auto-enable `moveControllerPropsToOnInit`.
 - `addControllerStaticPropsToExtend` (Default: false) Moves static props of a controller to the extends call. Useful for formatters.
-- `onlyMoveClassPropsUsingThis` (Default: false) Set to use old behaviour where only instance class props referencing `this` would be moved to the constructor or onInit. New default is to always move instance props.
+- `onlyMoveClassPropsUsingThis` (Default: false) Set to use old behavior where only instance class props referencing `this` would be moved to the constructor or onInit. New default is to always move instance props.
+- `overridesToOverride` (Default: false) Changes the name of the static overrides to override when being added to ControllerExtension.extend() allowing to use the new overrides keyword with older UI5 versions
 
 \* 'collapsing' named exports is a combination of simply ignoring them if their definition is the same as a property on the default export, and also assigning them to the default export.
 
