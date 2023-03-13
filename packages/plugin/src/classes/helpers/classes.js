@@ -57,7 +57,7 @@ export function convertClassToUI5Extend(
     ? Object.keys(extraStaticProps)
     : ["metadata", "renderer", "overrides"];
 
-  for (let propName of staticPropsToAdd) {
+  for (const propName of staticPropsToAdd) {
     if (extraStaticProps[propName]) {
       extendProps.push(
         t.objectProperty(t.identifier(propName), extraStaticProps[propName])
@@ -66,7 +66,7 @@ export function convertClassToUI5Extend(
   }
 
   for (const member of node.body.body) {
-    let memberName = member.key.name;
+    const memberName = member.key.name;
 
     if (t.isClassMethod(member)) {
       const func = t.functionExpression(
