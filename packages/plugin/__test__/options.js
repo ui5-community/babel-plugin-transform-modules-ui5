@@ -30,6 +30,9 @@ const Options = {
     "class-convert-controller-extend-static-prop": {
       addControllerStaticPropsToExtend: true,
     },
+    "class-convert-controller-extension-static-prop-compatibility.controller": {
+      overridesToOverride: true
+    },
     "class-convert-all": {
       autoConvertAllExtendClasses: true,
     },

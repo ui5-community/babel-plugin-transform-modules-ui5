@@ -57,13 +57,10 @@ export function convertClassToUI5Extend(
     ? Object.keys(extraStaticProps)
     : ["metadata", "renderer", "overrides"];
 
-  for (const propName of staticPropsToAdd) {
+  for (let propName of staticPropsToAdd) {
     if (extraStaticProps[propName]) {
       extendProps.push(
-        t.objectProperty(
-          t.identifier(propName === "overrides" ? "override" : propName),
-          extraStaticProps[propName]
-        )
+        t.objectProperty(t.identifier(propName), extraStaticProps[propName])
       );
     }
   }
@@ -118,15 +115,12 @@ export function convertClassToUI5Extend(
       }
     } else if (t.isClassProperty(member)) {
       if (!member.value) continue; // un-initialized static class prop (typescript)
-      if (
-        memberName === "metadata" ||
-        memberName === "renderer" ||
-        memberName === "overrides"
-      ) {
-        // Special handling for TypeScript limitation where metadata, renderer and overrides must be properties.
-        /*if (member.key.name === "overrides") {
+
+      // Special handling for TypeScript limitation where metadata, renderer and overrides must be properties.
+      if (["metadata", "renderer", "overrides"].includes(memberName)) {
+        if (opts.overridesToOverride && member.key.name === "overrides") {
           member.key.name = "override";
-        }*/
+        }
         extendProps.unshift(buildObjectProperty(member));
       } else if (member.static) {
         if (moveStaticStaticPropsToExtend) {
