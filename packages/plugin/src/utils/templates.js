@@ -94,8 +94,10 @@ export const buildDynamicImportHelper = template(`
           module.__esModule = true;
           resolve(module);
         }
-      })
-    })
+      }, (err) => {
+        reject(err);
+      });
+    });
   }
 `);
 
