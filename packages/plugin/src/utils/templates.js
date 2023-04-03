@@ -78,22 +78,74 @@ export const buildDefaultImportDeconstructor = template(`
   const LOCAL = _interopRequireDefault(MODULE);
 `);
 
+/*
+ * Scenarios for dynamic exports:
+ *
+ * 1.) ES module with no exports
+ *
+ * (await import("./moduleWithNoExports.js")) ==> Module
+ * (await import("./moduleWithNoExports.js")).default ==> undefined
+ *
+ * 2.) ES module with default export
+ *
+ * (await import("./moduleWithDefaultExport.js")) ==> Module
+ * (await import("./moduleWithDefaultExport.js")).default ==> DefaultExport
+ *
+ * 3.) ES module with named exports
+ *
+ * (await import("./moduleWithNamedExport.js")) ==> Module
+ * (await import("./moduleWithNamedExport.js")).default ==> undefined
+ * (await import("./moduleWithNamedExport.js")).NamedExport ==> NamedExport
+ *
+ * A Module object is always returned by the dynamic import.
+ *
+ * ---
+ *
+ * The dynamic import script template simulates the default and named exports
+ * for non-ES modules so that the TypeScript code completion can be properly
+ * used. The template below is used to translate dynamic imports to sap.ui.require
+ * calls which are typically be used for the following scenarios:
+ *
+ * 1.) UI5 Libraries
+ *
+ * A UI5 library exports its complete namespace and all available
+ * types/enums/... are accessible as named properties on that
+ * namespace, e.g.:
+ *
+ * (await import("sap/m/library")) => { __esModule: true, ... }
+ * (await import("sap/m/library")).default => undefined
+ * (await import("sap/m/library")).ButtonType => sap/m/ButtonType
+ *
+ * 2.) UI5 Classes
+ *
+ * A UI5 class exports itself as default. When importing a UI5 class
+ * it is expected to be accessible via the default property.
+ *
+ * (await import("sap/m/Button")) => { __esModule: true, ... }
+ * (await import("sap/m/Button")).default => sap/m/Button
+ *
+ * 3.) Static Helpers (sap/m/MessageBox)
+ *
+ * (await import("sap/m/MessageBox")) => { __esModule: true, ... }
+ * (await import("sap/m/MessageBox")).default => sap/m/MessageBox
+ * (await import("sap/m/MessageBox")).Action => undefined
+ * (await import("sap/m/MessageBox")).default.Action => sap/m/MessageBox.Action
+ *
+ * 4.) undefined or null (no exports)
+ *
+ * (await import("./non/exporting/module")) => { __esModule: true, ... }
+ * (await import("./non/exporting/module")) => undefined
+ */
 // TODO: inject __extends instead of Object.assign unless useBuiltIns in set
 export const buildDynamicImportHelper = template(`
   function __ui5_require_async(path) {
     return new Promise((resolve, reject) => {
       sap.ui.require([path], (module) => {
-        if (!module) { 
-          return reject("No module returned from " + path); 
-        } else if (module.__esModule) { 
-          return resolve(module); 
-        } else if (module.default) {
-          return reject(new Error(path + " module includes a 'default' property but not __esModule. Cannot use as dynamic import"));
-        } else {
-          module.default = typeof module === "object" ? Object.assign({}, module) : module;
-          module.__esModule = true;
-          resolve(module);
+        module = module === null || !(typeof module === "object" && path.endsWith("/library")) ? { default: module } : module;
+        if (!module.__esModule) {
+          Object.defineProperty(module, "__esModule", { value: true });
         }
+        resolve(module);
       }, (err) => {
         reject(err);
       });
