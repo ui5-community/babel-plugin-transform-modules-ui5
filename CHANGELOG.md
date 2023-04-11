@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.1.3](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.1.2...v7.1.3) (2023-04-11)
+
+
+### Bug Fixes
+
+* dynamic import must not handle __esModule flagged modules ([#93](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/93)) ([b269985](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/b26998540cac0c2c2868bd59198d6f9abfaab8f7))
+
+
+
+
+
 ## [7.1.2](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.1.1...v7.1.2) (2023-04-11)
 
 
