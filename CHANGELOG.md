@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.1.4](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.1.3...v7.1.4) (2023-04-11)
+
+
+### Bug Fixes
+
+* properly handle dynamic import of non-existing modules ([#94](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/94)) ([c443b36](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/c443b36d5035d2e2fa367e074d0732336af8eb78))
+
+
+
+
+
 ## [7.1.3](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.1.2...v7.1.3) (2023-04-11)
 
 
