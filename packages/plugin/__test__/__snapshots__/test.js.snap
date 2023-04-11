@@ -1012,17 +1012,15 @@ exports[`imports import-dynamic.js 1`] = `
   function __ui5_require_async(path) {
     return new Promise((resolve, reject) => {
       sap.ui.require([path], module => {
-        if (!module) {
-          return reject("No module returned from " + path);
-        } else if (module.__esModule) {
-          return resolve(module);
-        } else if (module.default) {
-          return reject(new Error(path + " module includes a 'default' property but not __esModule. Cannot use as dynamic import"));
-        } else {
-          module.default = typeof module === "object" ? Object.assign({}, module) : module;
-          module.__esModule = true;
-          resolve(module);
+        module = module === null || !(typeof module === "object" && path.endsWith("/library")) ? {
+          default: module
+        } : module;
+        if (!module.__esModule) {
+          Object.defineProperty(module, "__esModule", {
+            value: true
+          });
         }
+        resolve(module);
       }, err => {
         reject(err);
       });
