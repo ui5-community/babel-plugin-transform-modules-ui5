@@ -149,7 +149,7 @@ export const buildDynamicImportHelper = template(`
   function __ui5_require_async(path) {
     return new Promise((resolve, reject) => {
       sap.ui.require([path], (module) => {
-        if (!module.__esModule) {
+        if (!(module && module.__esModule)) {
           module = module === null || !(typeof module === "object" && path.endsWith("/library")) ? { default: module } : module;
           Object.defineProperty(module, "__esModule", { value: true });
         }
