@@ -135,14 +135,22 @@ export const buildDefaultImportDeconstructor = template(`
  *
  * (await import("./non/exporting/module")) => { __esModule: true, ... }
  * (await import("./non/exporting/module")) => undefined
+ *
+ * 5.) Other dependencies (jsPDF)
+ *
+ * (await import("jsPDF")) => { __esModule: true, jsPDF: ?, ... }
+ * (await import("sap/m/MessageBox")).jsPDF => jsPDF
+ *
+ * When requiring other dependencies they are already flagged as __esModule
+ * and must not be processed in our dynamic import to require handler.
  */
 // TODO: inject __extends instead of Object.assign unless useBuiltIns in set
 export const buildDynamicImportHelper = template(`
   function __ui5_require_async(path) {
     return new Promise((resolve, reject) => {
       sap.ui.require([path], (module) => {
-        module = module === null || !(typeof module === "object" && path.endsWith("/library")) ? { default: module } : module;
         if (!module.__esModule) {
+          module = module === null || !(typeof module === "object" && path.endsWith("/library")) ? { default: module } : module;
           Object.defineProperty(module, "__esModule", { value: true });
         }
         resolve(module);
