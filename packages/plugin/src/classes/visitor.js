@@ -138,7 +138,7 @@ function isSuperApply(callee) {
 function getRequiredParamsOfSAPUIDefine(path, node) {
   const defineArgs = node.arguments;
   const callbackNode = defineArgs.find((argNode) => t.isFunction(argNode));
-  return callbackNode.params; // Identifier
+  return callbackNode?.params || []; // Identifier
 }
 
 /**
