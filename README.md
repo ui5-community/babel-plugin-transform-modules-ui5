@@ -321,9 +321,12 @@ export default {
   A,
   X,
 };
+```
 
-//////// Generates
-("use strict");
+Outputs:
+
+```js
+"use strict";
 const X = 1;
 sap.ui.define(["./a"], A => {
   return {
@@ -630,6 +633,26 @@ const MyControl = SAPClass.extend('MyControl', {
 ```
 
 **CAUTION** The plugin does not currently search for 'metadata' or 'renderer' properties inside the constructor. So don't apply Babel's class property transform plugin before this one if you have metadata/renderer as instance properties (static properties are safe).
+
+### Comments
+
+In case of defining a *copyright* comment in your source code (detected by a leading `!`) at the first place, the plugin ensures to include it also as leading comment in the generated file at the first place, e.g.:
+
+```ts
+/*!
+ * ${copyright}
+ */
+import Control from "sap/ui/core/Control";
+```
+
+will be converted to:
+
+```js
+/*!
+ * ${copyright}
+ */
+sap.ui.define(["sap/ui/core/Control"], function(Control) { /* ... */ });
+```
 
 ## Options
 

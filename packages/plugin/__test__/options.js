@@ -31,7 +31,7 @@ const Options = {
       addControllerStaticPropsToExtend: true,
     },
     "class-convert-controller-extension-static-prop-compatibility.controller": {
-      overridesToOverride: true
+      overridesToOverride: true,
     },
     "class-convert-all": {
       autoConvertAllExtendClasses: true,
@@ -48,7 +48,7 @@ const Options = {
       },
     },
     "import-modules-map-fn": {
-      modulesMap: src => Options.files["import-modules-map"].modulesMap[src],
+      modulesMap: (src) => Options.files["import-modules-map"].modulesMap[src],
     },
     "ts-class-props-only-move-this": {
       onlyMoveClassPropsUsingThis: true,
@@ -58,6 +58,9 @@ const Options = {
     },
   },
   dirs: {
+    comments: {
+      noWrapBeforeImport: true,
+    },
     "min-wrap": {
       noWrapBeforeImport: true,
     },

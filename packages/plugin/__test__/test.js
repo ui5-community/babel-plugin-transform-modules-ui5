@@ -20,8 +20,8 @@ function processDirectory(dir) {
   const items = readdirSync(dir);
   // Process Files first
   items
-    .filter(item => item.endsWith(".js") || item.endsWith(".ts"))
-    .forEach(filename => {
+    .filter((item) => item.endsWith(".js") || item.endsWith(".ts"))
+    .forEach((filename) => {
       test(filename, () => {
         const filePath = join(dir, filename);
         let outputPath = filePath
@@ -61,7 +61,7 @@ function processDirectory(dir) {
             ],
             presets,
             sourceRoot: __dirname,
-            comments: false,
+            comments: filePath.includes("comments"),
             babelrc: false,
           }).code;
 
@@ -95,9 +95,9 @@ function processDirectory(dir) {
 
   // Recurse into directories
   items
-    .map(name => ({ name, path: join(dir, name) }))
-    .filter(item => statSync(item.path).isDirectory())
-    .forEach(item => {
+    .map((name) => ({ name, path: join(dir, name) }))
+    .filter((item) => statSync(item.path).isDirectory())
+    .forEach((item) => {
       describe(item.name, () => {
         processDirectory(item.path);
       });

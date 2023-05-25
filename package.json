@@ -23,6 +23,7 @@
     "lint": "lerna run lint",
     "lint:commit": "commitlint -e",
     "test": "lerna run test",
+    "test:update-snapshot": "lerna run test:update-snapshot",
     "release:version": "lerna version",
     "release:publish": "lerna publish from-git --yes --no-verify-access",
     "release:publish-manual": "lerna publish from-package --yes --no-verify-access"
