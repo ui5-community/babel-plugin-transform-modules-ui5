@@ -25,6 +25,14 @@ export function wrap(visitor, programNode, opts) {
 
   let { body } = programNode;
 
+  // find the copyright comment from the original program body
+  const copyright = body?.[0]?.leadingComments?.find((comment, idx, arr) => {
+    if (comment.value.startsWith("!")) {
+      arr.splice(idx, 1);
+      return true;
+    }
+  });
+
   let allExportHelperAdded = false;
   let extendAdded = false;
 
@@ -128,6 +136,11 @@ export function wrap(visitor, programNode, opts) {
     ...preDefine,
     generateDefine(body, imports, exportGlobal || opts.exportAllGlobal),
   ];
+
+  // if a copyright comment is present we append it to the new program node
+  if (copyright) {
+    programNode.body[0].leadingComments = [copyright];
+  }
 }
 
 function hasUseStrict(node) {

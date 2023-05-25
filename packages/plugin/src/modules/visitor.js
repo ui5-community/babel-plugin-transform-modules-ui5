@@ -128,7 +128,12 @@ export const ModuleTransformVisitor = {
     }
 
     // this is the very first import in noWrapBeforeImport mode and there are sibling nodes before this import
-    if (opts.noWrapBeforeImport && !this.firstImportMarked && path.inList && path.key > 0) {
+    if (
+      opts.noWrapBeforeImport &&
+      !this.firstImportMarked &&
+      path.inList &&
+      path.key > 0
+    ) {
       // mark the direct predecessor as the last one to exclude from wrapping
       path.getSibling(path.key - 1).node.lastBeforeWrapping = true;
       this.firstImportMarked = true;
