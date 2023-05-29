@@ -90,7 +90,7 @@ export function convertClassToUI5Extend(
         member.generator,
         member.async
       );
-      if (isConstructor) {
+      if (isConstructor && membersToAssign.length > 0) {
         // handling of parameter properties for constructors (TypeScript):
         //   -> assigning parameter properties as members to the instance
         const newMembers = membersToAssign.map((member) =>
@@ -100,15 +100,17 @@ export function convertClassToUI5Extend(
             value: member,
           })
         );
-        t.isSuperCallExpression;
-        const idx = member.body.body.findIndex(
-          (m) =>
-            t.isExpressionStatement(m) &&
-            t.isCallExpression(m.expression) &&
-            t.isSuper(m.expression.callee)
+        const superIndex = member.body.body.findIndex(
+          (node) =>
+            ast.isSuperCallExpression(node.expression) ||
+            ast.isSuperPrototypeCallOf(
+              node.expression,
+              superClassName,
+              "constructor"
+            )
         );
         member.body.body.splice(
-          idx === -1 ? member.body.body.length : idx + 1,
+          superIndex === -1 ? member.body.body.length : superIndex + 1,
           0,
           ...newMembers
         );
@@ -242,7 +244,15 @@ export function convertClassToUI5Extend(
       // Copy all except the super call from the constructor to the bindMethod (i.e. onInit)
       bindMethod.body.body.unshift(
         ...constructor.body.body.filter(
-          (node) => !ast.isSuperCallExpression(node.expression)
+          (node) =>
+            !(
+              ast.isSuperCallExpression(node.expression) ||
+              ast.isSuperPrototypeCallOf(
+                node.expression,
+                superClassName,
+                "constructor"
+              )
+            )
         )
       );
     }
