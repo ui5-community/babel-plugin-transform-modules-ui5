@@ -1206,6 +1206,19 @@ exports[`preset-env preset-env-usage.js 1`] = `
 });"
 `;
 
+exports[`typescript ts-class-param-props.ts 1`] = `
+"sap.ui.define(["sap/Class"], function (SAPClass) {
+  const MyClass = SAPClass.extend("MyClass", {
+    constructor: function _constructor(bar) {
+      SAPClass.prototype.constructor.call(this);
+      this.bar = bar;
+      this.foo = bar.getFoo();
+    }
+  });
+  return MyClass;
+});"
+`;
+
 exports[`typescript ts-class-props.ts 1`] = `
 "sap.ui.define(["sap/Class"], function (SAPClass) {
   const MyClass = SAPClass.extend("MyClass", {
