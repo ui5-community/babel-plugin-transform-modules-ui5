@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.1.5](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.1.4...v7.1.5) (2023-05-30)
+
+
+### Bug Fixes
+
+* enable support for TS param props ([#99](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/99)) ([2119b41](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/2119b41fbd5fb41ade7e096190cbebad03eecf7c)), closes [#65](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/65)
+* ensure copyright comments to be leading comments ([#97](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/97)) ([39ab194](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/39ab1946f08d3fc33609bd6b9ac6cda9a985c5d7))
+* sap.ui.define without callback function ([#98](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/98)) ([c1cd6a8](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/c1cd6a8f158de9b5036d9c768c48972d66ae20aa)), closes [#50](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/50)
+
+
+
+
+
 ## [7.1.4](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.1.3...v7.1.4) (2023-04-11)
 
 
