@@ -185,10 +185,14 @@ export function isSuperPrototypeCallOf(
 ) {
   return (
     t.isCallExpression(expression) &&
-    isCallExpressionCalling(
+    (isCallExpressionCalling(
       expression,
       `${superClassName}.prototype.${superMethodName}.apply`
-    )
+    ) ||
+      isCallExpressionCalling(
+        expression,
+        `${superClassName}.prototype.${superMethodName}.call`
+      ))
   );
 }
 
@@ -202,16 +206,20 @@ export function isSuperPrototypeCallOf(
 export function isCallExpressionCalling(expression, dotNotationString) {
   if (!t.isCallExpression(expression)) return false;
   const callee = expression.callee;
-  const parts = dotNotationString.split(".");
-  let node = callee;
-  for (const nextNamePart of parts.reverse()) {
-    if (!node) return false;
-    // property won't be there for an anonymous function
-    const nodeName = node.name || (node.property && node.property.name);
-    if (nodeName !== nextNamePart) return false;
-    node = node.object;
+  if (callee.type === "Identifier") {
+    return callee.name === dotNotationString;
+  } else {
+    const parts = dotNotationString.split(".");
+    let node = callee;
+    for (const nextNamePart of parts.reverse()) {
+      if (!node) return false;
+      // property won't be there for an anonymous function
+      const nodeName = node.name || (node.property && node.property.name);
+      if (nodeName !== nextNamePart) return false;
+      node = node.object;
+    }
+    return true;
   }
-  return true;
 }
 
 /**

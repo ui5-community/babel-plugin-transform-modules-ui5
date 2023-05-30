@@ -17,7 +17,8 @@ export const ClassTransformVisitor = {
    */
   Class: {
     enter(path, { file, opts = {} }) {
-      const { node, parent, parentPath } = path;
+      const { node } = path;
+      const { name: className } = node.id;
 
       if (opts.neverConvertClass) {
         return;
@@ -31,19 +32,37 @@ export const ClassTransformVisitor = {
       // and therefore may need to be transformed to .extend() syntax.
       const classInfo = classes.getClassInfo(path, node, path.parent, opts);
 
-      if (!shouldConvertClass(file, node, opts, classInfo)) {
+      // filter found decorators (to be not handled by other plugins)
+      node.decorators = node.decorators?.filter((d) => {
+        const exp = d.expression;
+        const name = exp.name || exp.callee?.name;
+        return classInfo[name] === undefined;
+      });
+
+      if (shouldConvertClass(file, node, opts, classInfo)) {
+        // Save super class name for converting super calls
+        this.superClassName = classInfo.superClassName;
+        // store the classinfo
+        this.classInfo = this.classInfo || {};
+        this.classInfo[className] = classInfo;
+      }
+    },
+    exit(path, { opts = {} }) {
+      const { node, parent, parentPath } = path;
+      const { name: className } = node.id;
+
+      // Only if classinfo has been found we process this file
+      const classInfo = this.classInfo?.[className];
+      if (!classInfo || !node.superClass) {
         return;
       }
 
-      // Save super class name for converting super calls
-      this.superClassName = classInfo.superClassName;
-
       // Find the Block scoped parent (Program or Function body) and search for assigned properties within that (eg. MyClass.X = "X").
-      const { name: className } = node.id;
       const blockParent = path.findParent((path) => path.isBlock()).node;
       const staticProps = ast.groupPropertiesByName(
         ast.getOtherPropertiesOfIdentifier(blockParent, className)
       );
+
       // TODO: flag metadata and renderer for removal if applicable
       const ui5ExtendClass = classes.convertClassToUI5Extend(
         path,
@@ -77,8 +96,7 @@ export const ClassTransformVisitor = {
         }
         parentPath.replaceWithMultiple(ui5ExtendClass);
       }
-    },
-    exit() {
+
       this.superClassName = null;
     },
   },

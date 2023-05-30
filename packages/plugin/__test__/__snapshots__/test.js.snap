@@ -641,6 +641,35 @@ sap.ui.define(["sap/m/Button"], function (Button) {
 });"
 `;
 
+exports[`decorators mixin.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller", "../lib/decorators", "../lib/RoutingSupport"], function (Controller, ___lib_decorators, __RoutingSupport) {
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  var _dec, _class;
+  const mixin = ___lib_decorators["mixin"];
+  const RoutingSupport = _interopRequireDefault(__RoutingSupport);
+  let AppController = (_dec = mixin(RoutingSupport), _dec(_class = class AppController extends Controller {}) || _class);
+  return AppController;
+});"
+`;
+
+exports[`decorators mixin_mixed.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller", "../lib/decorators", "../lib/RoutingSupport"], function (Controller, ___lib_decorators, __RoutingSupport) {
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const mixin = ___lib_decorators["mixin"];
+  const RoutingSupport = _interopRequireDefault(__RoutingSupport);
+  const AppController = Controller.extend("example.controller.AppController", {});
+  return AppController;
+});"
+`;
+
+exports[`empty empty_js.js 1`] = `""`;
+
+exports[`empty empty_ts.ts 1`] = `""`;
+
 exports[`examples Animal.js 1`] = `
 "sap.ui.define(["sap/ui/base/ManagedObject"], function (ManagedObject) {
   const Animal = ManagedObject.extend("examples.Animal", {
@@ -1269,6 +1298,24 @@ exports[`preset-env preset-env-class.js 1`] = `
 });"
 `;
 
+exports[`preset-env preset-env-property-mutators.js 1`] = `
+"sap.ui.define(["sap/class", "core-js/modules/es6.object.define-properties.js"], function (SAPClass, __core_js_modules_es6objectdefine_propertiesjs) {
+  var MyClass = SAPClass.extend("my.MyClass", Object.defineProperties({}, {
+    thing: {
+      get: function get() {
+        return this._thing;
+      },
+      set: function set(value) {
+        this._thing = value;
+      },
+      configurable: true,
+      enumerable: true
+    }
+  }));
+  return MyClass;
+});"
+`;
+
 exports[`preset-env preset-env-usage.js 1`] = `
 "sap.ui.define(["sap/SAPClass", "core-js/modules/es6.object.to-string.js"], function (SAPClass, __core_js_modules_es6objectto_stringjs) {
   import "core-js/modules/es6.promise.js";
@@ -1291,9 +1338,11 @@ exports[`preset-env preset-env-usage.js 1`] = `
 exports[`typescript ts-class-param-props.ts 1`] = `
 "sap.ui.define(["sap/Class"], function (SAPClass) {
   const MyClass = SAPClass.extend("MyClass", {
-    constructor: function _constructor(bar) {
+    constructor: function _constructor(bar, x, y) {
       SAPClass.prototype.constructor.call(this);
       this.bar = bar;
+      this.x = x;
+      this.y = y;
       this.foo = bar.getFoo();
     }
   });
@@ -1376,12 +1425,12 @@ exports[`typescript ts-export-default-typed-arrow-fn-with-named.1.ts 1`] = `
 exports[`typescript ts-export-interface.ts 1`] = `
 "sap.ui.define([], function () {
   const MY_CONSTANT = "constant";
-  var MyEnum;
-  (function (MyEnum) {
+  var MyEnum = function (MyEnum) {
     MyEnum[MyEnum["A"] = 0] = "A";
     MyEnum[MyEnum["B"] = 1] = "B";
     MyEnum[MyEnum["C"] = 2] = "C";
-  })(MyEnum || (MyEnum = {}));
+    return MyEnum;
+  }(MyEnum || {});
   ;
   var __exports = {
     __esModule: true
