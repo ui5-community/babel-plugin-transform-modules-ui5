@@ -69,13 +69,50 @@ export function convertClassToUI5Extend(
     const memberName = member.key.name;
 
     if (t.isClassMethod(member)) {
+      const isConstructor = member.kind === "constructor";
+      const membersToAssign = [];
+      const params = isConstructor
+        ? member.params?.map((param) => {
+            // handling of parameter properties for constructors (TypeScript):
+            // https://www.typescriptlang.org/docs/handbook/2/classes.html#parameter-properties
+            //   -> extracting the real parameters and store the members to assign
+            if (param.type === "TSParameterProperty") {
+              membersToAssign.push(param.parameter);
+              return param.parameter;
+            }
+            return param;
+          })
+        : member.params;
       const func = t.functionExpression(
         member.key,
-        member.params,
+        params,
         member.body,
         member.generator,
         member.async
       );
+      if (isConstructor) {
+        // handling of parameter properties for constructors (TypeScript):
+        //   -> assigning parameter properties as members to the instance
+        const newMembers = membersToAssign.map((member) =>
+          buildMemberAssignmentStatement(t.thisExpression(), {
+            key: member,
+            computed: false,
+            value: member,
+          })
+        );
+        t.isSuperCallExpression;
+        const idx = member.body.body.findIndex(
+          (m) =>
+            t.isExpressionStatement(m) &&
+            t.isCallExpression(m.expression) &&
+            t.isSuper(m.expression.callee)
+        );
+        member.body.body.splice(
+          idx === -1 ? member.body.body.length : idx + 1,
+          0,
+          ...newMembers
+        );
+      }
       if (member.static) {
         staticMembers.push(
           buildMemberAssignmentStatement(classNameIdentifier, {
