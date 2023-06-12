@@ -18,9 +18,9 @@ export const ClassTransformVisitor = {
   Class: {
     enter(path, { file, opts = {} }) {
       const { node } = path;
-      const { name: className } = node.id;
+      const className = node?.id?.name;
 
-      if (opts.neverConvertClass) {
+      if (!className || opts.neverConvertClass) {
         return;
       }
       if (!doesClassExtendFromImport(node, [...this.importNames])) {
@@ -43,13 +43,15 @@ export const ClassTransformVisitor = {
         // Save super class name for converting super calls
         this.superClassName = classInfo.superClassName;
         // store the classinfo
-        this.classInfo = this.classInfo || {};
-        this.classInfo[className] = classInfo;
+        if (className) {
+          this.classInfo = this.classInfo || {};
+          this.classInfo[className] = classInfo;
+        }
       }
     },
     exit(path, { opts = {} }) {
       const { node, parent, parentPath } = path;
-      const { name: className } = node.id;
+      const className = node?.id?.name;
 
       // Only if classinfo has been found we process this file
       const classInfo = this.classInfo?.[className];
