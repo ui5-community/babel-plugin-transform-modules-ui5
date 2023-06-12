@@ -1335,6 +1335,19 @@ exports[`preset-env preset-env-usage.js 1`] = `
 });"
 `;
 
+exports[`typescript ts-class-anonymous.ts 1`] = `
+"sap.ui.define(["sap/Class"], function (SAPClass) {
+  const MyClass = SAPClass.extend("MyClass", {
+    createAnonymousClass: function _createAnonymousClass() {
+      return new class {
+        getClipboardContentType() {}
+      }();
+    }
+  });
+  return MyClass;
+});"
+`;
+
 exports[`typescript ts-class-param-props.ts 1`] = `
 "sap.ui.define(["sap/Class"], function (SAPClass) {
   const MyClass = SAPClass.extend("MyClass", {
