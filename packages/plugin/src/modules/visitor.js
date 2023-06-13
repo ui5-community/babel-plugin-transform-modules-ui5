@@ -1,4 +1,4 @@
-import { types as t } from "@babel/core";
+import { types as t, template } from "@babel/core";
 import * as th from "../utils/templates";
 import * as ast from "../utils/ast";
 
@@ -8,6 +8,16 @@ const tempModuleName = (name) => `__${name}`;
 const cleanImportSource = (src) =>
   src.replace(/(\/)|(-)|(@)/g, "_").replace(/\./g, "");
 const hasGlobalExportFlag = (node) => hasJsdocGlobalExportFlag(node);
+const addModuleImport = (imports, name) => {
+  const existingImport = imports.find((imp) => imp.src === name);
+  if (!existingImport) {
+    imports.unshift({
+      src: name,
+      name: name,
+      tmpName: name,
+    });
+  }
+};
 
 export const ModuleTransformVisitor = {
   /*!
@@ -286,6 +296,28 @@ export const ModuleTransformVisitor = {
         ...node,
         callee: t.identifier("__ui5_require_async"),
       });
+    }
+  },
+
+  MemberExpression(path) {
+    const { node } = path;
+    if (node?.object?.type === "MetaProperty") {
+      // replace all "import.meta.url" with "module.url"
+      if (node?.property?.name === "url") {
+        path.replaceWith({
+          ...node,
+          ...template`module.url`(),
+        });
+        addModuleImport(this.imports, "module");
+      }
+      // replace all "import.meta.resolve(...)" with "require.toUrl(...)"
+      else if (node?.property?.name === "resolve") {
+        path.replaceWith({
+          ...node,
+          ...template`require.toUrl`(),
+        });
+        addModuleImport(this.imports, "require");
+      }
     }
   },
 };

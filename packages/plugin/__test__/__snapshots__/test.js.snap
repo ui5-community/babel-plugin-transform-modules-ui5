@@ -566,6 +566,20 @@ exports[`classes class-fix-with-existing-define.js 1`] = `
 });"
 `;
 
+exports[`classes class-import-meta.js 1`] = `
+"sap.ui.define(["require", "module", "sap/SAPClass"], function (require, module, SAPClass) {
+  const MyClass = SAPClass.extend("test.fixtures.classes.MyClass", {
+    myUrl: function _myUrl() {
+      return module.url;
+    },
+    resolveUrl: function _resolveUrl(url) {
+      return require.toUrl(url);
+    }
+  });
+  return MyClass;
+});"
+`;
+
 exports[`classic sap-ui-define.ts 1`] = `"sap.ui.define("", ["foo/bar/MyResource"]);"`;
 
 exports[`comments copyright.js 1`] = `
