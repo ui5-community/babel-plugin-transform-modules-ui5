@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.2.1](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.2.0...v7.2.1) (2023-06-13)
+
+
+### Bug Fixes
+
+* add support for import.meta.url|resolve ([#106](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/106)) ([afb1e6d](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/afb1e6daa0fcc9896fd184ac9d66990d0a29214a)), closes [#103](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/103)
+* support for anonymous classes ([#105](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/105)) ([64773d1](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/64773d180bf65e544806b9f04b7334cd76831b3d)), closes [#104](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/104)
+
+
+
+
+
 # [7.2.0](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.1.5...v7.2.0) (2023-05-30)
 
 
