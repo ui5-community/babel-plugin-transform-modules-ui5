@@ -25,13 +25,26 @@ export function wrap(visitor, programNode, opts) {
 
   let { body } = programNode;
 
-  // find the copyright comment from the original program body
-  const copyright = body?.[0]?.leadingComments?.find((comment, idx, arr) => {
+  // find the copyright comment from the original program body and remove it there
+  // since it need to be put around the new program body (which is sap.ui.define)
+  let copyright = body?.[0]?.leadingComments?.find((comment, idx, arr) => {
     if (comment.value.startsWith("!")) {
       arr.splice(idx, 1);
       return true;
     }
   });
+
+  // in case of TypeScript transpiling taking place upfront, the copyright comment
+  // is associcated with the program and not the program body, so we need to find it
+  // and move it to the new program body (which is sap.ui.define)
+  if (!copyright) {
+    copyright = visitor.comments?.find((comment, idx, arr) => {
+      if (comment.value.startsWith("!")) {
+        arr.splice(idx, 1);
+        return true;
+      }
+    });
+  }
 
   let allExportHelperAdded = false;
   let extendAdded = false;

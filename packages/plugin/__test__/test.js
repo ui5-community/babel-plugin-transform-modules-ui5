@@ -74,7 +74,8 @@ function processDirectory(dir) {
             plugins,
             presets,
             sourceRoot: __dirname,
-            comments: filePath.includes("comments"),
+            comments:
+              filePath.includes("comments") || filename.includes("copyright"),
             babelrc: false,
           }).code;
 
