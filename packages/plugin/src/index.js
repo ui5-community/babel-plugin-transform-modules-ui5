@@ -37,7 +37,7 @@ module.exports = () => {
 
         // Properties for Module Transform
         this.programNode = path.node;
-        this.comments = path.parent.comments;
+        this.parent = path.parent;
         this.defaultExport = null;
         this.defaultExportNode = null;
         this.exportGlobal = false;
