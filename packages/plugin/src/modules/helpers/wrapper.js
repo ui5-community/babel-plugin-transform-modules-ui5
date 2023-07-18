@@ -38,7 +38,7 @@ export function wrap(visitor, programNode, opts) {
   // is associcated with the program and not the program body, so we need to find it
   // and move it to the new program body (which is sap.ui.define)
   if (!copyright) {
-    copyright = visitor.comments?.find((comment, idx, arr) => {
+    copyright = visitor.parent?.comments?.find((comment, idx, arr) => {
       if (comment.value.startsWith("!")) {
         arr.splice(idx, 1);
         return true;
@@ -151,8 +151,9 @@ export function wrap(visitor, programNode, opts) {
   ];
 
   // if a copyright comment is present we append it to the new program node
-  if (copyright) {
-    programNode.body[0].leadingComments = [copyright];
+  if (copyright && visitor.parent) {
+    visitor.parent.leadingComments = visitor.parent.leadingComments || [];
+    visitor.parent.leadingComments.unshift(copyright);
   }
 }
 
