@@ -582,6 +582,13 @@ exports[`classes class-import-meta.js 1`] = `
 
 exports[`classic sap-ui-define.ts 1`] = `"sap.ui.define("", ["foo/bar/MyResource"]);"`;
 
+exports[`classic sap-ui-define-copyright.ts 1`] = `
+"/*!
+ * \${copyright}
+ */
+sap.ui.define("", ["foo/bar/MyResource"]);"
+`;
+
 exports[`comments copyright.js 1`] = `
 "/*!
  * \${copyright}
@@ -1362,8 +1369,50 @@ exports[`typescript ts-class-anonymous.ts 1`] = `
 });"
 `;
 
+exports[`typescript ts-class-anonymous-copyright.ts 1`] = `
+"/*!
+ * \${copyright}
+ */
+sap.ui.define(["sap/Class"], function (SAPClass) {
+  /**
+   * @name MyClass
+   */
+  const MyClass = SAPClass.extend("MyClass", {
+    createAnonymousClass: function _createAnonymousClass() {
+      return new class {
+        getClipboardContentType() {
+          /* ... */
+        }
+      }();
+    }
+  });
+  return MyClass;
+});"
+`;
+
 exports[`typescript ts-class-param-props.ts 1`] = `
 "sap.ui.define(["sap/Class"], function (SAPClass) {
+  const MyClass = SAPClass.extend("MyClass", {
+    constructor: function _constructor(bar, x, y) {
+      SAPClass.prototype.constructor.call(this);
+      this.bar = bar;
+      this.x = x;
+      this.y = y;
+      this.foo = bar.getFoo();
+    }
+  });
+  return MyClass;
+});"
+`;
+
+exports[`typescript ts-class-param-props-copyright.ts 1`] = `
+"/*!
+ * \${copyright}
+ */
+sap.ui.define(["sap/Class"], function (SAPClass) {
+  /**
+   * @name MyClass
+   */
   const MyClass = SAPClass.extend("MyClass", {
     constructor: function _constructor(bar, x, y) {
       SAPClass.prototype.constructor.call(this);
