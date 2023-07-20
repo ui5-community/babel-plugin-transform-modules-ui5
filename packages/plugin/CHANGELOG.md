@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.2.4](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.2.3...v7.2.4) (2023-07-20)
+
+
+### Bug Fixes
+
+* ensure template to be ES5 compliant ([#111](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/111)) ([16819bc](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/16819bc91ce1942e0968a0f7efaa4e7cf767b665))
+
+
+
+
+
 ## [7.2.3](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.2.2...v7.2.3) (2023-07-18)
 
 
