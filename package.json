@@ -2,15 +2,15 @@
   "name": "babel-ui5",
   "private": true,
   "devDependencies": {
-    "@babel/eslint-parser": "^7.21.8",
-    "@commitlint/cli": "^17.6.3",
-    "@commitlint/config-conventional": "^17.6.3",
+    "@babel/eslint-parser": "^7.22.9",
+    "@commitlint/cli": "^17.6.7",
+    "@commitlint/config-conventional": "^17.6.7",
     "cz-conventional-changelog": "^3.3.0",
-    "eslint": "^8.41.0",
+    "eslint": "^8.45.0",
     "eslint-config-prettier": "^8.8.0",
-    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-prettier": "^5.0.0",
     "husky": "^8.0.3",
-    "lerna": "^6.6.2"
+    "lerna": "^6"
   },
   "scripts": {
     "prepare": "npm run prepare:husky && npm run prepare:workspace",
