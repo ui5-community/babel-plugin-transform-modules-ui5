@@ -147,14 +147,14 @@ export const buildDefaultImportDeconstructor = template(`
 // TODO: inject __extends instead of Object.assign unless useBuiltIns in set
 export const buildDynamicImportHelper = template(`
   function __ui5_require_async(path) {
-    return new Promise((resolve, reject) => {
-      sap.ui.require([path], (module) => {
+    return new Promise(function(resolve, reject) {
+      sap.ui.require([path], function(module) {
         if (!(module && module.__esModule)) {
           module = module === null || !(typeof module === "object" && path.endsWith("/library")) ? { default: module } : module;
           Object.defineProperty(module, "__esModule", { value: true });
         }
         resolve(module);
-      }, (err) => {
+      }, function(err) {
         reject(err);
       });
     });
