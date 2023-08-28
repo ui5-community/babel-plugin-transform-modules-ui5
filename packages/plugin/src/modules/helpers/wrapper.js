@@ -92,7 +92,11 @@ export function wrap(visitor, programNode, opts) {
         reachedFirstImport = true;
       }
     }
-    if (preDefine.length && !hasUseStrict(programNode)) {
+    if (
+      !opts.neverUseStrict &&
+      preDefine.length &&
+      !hasUseStrict(programNode)
+    ) {
       programNode.directives = [
         t.directive(t.directiveLiteral("use strict")),
         ...(programNode.directives || []),
@@ -145,10 +149,23 @@ export function wrap(visitor, programNode, opts) {
     body.unshift(th.buildDefaultImportInterop());
   }
 
-  programNode.body = [
-    ...preDefine,
-    generateDefine(body, imports, exportGlobal || opts.exportAllGlobal),
-  ];
+  const define = generateDefine(
+    body,
+    imports,
+    exportGlobal || opts.exportAllGlobal,
+    hasUseStrict(programNode)
+  );
+
+  // add the "use strict" directive if not on program node
+  if (!opts.neverUseStrict && !hasUseStrict(programNode)) {
+    const defineFnBody = define.expression.arguments[1].body;
+    defineFnBody.directives = [
+      t.directive(t.directiveLiteral("use strict")),
+      ...(defineFnBody.directives || []),
+    ];
+  }
+
+  programNode.body = [...preDefine, define];
 
   // if a copyright comment is present we append it to the new program node
   if (copyright && visitor.parent) {
