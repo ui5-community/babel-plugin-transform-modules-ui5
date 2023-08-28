@@ -64,6 +64,10 @@ const Options = {
     "min-wrap": {
       noWrapBeforeImport: true,
     },
+    "never-use-strict": {
+      noWrapBeforeImport: true,
+      neverUseStrict: true,
+    },
     _private_: {
       noWrapBeforeImport: true,
       moveControllerPropsToOnInit: true,

@@ -118,17 +118,19 @@ Becomes:
 
 ```js
 sap.ui.define(['app/File'], function(__File) {
-    function _interopRequireDefault(obj) {
-        return (obj && obj.__esModule && (typeof obj.default !== "undefined")) ? obj.default : obj;
-    }
-    const Default = _interopRequireDefault(__File);
-    const Name1 = __File["Name1"];
-    const Name2 = __File["Name2"];
-    const File = __File;
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+      return (obj && obj.__esModule && (typeof obj.default !== "undefined")) ? obj.default : obj;
+  }
+  const Default = _interopRequireDefault(__File);
+  const Name1 = __File["Name1"];
+  const Name2 = __File["Name2"];
+  const File = __File;
 }
 ```
 
-Also refer to the `noImportInteropPrefixes` option below.
+Also refer to the `noImportInteropPrefixes` and `neverUseStrict` option below.
 
 #### Dynamic Import
 
@@ -327,6 +329,7 @@ Outputs:
 
 ```js
 "use strict";
+
 const X = 1;
 sap.ui.define(["./a"], A => {
   return {
@@ -335,6 +338,8 @@ sap.ui.define(["./a"], A => {
   };
 });
 ```
+
+Also refer to the `neverUseStrict` option below.
 
 ### Converting ES classes into Control.extend(..) syntax
 
@@ -581,8 +586,10 @@ const MyControl = SAPClass.extend('MyControl', {
     }
 });
 ```
+
 It additionally supports the usage of the new `overrides` class property required for a `ControllerExtension`.
 (For backward compatibility, you can use `overridesToOverride: true`)
+
 ```js
 class MyExtension extends ControllerExtension {
 
@@ -591,6 +598,7 @@ class MyExtension extends ControllerExtension {
   }
 }
 ```
+
 is converted to
 
 ```js
@@ -683,6 +691,7 @@ sap.ui.define(["sap/ui/core/Control"], function(Control) { /* ... */ });
 - `addControllerStaticPropsToExtend` (Default: false) Moves static props of a controller to the extends call. Useful for formatters.
 - `onlyMoveClassPropsUsingThis` (Default: false) Set to use old behavior where only instance class props referencing `this` would be moved to the constructor or onInit. New default is to always move instance props.
 - `overridesToOverride` (Default: false) Changes the name of the static overrides to override when being added to ControllerExtension.extend() allowing to use the new overrides keyword with older UI5 versions
+- `neverUseStrict` (Default: false) Disables the addition of the `"use strict";` directive to the program or `sap.ui.define` callback function.
 
 \* 'collapsing' named exports is a combination of simply ignoring them if their definition is the same as a property on the default export, and also assigning them to the default export.
 
