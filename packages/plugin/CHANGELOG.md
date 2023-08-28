@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.2.5](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.2.4...v7.2.5) (2023-08-28)
+
+
+### Bug Fixes
+
+* by default add "use strict" directive to sap.ui.define ([#115](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/115)) ([7d55cc6](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/7d55cc6126258b60728a00f4070ed19b8ffe9339)), closes [#113](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/113)
+
+
+
+
+
 ## [7.2.4](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.2.3...v7.2.4) (2023-07-20)
 
 
