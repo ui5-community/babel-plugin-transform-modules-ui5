@@ -338,17 +338,27 @@ function getFileBaseNamespace(path, pluginOpts) {
   }
 }
 
-const buildObjectProperty = (member) =>
-  t.objectProperty(member.key, member.value, member.computed);
+const buildObjectProperty = (member) => {
+  const newObjectProperty = t.objectProperty(
+    member.key,
+    member.value,
+    member.computed
+  );
+  newObjectProperty.leadingComments = member.leadingComments;
+  return newObjectProperty;
+};
 
-const buildMemberAssignmentStatement = (objectIdentifier, member) =>
-  t.expressionStatement(
+const buildMemberAssignmentStatement = (objectIdentifier, member) => {
+  const newMember = t.expressionStatement(
     t.assignmentExpression(
       "=",
       t.memberExpression(objectIdentifier, member.key, member.computed),
       member.value
     )
   );
+  newMember.leadingComments = member.leadingComments;
+  return newMember;
+};
 
 const buildThisMemberAssignmentStatement = buildMemberAssignmentStatement.bind(
   null,
