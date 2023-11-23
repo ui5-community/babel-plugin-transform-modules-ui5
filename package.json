@@ -3,19 +3,19 @@
   "private": true,
   "devDependencies": {
     "@babel/eslint-parser": "^7.23.3",
-    "@commitlint/cli": "^17.6.7",
-    "@commitlint/config-conventional": "^17.6.7",
+    "@commitlint/cli": "^18.4.3",
+    "@commitlint/config-conventional": "^18.4.3",
     "cz-conventional-changelog": "^3.3.0",
     "eslint": "^8.54.0",
-    "eslint-config-prettier": "^8.8.0",
+    "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.1",
     "husky": "^8.0.3",
-    "lerna": "^6"
+    "lerna": "^7"
   },
   "scripts": {
     "prepare": "npm run prepare:husky && npm run prepare:workspace",
     "prepare:husky": "node ./.husky/skip.js || husky install",
-    "prepare:workspace": "lerna bootstrap && lerna run clean && lerna run lint && lerna run build && lerna run test",
+    "prepare:workspace": "lerna run clean && lerna run lint && lerna run build && lerna run test",
     "hooks:pre-commit": "lerna run lint:staged && lerna run test",
     "hooks:pre-push": "npm run lint:commit",
     "clean": "lerna run clean",
@@ -27,5 +27,8 @@
     "release:version": "lerna version",
     "release:publish": "lerna publish from-git --yes --no-verify-access",
     "release:publish-manual": "lerna publish from-package --yes --no-verify-access"
-  }
+  },
+  "workspaces": [
+    "packages/*"
+  ]
 }
