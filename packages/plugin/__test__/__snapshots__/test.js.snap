@@ -757,6 +757,39 @@ sap.ui.define(["sap/m/Button"], function (Button) {
 });"
 `;
 
+exports[`comments preserve-for-class-members.js 1`] = `
+"sap.ui.define(["sap/SAPClass"], function (SAPClass) {
+  "use strict";
+
+  const Formatter = Formatter;
+  const mdata = {};
+
+  /**
+   * @name test.fixtures.classes.MyClass
+   */
+  const MyClass = SAPClass.extend("test.fixtures.classes.MyClass", {
+    constructor: function constructor() {
+      SAPClass.prototype.constructor.apply(this, arguments);
+      // some comment
+      this.myNumber = 1;
+    },
+    // this property is not moved into the constructor
+    overrides: {},
+    // this is MY method
+    myMethod: function _myMethod() {},
+    /**
+     * this is also my method
+     */
+    myOtherMethod: function _myOtherMethod() {}
+  });
+  /**
+   * block comment
+   */
+  MyClass.myOtherNumber = 42;
+  return MyClass;
+});"
+`;
+
 exports[`decorators mixin.js 1`] = `
 "sap.ui.define(["sap/ui/core/mvc/Controller", "../lib/decorators", "../lib/RoutingSupport"], function (Controller, ___lib_decorators, __RoutingSupport) {
   "use strict";

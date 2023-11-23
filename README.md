@@ -378,7 +378,7 @@ If the default file-based namespace does not work for you (perhaps the app name 
 
 ##### JSDoc
 
-The simplest way to override the names is to use JSDoc. This approach will also work well with classes output from TypeScript if you configure TypeScript to generate ES6 or higher, and don't enable removeComments.
+The simplest way to override the names is to use JSDoc. This approach will also work well with classes output from TypeScript if you configure TypeScript to generate ES6 or higher, and don't enable `removeComments``.
 
 You can set the `@name`/`@alias` directly or just the `@namespace` and have the name derived from the ES class name.
 
@@ -603,12 +603,11 @@ is converted to
 
 ```js
 const MyExtension = ControllerExtension.extend("MyExtension", {
-    overrides: {
-      onPageReady: function () {}
-    }
-  });
-  return MyExtension;
-});"
+  overrides: {
+    onPageReady: function () {}
+  }
+});
+return MyExtension;
 ```
 
 Since class properties are an early ES proposal, TypeScript's compiler (like babel's class properties transform) moves static properties outside the class definition, and moves instance properties inside the constructor (even if TypeScript is configured to output ESNext).
@@ -662,6 +661,8 @@ will be converted to:
 sap.ui.define(["sap/ui/core/Control"], function(Control) { /* ... */ });
 ```
 
+In general, comments are preserved, but for each class property/method whose position is changed, only the leading comment(s) are actively moved along with the member. Others may disappear.
+
 ## Options
 
 ### Imports
@@ -705,11 +706,11 @@ TODO: more options and better description.
 
 ## Example
 
-[openui5-master-detail-app-ts](https://github.com/r-murphy/openui5-masterdetail-app-ts), which is my fork of SAP's openui5-master-detail-app converted to TypeScript.
+[openui5-master-detail-app-ts](https://github.com/r-murphy/openui5-masterdetail-app-ts), which is a fork of SAP's openui5-master-detail-app converted to TypeScript.
 
 ## Building with Webpack
 
-Take a look at [ui5-loader](https://github.com/MagicCube/ui5-loader) (I have not tried this).
+Take a look at [ui5-loader](https://github.com/MagicCube/ui5-loader) (we have not tried this).
 
 ## Modularization / Preload
 
@@ -717,7 +718,7 @@ UI5 supports Modularization through a mechanism called `preload`, which can comp
 
 Some preload plugins:
 
-- Module/CLI: [openui5-preload](https://github.com/r-murphy/openui5-preload) (Mine)
+- Module/CLI: [openui5-preload](https://github.com/r-murphy/openui5-preload) (also created by Ryan Murphy)
 - Gulp: [gulp-ui5-lib](https://github.com/MagicCube/gulp-ui5-lib) (MagicCube)
 - Grunt: [grunt-openui5](https://github.com/SAP/grunt-openui5) (Official SAP)
 
