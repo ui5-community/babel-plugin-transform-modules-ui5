@@ -75,7 +75,7 @@ function processDirectory(dir) {
             presets,
             sourceRoot: __dirname,
             comments:
-              filePath.includes("comments") || filename.includes("copyright"),
+              filePath.includes("comments") || filename.includes("copyright") || filename.includes("controller-extension-usage"),
             babelrc: false,
           }).code;
 
