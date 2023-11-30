@@ -6,6 +6,9 @@ import * as classes from "./helpers/classes";
 const CONSTRUCTOR = "constructor";
 
 export const ClassTransformVisitor = {
+  ImportDeclaration(path) {
+    this.importDeclarationPaths.push(path);
+  },
   ImportDefaultSpecifier(path) {
     this.importNames.push(path.node.local.name);
   },
@@ -71,6 +74,7 @@ export const ClassTransformVisitor = {
         node,
         classInfo,
         staticProps,
+        this.importDeclarationPaths,
         opts
       );
 

@@ -8,6 +8,7 @@ import * as ast from "../../utils/ast";
 
 import { getJsDocClassInfo, getTags } from "./jsdoc";
 import { getDecoratorClassInfo } from "./decorators";
+import { getImportDeclaration } from "./imports";
 
 /**
  * Converts an ES6 class to a UI5 extend.
@@ -19,12 +20,14 @@ export function convertClassToUI5Extend(
   node,
   classInfo,
   extraStaticProps,
+  importDeclarationPaths,
   opts
 ) {
   if (!(t.isClassDeclaration(node) || t.isClassExpression(node))) {
     return node;
   }
 
+  const CONTROLLER_EXTENSION_TAG = "transformControllerExtension";
   const staticMembers = [];
 
   const classNameIdentifier = node.id;
@@ -65,7 +68,8 @@ export function convertClassToUI5Extend(
     }
   }
 
-  for (const member of node.body.body) {
+  for (const memberPath of path.get("body.body")) {
+    const member = memberPath.node;
     const memberName = member.key.name;
 
     if (t.isClassMethod(member)) {
@@ -153,7 +157,60 @@ export function convertClassToUI5Extend(
         }
       }
     } else if (t.isClassProperty(member)) {
-      if (!member.value) continue; // un-initialized static class prop (typescript)
+      // For class properties annotated to represent controller extensions, replace the pure declaration with an assignment (that's what the runtime expects)
+      // and keep them at the initialization object as properties (don't move into constructor).
+      if (
+        member.leadingComments?.some((comment) => {
+          return comment.value.includes("@" + CONTROLLER_EXTENSION_TAG);
+        }) ||
+        member.decorators?.some((decorator) => {
+          return decorator.expression?.name === CONTROLLER_EXTENSION_TAG;
+        })
+      ) {
+        const typeAnnotation = member.typeAnnotation?.typeAnnotation;
+        // double-check that it is a valid node for a controller extension
+        if (
+          t.isTSTypeReference(typeAnnotation) ||
+          t.isTSQualifiedName(typeAnnotation)
+        ) {
+          const typeName = getTypeName(typeAnnotation);
+
+          // 1. transform the property from being typed as instance and un-initialized to a property where the controller extension *class* is assigned as value
+          const valueIdentifier = t.identifier(typeName);
+          member.value = valueIdentifier;
+          member.typeAnnotation = null;
+          extendProps.unshift(buildObjectProperty(member)); // add it to the properties of the extend() config object
+
+          // 2. add a binding reference to the value, so in case the TS transpiler runs later it recognizes that the import is still needed
+          const typeNameFirstPart = typeName.split(".")[0]; // e.g. when "myExtension: someBundle.MyExtension"
+          if (memberPath.scope.hasBinding(typeNameFirstPart)) {
+            const binding = path.scope.getBinding(typeNameFirstPart);
+            binding.referencePaths.push(memberPath.get("value"));
+          }
+
+          // 3. restore the import in case it was run already and removed the import
+          const neededImportDeclaration = getImportDeclaration(
+            memberPath.hub.file.opts.filename,
+            typeName
+          );
+          if (
+            !importDeclarationPaths.some(
+              (path) => path.node === neededImportDeclaration
+            )
+          ) {
+            // TODO: import might be there but with the specifier removed; we can clone, but then other specifiers are duplicate
+            // if import is no longer there, re-add it
+            importDeclarationPaths[
+              importDeclarationPaths.length - 1
+            ].insertAfter(neededImportDeclaration);
+          }
+
+          // 4. prevent the member from also being added to the constructor (member does have a value now and initializer would be added below)
+          continue;
+        }
+      }
+
+      if (!member.value) continue; // remove all other un-initialized static class props (typescript)
 
       // Special handling for TypeScript limitation where metadata, renderer and overrides must be properties.
       if (["metadata", "renderer", "overrides"].includes(memberName)) {
@@ -337,6 +394,34 @@ function getFileBaseNamespace(path, pluginOpts) {
     return undefined;
   }
 }
+
+const getQualifiedName = (node) => {
+  let { left, right } = node;
+
+  // if left is TSQualifiedName, recursive call to get full namespace
+  if (t.isTSQualifiedName(left)) {
+    left = getQualifiedName(left);
+  } else {
+    // if left is an Identifier
+    left = left.name;
+  }
+
+  return `${left}.${right.name}`;
+};
+
+export const getTypeName = (typeAnnotation) => {
+  if (t.isTSTypeReference(typeAnnotation)) {
+    // for TSTypeReference, typeName can be an Identifier or a TSQualifiedName
+    return (
+      typeAnnotation.typeName.name || getQualifiedName(typeAnnotation.typeName)
+    );
+  }
+  if (t.isTSQualifiedName(typeAnnotation)) {
+    // for TSQualifiedName
+    return getQualifiedName(typeAnnotation);
+  }
+  return null;
+};
 
 const buildObjectProperty = (member) => {
   const newObjectProperty = t.objectProperty(

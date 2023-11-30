@@ -819,6 +819,20 @@ exports[`decorators mixin_mixed.js 1`] = `
 });"
 `;
 
+exports[`decorators ts-class-controller-extension-usage-decorator.ts 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller", "sap/fe/core/controllerextensions/Routing"], function (Controller, Routing) {
+  "use strict";
+
+  /**
+   * @namespace test.controller
+   */
+  const MyExtendedController = Controller.extend("test.controller.MyExtendedController", {
+    routing: Routing
+  });
+  return MyExtendedController;
+});"
+`;
+
 exports[`empty empty_js.js 1`] = `""`;
 
 exports[`empty empty_ts.ts 1`] = `""`;
@@ -1645,6 +1659,38 @@ sap.ui.define(["sap/Class"], function (SAPClass) {
     }
   });
   return MyClass;
+});"
+`;
+
+exports[`typescript ts-class-controller-extension-usage.ts 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller", "sap/fe/core/controllerextensions/Routing", "sap/fe/core/controllerextensions/OtherExtension", "sap/fe/core/controllerextensions/ThirdExtension", "sap/fe/core/controllerextensions/DoubleExportExtension", "sap/fe/core/controllerextensions/ManyExtensions"], function (Controller, Routing, sap_fe_core_controllerextensions_OtherExtension, ThirdExtension, sap_fe_core_controllerextensions_DoubleExportExtension, extensionCollection) {
+  "use strict";
+
+  const OtherExtension = sap_fe_core_controllerextensions_OtherExtension["OtherExtension"];
+  const SomethingElse = sap_fe_core_controllerextensions_DoubleExportExtension["SomethingElse"];
+  const AlmostRemovedExtension = sap_fe_core_controllerextensions_DoubleExportExtension["AlmostRemovedExtension"];
+  /**
+   * @namespace test.controller
+   */
+  const MyExtendedController = Controller.extend("test.controller.MyExtendedController", {
+    // @transformControllerExtension
+    fifth: extensionCollection.group.OneOfManyExtensions,
+    // @transformControllerExtension
+    fourth: AlmostRemovedExtension,
+    // @transformControllerExtension
+    third: ThirdExtension,
+    // @transformControllerExtension
+    other: OtherExtension,
+    /**
+     * @transformControllerExtension
+     */
+    routing: Routing,
+    constructor: function _constructor() {
+      Controller.prototype.constructor.call(this);
+      this.realPropertyExtension = SomethingElse.Something;
+    }
+  });
+  return MyExtendedController;
 });"
 `;
 
