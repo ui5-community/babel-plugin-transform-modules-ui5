@@ -471,7 +471,7 @@ class Controller extends SAPController {
 
 Instance props either get added to the constructor or to the `onInit` function (for controllers).
 
-Before version 7.x, they could also get added directly to the `SomeClass.extend(..)` config object, but not anymore now. So if you still want a prop in the extend object, it's best to use a static prop. However, there are some exception where it is known that UI5 expects certain properties in the extend object, like `renderer`, `metadata` and `overrides` and some configurable cases related to controller extensions (see below).
+Before version 7.x, they could also get added directly to the `SomeClass.extend(..)` config object, but not anymore now. So if you still want a prop in the extend object, it's best to use a static prop. However, there are some exception where it is known that UI5 expects certain properties in the extend object, like `renderer`, `metadata` and `overrides`<!-- and some configurable cases related to controller extensions (see below)-->.
 
 Refer to the next section to see the logic for determining if `constructor` or `onInit` is used as the init function for class properties.
 
@@ -613,7 +613,7 @@ const MyExtension = ControllerExtension.extend("MyExtension", {
 });
 return MyExtension;
 ```
-
+<!--
 When a controller implemented by you *uses* pre-defined controller extensions, in JavaScript the respective extension *class* needs to be assigned to the extend object; the UI5 runtime will instatiate the extension and this *instance* will then be available as `this.extensionName`.
 
 To support the same in TypeScript, while in the JavaScript code a controller *class* must be assigned in the extend object, the TypeScript compiler needs to see that the class property contains an extension *instance*. To support this, the plugin applies special logic which transforms the code accordingly. This logic is triggered with any comment containing the string `@transformControllerExtension` or the `@transformControllerExtension` decorator directly preceding the class property. And the class property must only be typed, but not assigned an instance. (The instance is created by the UI5 framework.)
@@ -643,7 +643,7 @@ const MyController = Controller.extend("MyController", {
 });
 return MyController;
 ```
-
+-->
 #### Static Properties
 
 Since class properties are an early ES proposal, TypeScript's compiler (like babel's class properties transform) moves static properties outside the class definition, and moves instance properties inside the constructor (even if TypeScript is configured to output ESNext).
