@@ -1875,6 +1875,31 @@ exports[`typescript ts-export-type.ts 1`] = `
 });"
 `;
 
+exports[`typescript ts-re-export.ts 1`] = `
+"sap.ui.define(["module", "./having-a-dash", "path/having-a-dash"], function (__module, ___having_a_dash, __path_having_a_dash) {
+  "use strict";
+
+  var __exports = {
+    __esModule: true
+  };
+  function extendExports(exports, obj) {
+    Object.keys(obj).forEach(function (key) {
+      if (key === "default" || key === "__esModule") return;
+      Object.defineProperty(exports, key, {
+        enumerable: true,
+        get: function get() {
+          return obj[key];
+        }
+      });
+    });
+  }
+  extendExports(__exports, __module);
+  extendExports(__exports, ___having_a_dash);
+  extendExports(__exports, __path_having_a_dash);
+  return __exports;
+});"
+`;
+
 exports[`typescript-preset-env ts-class-anonymous.ts 1`] = `
 "sap.ui.define(["sap/Class"], function (SAPClass) {
   "use strict";
