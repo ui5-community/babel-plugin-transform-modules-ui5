@@ -4,9 +4,9 @@ import * as ast from "../utils/ast";
 
 import { hasJsdocGlobalExportFlag } from "../classes/helpers/jsdoc";
 
-const tempModuleName = (name) => `__${name}`;
 const cleanImportSource = (src) =>
   src.replace(/(\/)|(-)|(@)/g, "_").replace(/\./g, "");
+const tempModuleName = (name) => `__${name}`;
 const hasGlobalExportFlag = (node) => hasJsdocGlobalExportFlag(node);
 const addModuleImport = (imports, name) => {
   const existingImport = imports.find((imp) => imp.src === name);
@@ -269,7 +269,7 @@ export const ModuleTransformVisitor = {
 
   ExportAllDeclaration(path) {
     const src = path.node.source.value;
-    const name = src.replace(/\//g, "_").replace(/\./g, "");
+    const name = cleanImportSource(src);
     const tmpName = tempModuleName(name);
 
     this.imports.push({ src, name, tmpName });
