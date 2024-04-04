@@ -21,7 +21,16 @@ export function wrap(visitor, programNode, opts) {
     injectDynamicImportHelper
   );
 
-  if (!needsWrap) return;
+  if (!needsWrap) {
+    // cleanup the program node if it's empty (just having empty imports)
+    programNode.body = programNode.body.filter((node) => {
+      if (t.isExportNamedDeclaration(node)) {
+        return node.declaration != null;
+      }
+      return true;
+    });
+    return;
+  }
 
   let { body } = programNode;
 
