@@ -50,7 +50,7 @@ export function buildNamedExport(obj) {
 
 export const buildAllExportHelper = template(`
   function extendExports(exports, obj) {
-    Object.keys(obj).forEach(function (key) {
+    obj && Object.keys(obj).forEach(function (key) {
       if (key === "default" || key === "__esModule") return;
       Object.defineProperty(exports, key, {
         enumerable: true,

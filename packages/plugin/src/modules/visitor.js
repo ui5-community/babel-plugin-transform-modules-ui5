@@ -1,9 +1,30 @@
+import { join, dirname } from "path";
+import { existsSync, statSync } from "fs";
+
 import { types as t, template } from "@babel/core";
 import * as th from "../utils/templates";
 import * as ast from "../utils/ast";
 
 import { hasJsdocGlobalExportFlag } from "../classes/helpers/jsdoc";
 
+const resolveSource = (src, filename) => {
+  src = src.replace(/\\/g, "/");
+  const dir = dirname(filename);
+  const absoluteSrc = join(dir, src);
+  if (existsSync(absoluteSrc) && statSync(absoluteSrc).isDirectory) {
+    if (
+      existsSync(join(absoluteSrc, "index.js")) ||
+      existsSync(join(absoluteSrc, "index.jsx")) ||
+      existsSync(join(absoluteSrc, "index.ts")) ||
+      existsSync(join(absoluteSrc, "index.tsx")) ||
+      existsSync(join(absoluteSrc, "index.mjs")) ||
+      existsSync(join(absoluteSrc, "index.cjs"))
+    ) {
+      src = `${src}/index`;
+    }
+  }
+  return src;
+};
 const cleanImportSource = (src) =>
   src.replace(/(\/)|(-)|(@)/g, "_").replace(/\./g, "");
 const tempModuleName = (name) => `__${name}`;
@@ -23,13 +44,13 @@ export const ModuleTransformVisitor = {
   /*!
    * Removes the ES6 import and adds the details to the import array in our state.
    */
-  ImportDeclaration(path, { opts = {}, ...state }) {
+  ImportDeclaration(path, { filename, opts = {}, ...state }) {
     const { node } = path;
 
     if (node.importKind === "type") return; // flow-type
 
     const { specifiers, source } = node;
-    const src = source.value.replace(/\\/g, "/");
+    const src = resolveSource(source.value, filename);
 
     // When 'libs' are used, only 'libs' will be converted to UI5 imports.
     const { libs = [".*"] } = opts;
@@ -168,14 +189,14 @@ export const ModuleTransformVisitor = {
    * The reason we don't export in place is to handle the situation
    * where a let or var can be defined, and the latest one should be exported.
    */
-  ExportNamedDeclaration(path) {
+  ExportNamedDeclaration(path, { filename }) {
     const { node } = path;
     const { specifiers, declaration, source } = node;
 
     let fromSource = "";
     if (source) {
       // e.g. export { one, two } from 'x'
-      const src = source.value;
+      const src = resolveSource(source.value, filename);
       const name = cleanImportSource(src);
       const tmpName = tempModuleName(name);
       this.imports.push({ src, name, tmpName });
@@ -267,8 +288,8 @@ export const ModuleTransformVisitor = {
     }
   },
 
-  ExportAllDeclaration(path) {
-    const src = path.node.source.value;
+  ExportAllDeclaration(path, { filename }) {
+    const src = resolveSource(path.node.source.value, filename);
     const name = cleanImportSource(src);
     const tmpName = tempModuleName(name);
 
