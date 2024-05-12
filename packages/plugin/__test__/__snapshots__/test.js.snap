@@ -1417,6 +1417,12 @@ exports[`imports import-multiple.js 1`] = `
 });"
 `;
 
+exports[`imports import-remove-fileext.js 1`] = `
+"sap.ui.define(["array-flatten/dist/index"], function (__array_flatten_dist_indexjs) {
+  "use strict";
+});"
+`;
+
 exports[`libs libs-other-imports.js 1`] = `
 "import _ from "lodash";
 sap.ui.define(["sap/SAPClass"], function (SAPClass) {
