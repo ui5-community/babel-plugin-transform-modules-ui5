@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.3.1](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.3.0...v7.3.1) (2024-05-12)
+
+
+### Bug Fixes
+
+* remove file extensions from imports to avoid redundant extensions ([#125](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/125)) ([e86d6f6](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/e86d6f675451b6eaaaf63f9433200cd7406d0245))
+* support index modules for dependencies ([#123](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/123)) ([f510380](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/f510380f7c201d9aba3e735badea21546f81f03d))
+
+
+
+
+
 # [7.3.0](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.2.6...v7.3.0) (2024-01-18)
 
 
