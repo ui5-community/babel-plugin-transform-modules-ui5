@@ -29,15 +29,43 @@ const cleanImportSource = (src) =>
   src.replace(/(\/)|(-)|(@)/g, "_").replace(/\./g, "");
 const tempModuleName = (name) => `__${name}`;
 const hasGlobalExportFlag = (node) => hasJsdocGlobalExportFlag(node);
-const addModuleImport = (imports, name) => {
-  const existingImport = imports.find((imp) => imp.src === name);
+const addImport = (imports, imp, filename, first) => {
+  const existingImport = imports.find((i) => i.src === imp.src);
   if (!existingImport) {
-    imports.unshift({
+    // if a module ends with the file extension ".js" and it can be resolved to
+    // a local file having also the file extension ".js" and not ".js.js" then
+    // we need to slice the file extension to avoid redundant file extension
+    // (the require/define of UI5 always adds the file extension ".js" to the module name)
+    if (imp.src.indexOf(".js") != -1) {
+      try {
+        const modulePath = require.resolve(imp.src);
+        if (modulePath.endsWith(imp.src.split("/").pop())) {
+          console.log(
+            `\x1b[33mHint:\x1b[0m Removed file extension for dependency "\x1b[34m${imp.src}\x1b[0m" found in \x1b[90m${filename}\x1b[0m`
+          );
+          imp.src = imp.src.slice(0, -3);
+        }
+      } catch (ex) {
+        // ignore the error, do not slice file extension as the module
+        // can't be resolved with the given file extension, e.g.
+        // myns/module.js must be provided as myns/module
+        // myns/module.js.js must be provided as myns/module.js
+      }
+    }
+    imports[first ? "unshift" : "push"](imp);
+  }
+};
+const addModuleImport = (imports, name, filename) => {
+  addImport(
+    imports,
+    {
       src: name,
       name: name,
       tmpName: name,
-    });
-  }
+    },
+    filename,
+    true
+  );
 };
 
 export const ModuleTransformVisitor = {
@@ -180,7 +208,7 @@ export const ModuleTransformVisitor = {
     imp.deconstructors = imp.deconstructors.concat(deconstructors);
 
     if (!existingImport) {
-      this.imports.push(imp);
+      addImport(this.imports, imp, filename);
     }
   },
 
@@ -199,7 +227,7 @@ export const ModuleTransformVisitor = {
       const src = resolveSource(source.value, filename);
       const name = cleanImportSource(src);
       const tmpName = tempModuleName(name);
-      this.imports.push({ src, name, tmpName });
+      addImport(this.imports, { src, name, tmpName }, filename);
       fromSource = tmpName + ".";
     }
 
@@ -252,7 +280,7 @@ export const ModuleTransformVisitor = {
     }
   },
 
-  ExportDefaultDeclaration(path) {
+  ExportDefaultDeclaration(path, { filename }) {
     const { node } = path;
     let { declaration } = node;
     const declarationName = ast.getIdName(declaration);
@@ -293,7 +321,7 @@ export const ModuleTransformVisitor = {
     const name = cleanImportSource(src);
     const tmpName = tempModuleName(name);
 
-    this.imports.push({ src, name, tmpName });
+    addImport(this.imports, { src, name, tmpName }, filename);
 
     this.exportAllHelper = true;
 
@@ -320,7 +348,7 @@ export const ModuleTransformVisitor = {
     }
   },
 
-  MemberExpression(path) {
+  MemberExpression(path, { filename }) {
     const { node } = path;
     if (node?.object?.type === "MetaProperty") {
       // replace all "import.meta.url" with "module.url"
@@ -329,7 +357,7 @@ export const ModuleTransformVisitor = {
           ...node,
           ...template`module.url`(),
         });
-        addModuleImport(this.imports, "module");
+        addModuleImport(this.imports, "module", filename);
       }
       // replace all "import.meta.resolve(...)" with "require.toUrl(...)"
       else if (node?.property?.name === "resolve") {
@@ -337,7 +365,7 @@ export const ModuleTransformVisitor = {
           ...node,
           ...template`require.toUrl`(),
         });
-        addModuleImport(this.imports, "require");
+        addModuleImport(this.imports, "require", filename);
       }
     }
   },
