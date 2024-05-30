@@ -1587,12 +1587,9 @@ exports[`preset-env preset-env-property-mutators.js 1`] = `
 `;
 
 exports[`preset-env preset-env-usage.js 1`] = `
-"sap.ui.define(["sap/SAPClass", "core-js/modules/es6.object.to-string.js"], function (SAPClass, __core_js_modules_es6objectto_stringjs) {
+"sap.ui.define(["sap/SAPClass", "core-js/modules/es6.object.to-string.js", "core-js/modules/es6.promise.js", "core-js/modules/es6.string.includes.js", "core-js/modules/es7.array.includes.js"], function (SAPClass, __core_js_modules_es6objectto_stringjs, __core_js_modules_es6promisejs, __core_js_modules_es6stringincludesjs, __core_js_modules_es7arrayincludesjs) {
   "use strict";
 
-  import "core-js/modules/es6.promise.js";
-  import "core-js/modules/es6.string.includes.js";
-  import "core-js/modules/es7.array.includes.js";
   var AClass = SAPClass.extend("my.MyClass", {
     delay: function _delay() {
       return new Promise(function (resolve) {
@@ -1955,11 +1952,9 @@ exports[`typescript ts-re-export-type-only.ts 1`] = `
 `;
 
 exports[`typescript-preset-env ts-class-anonymous.ts 1`] = `
-"sap.ui.define(["sap/Class"], function (SAPClass) {
+"sap.ui.define(["sap/Class", "core-js/modules/es6.symbol.js", "core-js/modules/es6.number.constructor.js"], function (SAPClass, __core_js_modules_es6symboljs, __core_js_modules_es6numberconstructorjs) {
   "use strict";
 
-  import "core-js/modules/es6.symbol.js";
-  import "core-js/modules/es6.number.constructor.js";
   function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
   function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
   function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
@@ -1988,11 +1983,9 @@ exports[`typescript-preset-env ts-class-anonymous-copyright.ts 1`] = `
 "/*!
  * \${copyright}
  */
-sap.ui.define(["sap/Class"], function (SAPClass) {
+sap.ui.define(["sap/Class", "core-js/modules/es6.symbol.js", "core-js/modules/es6.number.constructor.js"], function (SAPClass, __core_js_modules_es6symboljs, __core_js_modules_es6numberconstructorjs) {
   "use strict";
 
-  import "core-js/modules/es6.symbol.js";
-  import "core-js/modules/es6.number.constructor.js";
   function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
   function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
   function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
@@ -2026,11 +2019,9 @@ exports[`typescript-preset-env ts-class-anonymous-copyright-file.ts 1`] = `
 "/*!
  * \${copyright}
  */
-sap.ui.define(["sap/Class"], function (SAPClass) {
+sap.ui.define(["sap/Class", "core-js/modules/es6.symbol.js", "core-js/modules/es6.number.constructor.js"], function (SAPClass, __core_js_modules_es6symboljs, __core_js_modules_es6numberconstructorjs) {
   "use strict";
 
-  import "core-js/modules/es6.symbol.js";
-  import "core-js/modules/es6.number.constructor.js";
   function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
   function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
   function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
