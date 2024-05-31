@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.4.0](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.3.1...v7.4.0) (2024-05-31)
+
+
+### Bug Fixes
+
+* remove empty export declaration added by TypeScript ([3cb14cf](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/3cb14cf7aefd400d0191d364f457c66452edc32a)), closes [/github.com/babel/babel/blob/main/packages/babel-plugin-transform-typescript/src/index.ts#L399](https://github.com//github.com/babel/babel/blob/main/packages/babel-plugin-transform-typescript/src/index.ts/issues/L399)
+
+
+### Features
+
+* imports added by other plugins are also included in the sap.ui.define calls ([#126](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/126)) ([895fe62](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/895fe624df66a6db1b9daa5cadce8a984ced5af4))
+
+
+
+
+
 ## [7.3.1](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.3.0...v7.3.1) (2024-05-12)
 
 
