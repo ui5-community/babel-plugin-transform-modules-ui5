@@ -55,6 +55,10 @@ module.exports = () => {
         path.traverse(ClassTransformVisitor, this);
       },
       exit(path, { opts }) {
+        path.traverse(
+          { ImportDeclaration: ModuleTransformVisitor.ImportDeclaration },
+          this
+        );
         wrap(this, path.node, opts);
       },
     },
