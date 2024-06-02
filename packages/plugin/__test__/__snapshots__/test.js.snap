@@ -1418,7 +1418,7 @@ exports[`imports import-multiple.js 1`] = `
 `;
 
 exports[`imports import-remove-fileext.js 1`] = `
-"sap.ui.define(["array-flatten/dist/index"], function (__array_flatten_dist_indexjs) {
+"sap.ui.define(["@dummy/chart.js", "chart.js", "array-flatten/dist/index"], function (___dummy_chartjs, __chartjs, __array_flatten_dist_indexjs) {
   "use strict";
 });"
 `;

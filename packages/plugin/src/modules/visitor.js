@@ -32,11 +32,11 @@ const hasGlobalExportFlag = (node) => hasJsdocGlobalExportFlag(node);
 const addImport = (imports, imp, filename, first) => {
   const existingImport = imports.find((i) => i.src === imp.src);
   if (!existingImport) {
-    // if a module ends with the file extension ".js" and it can be resolved to
+    // if a module path ends with the file extension ".js" and it can be resolved to
     // a local file having also the file extension ".js" and not ".js.js" then
     // we need to slice the file extension to avoid redundant file extension
     // (the require/define of UI5 always adds the file extension ".js" to the module name)
-    if (imp.src.indexOf(".js") != -1) {
+    if (/^(?:(@[^/]+)\/)?([^/]+)\/(.*)\.js$/.test(imp.src)) {
       try {
         const modulePath = require.resolve(imp.src);
         if (modulePath.endsWith(imp.src.split("/").pop())) {
