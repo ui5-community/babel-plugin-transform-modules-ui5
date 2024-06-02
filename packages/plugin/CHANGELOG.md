@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.4.1](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.4.0...v7.4.1) (2024-06-02)
+
+
+### Bug Fixes
+
+* ensure to remove file ext .js only from module path ([#127](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/127)) ([c6afb92](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/c6afb92c2f758a245086baa6f77d3274bb4e5466))
+
+
+
+
+
 # [7.4.0](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.3.1...v7.4.0) (2024-05-31)
 
 
