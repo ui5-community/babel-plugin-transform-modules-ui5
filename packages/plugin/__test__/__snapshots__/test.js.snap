@@ -1665,6 +1665,32 @@ sap.ui.define(["sap/Class"], function (SAPClass) {
 });"
 `;
 
+exports[`typescript ts-class-controller-extension-extended.ts 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller", "sap/ui/core/mvc/ControllerExtension", "sap/fe/core/controllerextensions/Routing"], function (Controller, ControllerExtension, Routing) {
+  "use strict";
+
+  const MyExtendedController = Controller.extend("test.controller.MyExtendedController", {
+    routing: Routing.override({})
+  });
+  return MyExtendedController;
+});"
+`;
+
+exports[`typescript ts-class-controller-extension-extended-explicit-type.ts 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller", "sap/ui/core/mvc/ControllerExtension", "sap/fe/core/controllerextensions/Routing"], function (Controller, ControllerExtension, Routing) {
+  "use strict";
+
+  const MyExtendedController = Controller.extend("test.controller.MyExtendedController", {
+    routing2: Routing.override({
+      x: 1,
+      fn: () => {}
+    }),
+    routing: Routing.override({})
+  });
+  return MyExtendedController;
+});"
+`;
+
 exports[`typescript ts-class-controller-extension-usage.ts 1`] = `
 "sap.ui.define(["sap/ui/core/mvc/Controller", "sap/fe/core/controllerextensions/Routing", "sap/fe/core/controllerextensions/OtherExtension", "sap/fe/core/controllerextensions/ThirdExtension", "sap/fe/core/controllerextensions/DoubleExportExtension", "sap/fe/core/controllerextensions/ManyExtensions"], function (Controller, Routing, sap_fe_core_controllerextensions_OtherExtension, ThirdExtension, sap_fe_core_controllerextensions_DoubleExportExtension, extensionCollection) {
   "use strict";
@@ -1692,6 +1718,26 @@ exports[`typescript ts-class-controller-extension-usage.ts 1`] = `
       Controller.prototype.constructor.call(this);
       this.realPropertyExtension = SomethingElse.Something;
     }
+  });
+  return MyExtendedController;
+});"
+`;
+
+exports[`typescript ts-class-controller-extension-usage-new.ts 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller", "sap/fe/core/controllerextensions/Routing", "sap/fe/core/controllerextensions/OtherExtension", "sap/fe/core/controllerextensions/ThirdExtension", "sap/fe/core/controllerextensions/DoubleExportExtension", "sap/fe/core/controllerextensions/ManyExtensions", "sap/ui/core/mvc/ControllerExtension"], function (Controller, Routing, sap_fe_core_controllerextensions_OtherExtension, ThirdExtension, sap_fe_core_controllerextensions_DoubleExportExtension, extensionCollection, ControllerExtension) {
+  "use strict";
+
+  const OtherExtension = sap_fe_core_controllerextensions_OtherExtension["OtherExtension"];
+  const AlmostRemovedExtension = sap_fe_core_controllerextensions_DoubleExportExtension["AlmostRemovedExtension"];
+  /**
+   * @namespace test.controller
+   */
+  const MyExtendedController = Controller.extend("test.controller.MyExtendedController", {
+    fifth: extensionCollection.group.OneOfManyExtensions,
+    fourth: AlmostRemovedExtension,
+    third: ThirdExtension,
+    other: OtherExtension,
+    routing: Routing
   });
   return MyExtendedController;
 });"

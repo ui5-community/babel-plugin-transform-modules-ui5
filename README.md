@@ -471,7 +471,7 @@ class Controller extends SAPController {
 
 Instance props either get added to the constructor or to the `onInit` function (for controllers).
 
-Before version 7.x, they could also get added directly to the `SomeClass.extend(..)` config object, but not anymore now. So if you still want a prop in the extend object, it's best to use a static prop. However, there are some exception where it is known that UI5 expects certain properties in the extend object, like `renderer`, `metadata` and `overrides`<!-- and some configurable cases related to controller extensions (see below)-->.
+Before version 7.x, they could also get added directly to the `SomeClass.extend(..)` config object, but not anymore now. So if you still want a prop in the extend object, it's best to use a static prop. However, there are some exception where it is known that UI5 expects certain properties in the extend object, like `renderer`, `metadata` and `overrides` and some configurable cases related to controller extensions (see below).
 
 Refer to the next section to see the logic for determining if `constructor` or `onInit` is used as the init function for class properties.
 
@@ -591,7 +591,7 @@ const MyControl = SAPClass.extend('MyControl', {
 
 #### Properties related to Controller Extensions
 
-The new (as of UI5 1.112) `overrides` class property required for implementing a `ControllerExtension` will also be added to the extend object.
+The `overrides` class property (added in UI5 version 1.112) required for implementing a `ControllerExtension` will also be added to the extend object.
 (For backward compatibility with older UI5 runtimes, you can use `overridesToOverride: true`.)
 
 ```js
@@ -613,29 +613,33 @@ const MyExtension = ControllerExtension.extend("MyExtension", {
 });
 return MyExtension;
 ```
-<!--
-When a controller implemented by you *uses* pre-defined controller extensions, in JavaScript the respective extension *class* needs to be assigned to the extend object; the UI5 runtime will instatiate the extension and this *instance* will then be available as `this.extensionName`.
 
-To support the same in TypeScript, while in the JavaScript code a controller *class* must be assigned in the extend object, the TypeScript compiler needs to see that the class property contains an extension *instance*. To support this, the plugin applies special logic which transforms the code accordingly. This logic is triggered with any comment containing the string `@transformControllerExtension` or the `@transformControllerExtension` decorator directly preceding the class property. And the class property must only be typed, but not assigned an instance. (The instance is created by the UI5 framework.)
+When a controller implemented by you *uses* pre-defined controller extensions, in JavaScript the respective extension *class* needs to be assigned to the extend object under an arbitrary property name like `someExtension`. Whenever the controller is instantiated, the UI5 runtime will instatiate the extension and this *instance* of the extension will then be available as `this.someExtension` inside your controller code.
+
+While in the JavaScript code a controller *class* must be assigned in the extend object, the TypeScript compiler needs to see that the class property contains an extension *instance*. To support this, a dummy method `ControllerExtension.use(...)` was introduced in the UI5 type definitions in version 1.127. This method takes an extension *class* as argument and claims to return an *instance*, so TypeScript will allow you to work with an instance in your controller. However, behind the scenes, the method call is simply removed by this transformer plugin, so the UI5 runtime gets the extension *class* it needs to create a new instance of the extension for each controller instance. For these assignments, the transformer plugin also takes care that they remain inside the extend object in the resulting JavaScript code.
 
 Example:
 ```js
+import Routing from "sap/fe/core/controllerextensions/Routing";
+import ControllerExtension from "sap/ui/core/mvc/ControllerExtension";
+
 class MyController extends Controller {
 
-  // @transformControllerExtension
-  routing: Routing; // use the "Routing" extension provided by "sap/fe/core/controllerextensions/Routing"
+  routing = ControllerExtension.use(Routing); // use the "Routing" extension provided by sap.fe
 
   someMethod() {
-    this.routing.doSomething();
+    this.routing.navigate(...);
   }
 }
 ```
 
-is converted to
+is converted to the proper `Controller.extend(...)` code as expected by the UI5 runtime:
 
 ```js
+// ...
+
 const MyController = Controller.extend("MyController", {
-  routing: Routing, // note that this is now the Routing CLASS being assigned as value within the extend object, while above it was the Routing TYPE defining the type of the member property
+  routing: Routing, // now the Routing *class* is assigned as value, while above it appeared to be an instance
   
   someMethod: function() {
     this.routing.doSomething();
@@ -643,7 +647,28 @@ const MyController = Controller.extend("MyController", {
 });
 return MyController;
 ```
--->
+
+> ***NOTE***: In order to have this transformer plugin recognize and remove the dummy method call, you MUST a) call it on the ControllerExtension base class (the module imported from `sap/ui/core/mvc/ControllerExtension`), not on a class deriving from it (even though it is inherited) and b) assign the extension right in the class definition as shown in the examples on this page (an "equal" sign is used, not a colon like in JavaScript, as this is now ES class syntax and not a configuration object).
+
+Some controller extensions allow implementing hooks or overriding their behavior. This can be done equally:
+
+```js
+import Routing from "sap/fe/core/controllerextensions/Routing";
+import ControllerExtension from "sap/ui/core/mvc/ControllerExtension";
+
+class MyController extends Controller {
+
+  routing = ControllerExtension.use(Routing.override({
+    someHook: function(...) { ... }
+  })); // adapt the "Routing" extension provided by sap.fe
+
+  someMethod() {
+    this.routing.navigate(...);
+  }
+}
+```
+
+
 #### Static Properties
 
 Since class properties are an early ES proposal, TypeScript's compiler (like babel's class properties transform) moves static properties outside the class definition, and moves instance properties inside the constructor (even if TypeScript is configured to output ESNext).
