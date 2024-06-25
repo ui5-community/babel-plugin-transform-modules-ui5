@@ -1,4 +1,4 @@
-import { join, dirname } from "path";
+import { join, dirname, resolve } from "path";
 import { existsSync, statSync } from "fs";
 
 import { types as t, template } from "@babel/core";
@@ -38,7 +38,23 @@ const addImport = (imports, imp, filename, first) => {
     // (the require/define of UI5 always adds the file extension ".js" to the module name)
     if (/^(?:(@[^/]+)\/)?([^/]+)\/(.*)\.js$/.test(imp.src)) {
       try {
-        const modulePath = require.resolve(imp.src);
+        let modulePath;
+        let absModuleSrc = imp.src;
+        // if the module has a relative path, resolve it to an absolute path
+        // and verify if the file exists, if not, try to resolve it as a module
+        if (/^\.\.?\//.test(absModuleSrc)) {
+          absModuleSrc = resolve(dirname(filename), absModuleSrc);
+          // handle the fallback of module names introduced with Node 20.0.0
+          [".js", ".jsx", ".ts", ".tsx"].some((ext) => {
+            if (existsSync(absModuleSrc.replace(/\.js$/, ext))) {
+              modulePath = imp.src;
+              return true;
+            }
+          });
+        } else {
+          modulePath = require.resolve(absModuleSrc);
+        }
+        // detect removal of file extension and log a hint
         if (modulePath.endsWith(imp.src.split("/").pop())) {
           console.log(
             `\x1b[33mHint:\x1b[0m Removed file extension for dependency "\x1b[34m${imp.src}\x1b[0m" found in \x1b[90m${filename}\x1b[0m`

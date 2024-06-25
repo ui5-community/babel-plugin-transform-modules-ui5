@@ -1418,7 +1418,7 @@ exports[`imports import-multiple.js 1`] = `
 `;
 
 exports[`imports import-remove-fileext.js 1`] = `
-"sap.ui.define(["@dummy/chart.js", "chart.js", "array-flatten/dist/index"], function (___dummy_chartjs, __chartjs, __array_flatten_dist_indexjs) {
+"sap.ui.define(["@dummy/chart.js", "chart.js", "array-flatten/dist/index", "./_private_/module_js", "./_private_/module_jsx", "./_private_/module_ts", "./_private_/module_tsx", "./_private_/unknown_module.js"], function (___dummy_chartjs, __chartjs, __array_flatten_dist_indexjs, ____private__module_jsjs, ____private__module_jsxjs, ____private__module_tsjs, ____private__module_tsxjs, ____private__unknown_modulejs) {
   "use strict";
 });"
 `;
