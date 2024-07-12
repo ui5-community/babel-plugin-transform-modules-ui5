@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.5.0](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.4.2...v7.5.0) (2024-07-12)
+
+
+### Features
+
+* support ControllerExtensions extended with .override(...) ([#128](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/128)) ([f744d9d](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/f744d9db3dd82020712b47a18ce55ed51a13fe89))
+
+
+
+
+
 ## [7.4.2](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.4.1...v7.4.2) (2024-06-25)
 
 

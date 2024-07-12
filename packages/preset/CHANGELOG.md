@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.5.0](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.4.2...v7.5.0) (2024-07-12)
+
+**Note:** Version bump only for package babel-preset-transform-ui5
+
+
+
+
+
 ## [7.4.2](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.4.1...v7.4.2) (2024-06-25)
 
 **Note:** Version bump only for package babel-preset-transform-ui5
