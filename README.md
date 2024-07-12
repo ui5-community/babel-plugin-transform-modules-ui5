@@ -595,6 +595,9 @@ The `overrides` class property (added in UI5 version 1.112) required for impleme
 (For backward compatibility with older UI5 runtimes, you can use `overridesToOverride: true`.)
 
 ```js
+/**
+ * @namespace my.sample
+ */
 class MyExtension extends ControllerExtension {
 
   static overrides = {
@@ -606,7 +609,7 @@ class MyExtension extends ControllerExtension {
 is converted to
 
 ```js
-const MyExtension = ControllerExtension.extend("MyExtension", {
+const MyExtension = ControllerExtension.extend("my.sample.MyExtension", {
   overrides: {
     onPageReady: function () {}
   }
@@ -623,6 +626,9 @@ Example:
 import Routing from "sap/fe/core/controllerextensions/Routing";
 import ControllerExtension from "sap/ui/core/mvc/ControllerExtension";
 
+/**
+ * @namespace my.sample
+ */
 class MyController extends Controller {
 
   routing = ControllerExtension.use(Routing); // use the "Routing" extension provided by sap.fe
@@ -638,7 +644,7 @@ is converted to the proper `Controller.extend(...)` code as expected by the UI5 
 ```js
 // ...
 
-const MyController = Controller.extend("MyController", {
+const MyController = Controller.extend("my.sample.MyController", {
   routing: Routing, // now the Routing *class* is assigned as value, while above it appeared to be an instance
   
   someMethod: function() {
@@ -648,7 +654,8 @@ const MyController = Controller.extend("MyController", {
 return MyController;
 ```
 
-> ***NOTE***: In order to have this transformer plugin recognize and remove the dummy method call, you MUST a) call it on the ControllerExtension base class (the module imported from `sap/ui/core/mvc/ControllerExtension`), not on a class deriving from it (even though it is inherited) and b) assign the extension right in the class definition as shown in the examples on this page (an "equal" sign is used, not a colon like in JavaScript, as this is now ES class syntax and not a configuration object).
+> ***NOTE***: In order to have this transformer plugin recognize and remove the dummy method call, you MUST a) call it on the ControllerExtension base class (the module imported from `sap/ui/core/mvc/ControllerExtension`), not on a class deriving from it (even though it is inherited) and b) assign the extension right in the class definition as shown in the examples on this page (an "equal" sign is used, not a colon like in JavaScript, as this is now ES class syntax and not a configuration object). Any variation may cause the call not to be recognized and removed and lead to a runtime error. Calling `ControllerExtension.use(...)` with more or less than one argument will not only cause a TypeScript error, but will also make this transformer throw an error.<br>
+The removal only takes place when the class definition overall is recognized and transformed by this transformer. So when the class still is an ES6 class in the output, first fix this, then check again whether the `ControllerExtension.use(...)` call has been removed.
 
 Some controller extensions allow implementing hooks or overriding their behavior. This can be done equally:
 
@@ -656,6 +663,9 @@ Some controller extensions allow implementing hooks or overriding their behavior
 import Routing from "sap/fe/core/controllerextensions/Routing";
 import ControllerExtension from "sap/ui/core/mvc/ControllerExtension";
 
+/**
+ * @namespace my.sample
+ */
 class MyController extends Controller {
 
   routing = ControllerExtension.use(Routing.override({
@@ -673,10 +683,10 @@ class MyController extends Controller {
 
 Since class properties are an early ES proposal, TypeScript's compiler (like babel's class properties transform) moves static properties outside the class definition, and moves instance properties inside the constructor (even if TypeScript is configured to output ESNext).
 
-To support this, the plugin will also search for static properties outside the class definition. It does not currently search in the constructor (but will in the future) so be sure to define renderer and metadata as static props if Typescript is used.
+To support this, the plugin will also search for static properties outside the class definition. It does not currently search in the constructor (but will in the future) so be sure to define renderer and metadata as static props if TypeScript is used.
 
 ```ts
-/** Typescript **/
+/** TypeScript **/
 class MyControl extends SAPClass {
     static renderer: any = MyControlRenderer;
     static metadata: any = {
@@ -684,7 +694,7 @@ class MyControl extends SAPClass {
     };
 }
 
-/** Typescript Output **/
+/** TypeScript Output **/
 class MyControl extends SAPClass {}
 MyControl.renderer = MyControlRenderer;
 MyControl.metadata = {
