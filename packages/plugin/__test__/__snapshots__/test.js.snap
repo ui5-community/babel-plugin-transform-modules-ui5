@@ -1680,23 +1680,22 @@ exports[`typescript ts-class-controller-extension-extended.ts 1`] = `
   return MyExtendedController;
 });"
 `;
-
 exports[`typescript ts-class-controller-extension-extended-error-1.ts 1`] = `
 "ControllerExtension.use() must be called with exactly one argument but has 0
-[0m [90m  7 |[39m [90m */[39m[0m
-[0m [90m  8 |[39m [36mexport[39m [36mdefault[39m [36mclass[39m [33mMyExtendedController[39m [36mextends[39m [33mController[39m {[0m
-[0m[31m[1m>[22m[39m[90m  9 |[39m 	routing [33m=[39m [33mControllerExtension[39m[33m.[39muse()[33m;[39m [90m// should throw an error[39m[0m
-[0m [90m    |[39m 	[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
-[0m [90m 10 |[39m }[0m"
+   7 |  */
+   8 | export default class MyExtendedController extends Controller {
+>  9 | 	routing = ControllerExtension.use(); // should throw an error
+     | 	^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  10 | }"
 `;
 
 exports[`typescript ts-class-controller-extension-extended-error-2.ts 1`] = `
 "ControllerExtension.use() must be called with exactly one argument but has 2
-[0m [90m  7 |[39m [90m */[39m[0m
-[0m [90m  8 |[39m [36mexport[39m [36mdefault[39m [36mclass[39m [33mMyExtendedController[39m [36mextends[39m [33mController[39m {[0m
-[0m[31m[1m>[22m[39m[90m  9 |[39m 	routing [33m=[39m [33mControllerExtension[39m[33m.[39muse([35m1[39m[33m,[39m [35m2[39m)[33m;[39m [90m// should throw an error[39m[0m
-[0m [90m    |[39m 	[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
-[0m [90m 10 |[39m }[0m"
+   7 |  */
+   8 | export default class MyExtendedController extends Controller {
+>  9 | 	routing = ControllerExtension.use(1, 2); // should throw an error
+     | 	^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  10 | }"
 `;
 
 exports[`typescript ts-class-controller-extension-extended-explicit-type.ts 1`] = `
