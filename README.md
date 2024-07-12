@@ -6,7 +6,7 @@ It allows you to develop SAPUI5 applications by using the latest [ECMAScript](ht
 
 ## Install
 
-This repo contains both a preset and a plugin. It is recommended to use the preset since the plugin will get split into two in the future.
+This repo contains both a preset and a plugin. It is recommended to use the preset since the plugin may get split into two in the future.
 
 ```sh
 npm install babel-preset-transform-ui5 --save-dev
@@ -66,8 +66,8 @@ The order of presets is important and `@babel/preset-env` should be higher in th
 
 There are 2 main features of the plugin, and you can use both or one without the other:
 
-1. Converting ES modules (import/export) into sap.ui.define or sap.ui.require.
-2. Converting ES classes into Control.extend(..) syntax.
+1. Converting ES modules (`import`/`export`) into `sap.ui.define(...)` or `sap.ui.require(...)`.
+2. Converting ES classes into `Control.extend(...)` syntax.
 
 **NOTE:** The class transform might be split into its own plugin in the future.
 
@@ -619,7 +619,17 @@ return MyExtension;
 
 When a controller implemented by you *uses* pre-defined controller extensions, in JavaScript the respective extension *class* needs to be assigned to the extend object under an arbitrary property name like `someExtension`. Whenever the controller is instantiated, the UI5 runtime will instatiate the extension and this *instance* of the extension will then be available as `this.someExtension` inside your controller code.
 
-While in the JavaScript code a controller *class* must be assigned in the extend object, the TypeScript compiler needs to see that the class property contains an extension *instance*. To support this, a dummy method `ControllerExtension.use(...)` was introduced in the UI5 type definitions in version 1.127. This method takes an extension *class* as argument and claims to return an *instance*, so TypeScript will allow you to work with an instance in your controller. However, behind the scenes, the method call is simply removed by this transformer plugin, so the UI5 runtime gets the extension *class* it needs to create a new instance of the extension for each controller instance. For these assignments, the transformer plugin also takes care that they remain inside the extend object in the resulting JavaScript code.
+While in the JavaScript code a controller *class* must be assigned in the extend object, the TypeScript compiler needs to see that the class property contains an extension *instance*. To support this, a dummy method `ControllerExtension.use(...)` was introduced in the UI5 type definitions in version 1.127. It is being downported to patches of older releases and should be available in the following (and higher) versions of OpenUI5, SAPUI5, `@openui5/types` and `@sapui5/types`:
+- 1.127.0
+- 1.126.1
+- 1.124.3
+- 1.120.18
+
+The other releases in between are no longer maintained and will not get a downport. Neither will older releases.
+
+For `@types/openui5`, versioning is different and downports are *tbd* with at least 1.120.4 being a likely target.
+
+This method takes an extension *class* as argument and claims to return an *instance*, so TypeScript will allow you to work with an instance in your controller. However, behind the scenes, the method call is simply removed by this transformer plugin, so the UI5 runtime gets the extension *class* it needs to create a new instance of the extension for each controller instance. For these assignments, the transformer plugin also takes care that they remain inside the extend object in the resulting JavaScript code.
 
 Example:
 ```js
@@ -795,7 +805,7 @@ Some preload plugins:
 
 ## Credits
 
-- Thanks to MagicCube for the upstream initial work.
+- Thanks to MagicCube for the upstream initial work and to [Ryan Murphy](https://github.com/r-murphy) for continuing development and handing over the project to the UI5 community.
 
 ## TODO
 
@@ -812,4 +822,4 @@ Issues also welcome for feature requests.
 
 ## License
 
-MIT © 2019 Ryan Murphy and contributors
+MIT © 2019-2024 Ryan Murphy, UI5 community and contributors
