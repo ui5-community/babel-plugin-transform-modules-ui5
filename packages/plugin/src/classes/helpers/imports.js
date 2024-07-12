@@ -11,6 +11,10 @@ export const saveImports = (file) => {
 
 // can be called from visitor to access previously present declarations
 export function getImportDeclaration(filename, typeName) {
+  if (!filename || !typeName) {
+    return null;
+  }
+
   const typeNameParts = typeName.split(".");
 
   // find the declaration importing the typeName among the collected import declarations in this file
