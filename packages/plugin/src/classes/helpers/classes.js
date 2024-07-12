@@ -190,7 +190,7 @@ export function convertClassToUI5Extend(
 
           // 3. restore the import in case it was run already and removed the import
           const neededImportDeclaration = getImportDeclaration(
-            memberPath.hub.file.opts.filename,
+            memberPath?.hub?.file?.opts?.filename,
             typeName
           );
           if (
@@ -231,14 +231,25 @@ export function convertClassToUI5Extend(
           callee.property.name === "use" // we are looking for "ControllerExtension.use(...)"
         ) {
           const importDeclaration = getImportDeclaration(
-            memberPath.hub.file.opts.filename,
-            callee.object.name // usually, but not necessarily always: "ControllerExtension"...
+            memberPath?.hub?.file?.opts?.filename,
+            callee?.object?.name // usually, but not necessarily always: "ControllerExtension"...
           );
           // ...hence we rather look at the imported module name to be sure
           if (
-            importDeclaration.source.value ===
+            importDeclaration?.source?.value ===
             "sap/ui/core/mvc/ControllerExtension"
           ) {
+            if (
+              !member.value.arguments ||
+              member.value.arguments.length !== 1
+            ) {
+              // exactly one argument must be there
+              throw memberPath.buildCodeFrameError(
+                `ControllerExtension.use() must be called with exactly one argument but has ${
+                  member.value.arguments ? member.value.arguments.length : 0
+                }`
+              );
+            }
             member.value = member.value.arguments[0];
             extendProps.unshift(buildObjectProperty(member)); // add it to the properties of the extend() config object
             continue; // prevent the member from also being added to the constructor
