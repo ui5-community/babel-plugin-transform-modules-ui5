@@ -1,4 +1,4 @@
-import { types as t } from "@babel/core";
+import { types as t, traverse } from "@babel/core";
 import * as eh from "./exports";
 import * as th from "../../utils/templates";
 import * as ast from "../../utils/ast";
@@ -158,23 +158,27 @@ export function wrap(visitor, programNode, opts) {
     body.unshift(th.buildDefaultImportInterop());
   }
 
-  const define = generateDefine(
+  // should we use sap.ui.require instead of sap.ui.define?
+  let useSapUiRequire = hasUseSapUiRequire(visitor.parent.comments, body, true);
+
+  // generate the sap.ui.define or sap.ui.require
+  const defineOrRequire = generateDefineOrRequire(
     body,
     imports,
     exportGlobal || opts.exportAllGlobal,
-    hasUseStrict(programNode)
+    useSapUiRequire
   );
 
   // add the "use strict" directive if not on program node
   if (!opts.neverUseStrict && !hasUseStrict(programNode)) {
-    const defineFnBody = define.expression.arguments[1].body;
-    defineFnBody.directives = [
+    const defineOrRequireFnBody = defineOrRequire.expression.arguments[1].body;
+    defineOrRequireFnBody.directives = [
       t.directive(t.directiveLiteral("use strict")),
-      ...(defineFnBody.directives || []),
+      ...(defineOrRequireFnBody.directives || []),
     ];
   }
 
-  programNode.body = [...preDefine, define];
+  programNode.body = [...preDefine, defineOrRequire];
 
   // if a copyright comment is present we append it to the new program node
   if (copyright && visitor.parent) {
@@ -189,13 +193,42 @@ function hasUseStrict(node) {
   );
 }
 
-function generateDefine(body, imports, exportGlobal) {
+function hasUseSapUiRequire(comments, body, remove) {
+  // detect the @sapUiRequire comment
+  return comments.some((comment) => {
+    let found = false;
+    // check for existing comment block
+    if (comment.type === "CommentBlock") {
+      found = comment.value.trim() === "@sapUiRequire";
+    }
+    // remove the comment (if it is somewhere in the body)
+    if (found && remove) {
+      body?.forEach((node) => {
+        traverse(node, {
+          enter(path) {
+            ["leadingComments", "trailingComments", "innerComments"].forEach(
+              (key) => {
+                path.node[key] = path.node[key]?.filter((c) => c !== comment);
+              }
+            );
+          },
+          noScope: true,
+        });
+      });
+    }
+    return found;
+  });
+}
+
+function generateDefineOrRequire(body, imports, exportGlobal, useRequire) {
   const defineOpts = {
     SOURCES: t.arrayExpression(imports.map((i) => t.stringLiteral(i.src))),
     PARAMS: imports.map((i) => t.identifier(i.tmpName)),
     BODY: body,
   };
-  return exportGlobal
-    ? th.buildDefineGlobal(defineOpts)
-    : th.buildDefine(defineOpts);
+  return useRequire
+    ? th.buildRequire(defineOpts)
+    : exportGlobal
+      ? th.buildDefineGlobal(defineOpts)
+      : th.buildDefine(defineOpts);
 }
