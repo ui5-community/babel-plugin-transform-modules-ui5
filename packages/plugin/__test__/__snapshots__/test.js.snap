@@ -1604,6 +1604,104 @@ exports[`preset-env preset-env-usage.js 1`] = `
 });"
 `;
 
+exports[`sap-ui-require othermodule-annotation.js 1`] = `
+"sap.ui.require(["sap/ui/core/Control"], function (Control) {
+  "use strict";
+
+  Control.extend("my.Control", {});
+});"
+`;
+
+exports[`sap-ui-require othermodule-annotation-end.js 1`] = `
+"sap.ui.require(["sap/ui/core/Control"], function (Control) {
+  "use strict";
+
+  Control.extend("my.Control", {});
+});"
+`;
+
+exports[`sap-ui-require othermodule-annotation-middle.js 1`] = `
+"sap.ui.require(["sap/ui/core/Control"], function (Control) {
+  "use strict";
+
+  Control.extend("my.Control", {});
+});"
+`;
+
+exports[`sap-ui-require othermodule-annotation-nested.js 1`] = `
+"sap.ui.require(["sap/ui/core/Control"], function (Control) {
+  "use strict";
+
+  Control.extend("my.Control", {
+    onInit: function () {}
+  });
+});"
+`;
+
+exports[`sap-ui-require othermodule-noannotation.js 1`] = `
+"sap.ui.define(["sap/ui/core/Control"], function (Control) {
+  "use strict";
+
+  Control.extend("my.Control", {});
+});"
+`;
+
+exports[`sap-ui-require testsuite-annotation.qunit.js 1`] = `
+"sap.ui.require([], function () {
+  "use strict";
+
+  function __ui5_require_async(path) {
+    return new Promise(function (resolve, reject) {
+      sap.ui.require([path], function (module) {
+        if (!(module && module.__esModule)) {
+          module = module === null || !(typeof module === "object" && path.endsWith("/library")) ? {
+            default: module
+          } : module;
+          Object.defineProperty(module, "__esModule", {
+            value: true
+          });
+        }
+        resolve(module);
+      }, function (err) {
+        reject(err);
+      });
+    });
+  }
+  QUnit.config.autostart = false;
+  void Promise.all([__ui5_require_async("unit/controller/App.qunit")]).then(() => {
+    QUnit.start();
+  });
+});"
+`;
+
+exports[`sap-ui-require testsuite-noannotation.qunit.js 1`] = `
+"sap.ui.define([], function () {
+  "use strict";
+
+  function __ui5_require_async(path) {
+    return new Promise(function (resolve, reject) {
+      sap.ui.require([path], function (module) {
+        if (!(module && module.__esModule)) {
+          module = module === null || !(typeof module === "object" && path.endsWith("/library")) ? {
+            default: module
+          } : module;
+          Object.defineProperty(module, "__esModule", {
+            value: true
+          });
+        }
+        resolve(module);
+      }, function (err) {
+        reject(err);
+      });
+    });
+  }
+  QUnit.config.autostart = false;
+  void Promise.all([__ui5_require_async("unit/controller/App.qunit")]).then(() => {
+    QUnit.start();
+  });
+});"
+`;
+
 exports[`typescript ts-class-anonymous.ts 1`] = `
 "sap.ui.define(["sap/Class"], function (SAPClass) {
   "use strict";
@@ -1680,6 +1778,7 @@ exports[`typescript ts-class-controller-extension-extended.ts 1`] = `
   return MyExtendedController;
 });"
 `;
+
 exports[`typescript ts-class-controller-extension-extended-error-1.ts 1`] = `
 "ControllerExtension.use() must be called with exactly one argument but has 0
    7 |  */

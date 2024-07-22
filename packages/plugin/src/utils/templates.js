@@ -8,6 +8,12 @@ export const buildAssign = template(`
   OBJECT.NAME = VALUE;
 `);
 
+export const buildRequire = template(`
+  sap.ui.require(SOURCES, function (PARAMS) {
+    BODY;
+  });
+`);
+
 export const buildDefine = template(`
   sap.ui.define(SOURCES, function (PARAMS) {
     BODY;

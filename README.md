@@ -90,7 +90,7 @@ A more detailed feature list includes:
 
 ### Converting ES modules (import/export) into sap.ui.define or sap.ui.require
 
-The plugin will wrap any code having import/export statements in an sap.ui.define. If there is no import/export, it won't be wrapped.
+The plugin will wrap any code having import/export statements in `sap.ui.define`. If there is no import/export, it won't be wrapped.
 
 #### Static Import
 
@@ -340,6 +340,40 @@ sap.ui.define(["./a"], A => {
 ```
 
 Also refer to the `neverUseStrict` option below.
+
+### Top-Level Scripts (e.g. QUnit Testsuites)
+
+By default, modules are converted to UI5 AMD-like modules using `sap.ui.define`. In some cases, it is necessary to include modules via script tags, such as for QUnit testsuites. Therefore, this Babel plugin supports converting modules into scripts using `sap.ui.require` instead of AMD-like modules using `sap.ui.define`. These modules can then be used as *top-level* scripts, which can be included via `<script>` tags in HTML pages. To mark a module as being converted into a `sap.ui.require` script, you need to add the comment `/* @sapUiRequire */` at the top of the file.
+
+Example:
+
+```js
+/* @sapUiRequire */
+
+// https://api.qunitjs.com/config/autostart/
+QUnit.config.autostart = false;
+
+// import all your QUnit tests here
+void Promise.all([import("unit/controller/App.qunit")]).then(() => {
+  QUnit.start();
+});
+```
+
+will be converted to:
+
+```js
+"sap.ui.require([], function () {
+  "use strict";
+
+  function __ui5_require_async(path) { /* ... */ }
+  QUnit.config.autostart = false;
+  void Promise.all([__ui5_require_async("unit/controller/App.qunit")]).then(() => {
+    QUnit.start();
+  });
+});
+```
+
+> :warning: Although `sap.ui.define` and `sap.ui.require` may appear similar from an API perspective, they have different behaviors. To understand these differences, please read the section titled "Using sap.ui.require instead of sap.ui.define on the top level" in the [Troubleshooting for Loading Modules](https://ui5.sap.com/#/topic/4363b3fe3561414ca1b030afc8cd30ce).
 
 ### Converting ES classes into Control.extend(..) syntax
 
