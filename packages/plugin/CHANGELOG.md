@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.6.0](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.5.0...v7.6.0) (2024-07-22)
+
+
+### Features
+
+* support sap.ui.require for [@sap](https://github.com/sap)UiRequire annotated modules ([#131](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/131)) ([23c4ac6](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/23c4ac67eef5a825692c528852ef62bbd621d13e))
+
+
+
+
+
 # [7.5.0](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.4.2...v7.5.0) (2024-07-12)
 
 
