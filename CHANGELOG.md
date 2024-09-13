@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.6.1](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.6.0...v7.6.1) (2024-09-13)
+
+
+### Bug Fixes
+
+* support wrapped controller extension assignments ([dfa51b6](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/dfa51b613259aeedb3f20987f5e5165ca35545d8))
+
+
+
+
+
 # [7.6.0](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.5.0...v7.6.0) (2024-07-22)
 
 
