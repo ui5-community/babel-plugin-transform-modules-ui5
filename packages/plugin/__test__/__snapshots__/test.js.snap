@@ -1875,6 +1875,25 @@ exports[`typescript ts-class-controller-extension-usage-new.ts 1`] = `
 });"
 `;
 
+exports[`typescript ts-class-controller-extension-wrapped.ts 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller", "sap/ui/core/mvc/ControllerExtension", "sap/fe/core/controllerextensions/Routing"], function (Controller, ControllerExtension, Routing) {
+  "use strict";
+
+  const cov_1uvvg22e7l = () => {
+    return {
+      "s": {}
+    };
+  };
+  const MyExtendedController = Controller.extend("test.controller.MyExtendedController", {
+    routing4: (cov_1uvvg22e7l().s[5]++, ControllerExtension.use(Routing.override({})), Routing),
+    routing3: (cov_1uvvg22e7l().s[5]++, cov_1uvvg22e7l().s[5]++, Routing.override({})),
+    routing2: (cov_1uvvg22e7l().s[5]++, Routing.override({})),
+    routing: (cov_1uvvg22e7l().s[5]++, Routing)
+  });
+  return MyExtendedController;
+});"
+`;
+
 exports[`typescript ts-class-param-props.ts 1`] = `
 "sap.ui.define(["sap/Class"], function (SAPClass) {
   "use strict";
