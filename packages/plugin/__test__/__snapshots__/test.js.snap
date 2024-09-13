@@ -1885,9 +1885,10 @@ exports[`typescript ts-class-controller-extension-wrapped.ts 1`] = `
     };
   };
   const MyExtendedController = Controller.extend("test.controller.MyExtendedController", {
-    routing3: Routing.override({}),
-    routing2: Routing.override({}),
-    routing: Routing
+    routing4: (cov_1uvvg22e7l().s[5]++, ControllerExtension.use(Routing.override({})), ControllerExtension.use(Routing)),
+    routing3: (cov_1uvvg22e7l().s[5]++, cov_1uvvg22e7l().s[5]++, ControllerExtension.use(Routing.override({}))),
+    routing2: (cov_1uvvg22e7l().s[5]++, ControllerExtension.use(Routing.override({}))),
+    routing: (cov_1uvvg22e7l().s[5]++, ControllerExtension.use(Routing))
   });
   return MyExtendedController;
 });"

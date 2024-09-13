@@ -14,4 +14,5 @@ export default class MyExtendedController extends Controller {
 	routing = (cov_1uvvg22e7l().s[5]++, ControllerExtension.use(Routing));
 	routing2 = (cov_1uvvg22e7l().s[5]++, ControllerExtension.use(Routing.override({})));
 	routing3 = (cov_1uvvg22e7l().s[5]++, cov_1uvvg22e7l().s[5]++, ControllerExtension.use(Routing.override({})));
+	routing4 = (cov_1uvvg22e7l().s[5]++, ControllerExtension.use(Routing.override({})), ControllerExtension.use(Routing));
 }

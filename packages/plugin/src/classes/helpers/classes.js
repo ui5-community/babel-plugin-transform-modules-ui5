@@ -222,60 +222,24 @@ export function convertClassToUI5Extend(
       // @transformControllerExtension marker, because it is not a type assignment. In the resulting code, the
       // "ControllerExtension.use(...)" part should be removed and the content of the brackets should be assigned
       // directly to the member property.
+      const rightSide = member.value;
+      if (isCallToControllerExtensionUse(rightSide, memberPath)) {
+        member.value = rightSide.arguments[0];
+        extendProps.unshift(buildObjectProperty(member)); // add it to the properties of the extend() config object
+        continue; // prevent the member from also being added to the constructor
+      }
+
+      // code instrumentation sometimes wraps ControllerExtension.use() calls like:
+      // this.routing = (cov_1uvvg22e7l().s[5]++, ControllerExtension.use(Routing.override({ … })));
       if (
-        t.isCallExpression(member.value) ||
-        t.isSequenceExpression(member.value)
+        t.isSequenceExpression(rightSide) &&
+        rightSide.expressions.some((expression) =>
+          isCallToControllerExtensionUse(expression, memberPath)
+        )
       ) {
-        let callExpression = member.value;
-
-        // code instrumentation sometimes wraps it like:
-        // this.routing = (cov_1uvvg22e7l().s[5]++, ControllerExtension.use(Routing.override({ … })));
-        if (t.isSequenceExpression(member.value)) {
-          // iterate through the expressions in the sequence
-          for (const expr of member.value.expressions) {
-            if (t.isCallExpression(expr)) {
-              callExpression = expr;
-              break;
-            }
-          }
-        }
-
-        if (t.isCallExpression(callExpression)) {
-          const callee = callExpression.callee;
-          if (
-            t.isMemberExpression(callee) &&
-            t.isIdentifier(callee.object) &&
-            t.isIdentifier(callee.property) &&
-            callee.property.name === "use" // we are looking for "ControllerExtension.use(...)"
-          ) {
-            const importDeclaration = getImportDeclaration(
-              memberPath?.hub?.file?.opts?.filename,
-              callee?.object?.name // usually, but not necessarily always: "ControllerExtension"...
-            );
-            // ...hence we rather look at the imported module name to be sure
-            if (
-              importDeclaration?.source?.value ===
-              "sap/ui/core/mvc/ControllerExtension"
-            ) {
-              if (
-                !callExpression.arguments ||
-                callExpression.arguments.length !== 1
-              ) {
-                // exactly one argument must be there
-                throw memberPath.buildCodeFrameError(
-                  `ControllerExtension.use() must be called with exactly one argument but has ${
-                    callExpression.arguments
-                      ? callExpression.arguments.length
-                      : 0
-                  }`
-                );
-              }
-              member.value = callExpression.arguments[0];
-              extendProps.unshift(buildObjectProperty(member)); // add it to the properties of the extend() config object
-              continue; // prevent the member from also being added to the constructor
-            }
-          }
-        }
+        member.value = rightSide;
+        extendProps.unshift(buildObjectProperty(member)); // add it to the properties of the extend() config object
+        continue; // prevent the member from also being added to the constructor
       }
 
       // Special handling for TypeScript limitation where metadata, renderer and overrides must be properties.
@@ -312,6 +276,47 @@ export function convertClassToUI5Extend(
         }
       }
     }
+  }
+
+  /**
+   * Checks whether the given thing is a CallExpression that calls ControllerExtension.use(...)
+   *
+   * @param {*} expression the thing to check - does not need to be a CallExpression
+   * @param {string} memberPath
+   * @returns true if the given expression is a CallExpression that calls ControllerExtension.use(...)
+   */
+  function isCallToControllerExtensionUse(expression, memberPath) {
+    if (!t.isCallExpression(expression)) {
+      return false;
+    }
+    const callee = expression.callee;
+    if (
+      t.isMemberExpression(callee) &&
+      t.isIdentifier(callee.object) &&
+      t.isIdentifier(callee.property) &&
+      callee.property.name === "use" // we are looking for "ControllerExtension.use(...)"
+    ) {
+      const importDeclaration = getImportDeclaration(
+        memberPath?.hub?.file?.opts?.filename,
+        callee?.object?.name // usually, but not necessarily always: "ControllerExtension"...
+      );
+      // ...hence we rather look at the imported module name to be sure
+      if (
+        importDeclaration?.source?.value ===
+        "sap/ui/core/mvc/ControllerExtension"
+      ) {
+        if (!expression.arguments || expression.arguments.length !== 1) {
+          // exactly one argument must be there
+          throw memberPath.buildCodeFrameError(
+            `ControllerExtension.use() must be called with exactly one argument but has ${
+              expression.arguments ? expression.arguments.length : 0
+            }`
+          );
+        }
+        return true;
+      }
+    }
+    return false; // return false if not a match
   }
 
   // Arrow function properties need to get moved to the constructor so that
