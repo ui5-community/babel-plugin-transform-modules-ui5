@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.6.2](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.6.1...v7.6.2) (2024-09-14)
+
+
+### Bug Fixes
+
+* move qunit config autostart out of require/define ([#134](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/134)) ([9643cd0](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/9643cd08314ce54816886df6c618fbb142c1b3e8))
+
+
+
+
+
 ## [7.6.1](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.6.0...v7.6.1) (2024-09-13)
 
 
