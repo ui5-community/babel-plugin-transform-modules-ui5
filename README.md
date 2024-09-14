@@ -362,11 +362,11 @@ void Promise.all([import("unit/controller/App.qunit")]).then(() => {
 will be converted to:
 
 ```js
-"sap.ui.require([], function () {
-  "use strict";
+"use strict";
 
+QUnit.config.autostart = false;
+"sap.ui.require([], function () {
   function __ui5_require_async(path) { /* ... */ }
-  QUnit.config.autostart = false;
   void Promise.all([__ui5_require_async("unit/controller/App.qunit")]).then(() => {
     QUnit.start();
   });
@@ -374,6 +374,8 @@ will be converted to:
 ```
 
 > :warning: Although `sap.ui.define` and `sap.ui.require` may appear similar from an API perspective, they have different behaviors. To understand these differences, please read the section titled "Using sap.ui.require instead of sap.ui.define on the top level" in the [Troubleshooting for Loading Modules](https://ui5.sap.com/#/topic/4363b3fe3561414ca1b030afc8cd30ce).
+
+> :bulb: The plugin detects the global usage of `QUnit.config.autostart` and moves this out of the `sap.ui.require` or `sap.ui.define` block automatically to ensure that the config is applied sychronously when loading the module. The move can be supressed with the configuration option `noWrapQUnitConfigAutostart`. If `QUnit` is imported, e.g. `import QUnit from "qunit";` then this is detected and the autostart config is not moved as it must apply locally.
 
 ### Converting ES classes into Control.extend(..) syntax
 
@@ -795,6 +797,7 @@ In general, comments are preserved, but for each class property/method whose pos
 ### Wrapping
 
 - `noWrapBeforeImport` (Default: false) Does not wrap code before the first import (if there are imports).
+- `noWrapQUnitConfigAutostart` (Default: true) Does not wrap the `QUnit.config.autostart` in the `sap.ui.require` or `sap.ui.define` block.
 
 ### Class Conversion
 
