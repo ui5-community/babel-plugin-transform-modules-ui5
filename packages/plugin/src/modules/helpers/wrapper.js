@@ -83,6 +83,7 @@ export function wrap(visitor, programNode, opts) {
     }
   }
 
+  let moveUseStrictIfNeeded = false;
   const preDefine = [...ignoredImports];
   // If the noWrapBeforeImport opt is set, split any code before the first import and afterwards into separate arrays.
   // This should be done before any interops or other vars are injected.
@@ -101,6 +102,25 @@ export function wrap(visitor, programNode, opts) {
         reachedFirstImport = true;
       }
     }
+    moveUseStrictIfNeeded = true;
+    body = newBody;
+  }
+
+  // If the QUnit.config.autostart is found it needs to be moved to the top of the program
+  if (
+    opts.noWrapQUnitConfigAutostart === undefined ||
+    opts.noWrapQUnitConfigAutostart
+  ) {
+    const qunitConfigAutostart = findQUnitConfigAutostart(body, imports);
+    if (qunitConfigAutostart) {
+      preDefine.push(qunitConfigAutostart);
+      body = body.filter((node) => node !== qunitConfigAutostart);
+      moveUseStrictIfNeeded = true;
+    }
+  }
+
+  // if code has been moved to preDefine, we need to move the "use strict" directive
+  if (moveUseStrictIfNeeded) {
     if (
       !opts.neverUseStrict &&
       preDefine.length &&
@@ -111,7 +131,6 @@ export function wrap(visitor, programNode, opts) {
         ...(programNode.directives || []),
       ];
     }
-    body = newBody;
   }
 
   if (injectDynamicImportHelper) {
@@ -217,6 +236,32 @@ function hasUseSapUiRequire(comments, body, remove) {
       });
     }
     return found;
+  });
+}
+
+function findQUnitConfigAutostart(body, imports) {
+  // if one imports QUnit, we don't need to move the QUnit.config.autostart
+  // as the configuration should apply to the local QUnit module
+  if (imports?.some((imp) => imp.name === "QUnit")) {
+    return undefined;
+  }
+  // find the QUnit.config.autostart
+  return body?.find((node) => {
+    return (
+      t.isExpressionStatement(node) &&
+      t.isAssignmentExpression(node.expression) &&
+      t.isMemberExpression(node.expression.left) &&
+      t.isMemberExpression(node.expression.left.object) &&
+      t.isIdentifier(node.expression.left.object.object) &&
+      node.expression.left.object.object.name === "QUnit" &&
+      t.isIdentifier(node.expression.left.object.property) &&
+      node.expression.left.object.property.name === "config" &&
+      t.isIdentifier(node.expression.left.property) &&
+      node.expression.left.property.name === "autostart" &&
+      node.expression.operator === "=" /* &&
+      t.isBooleanLiteral(node.expression.right) &&
+      node.expression.right.value === false */
+    );
   });
 }
 

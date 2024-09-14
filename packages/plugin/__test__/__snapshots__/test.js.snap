@@ -1647,9 +1647,10 @@ exports[`sap-ui-require othermodule-noannotation.js 1`] = `
 `;
 
 exports[`sap-ui-require testsuite-annotation.qunit.js 1`] = `
-"sap.ui.require([], function () {
-  "use strict";
+""use strict";
 
+QUnit.config.autostart = false;
+sap.ui.require([], function () {
   function __ui5_require_async(path) {
     return new Promise(function (resolve, reject) {
       sap.ui.require([path], function (module) {
@@ -1667,6 +1668,37 @@ exports[`sap-ui-require testsuite-annotation.qunit.js 1`] = `
       });
     });
   }
+  void Promise.all([__ui5_require_async("unit/controller/App.qunit")]).then(() => {
+    QUnit.start();
+  });
+});"
+`;
+
+exports[`sap-ui-require testsuite-annotation-with-qunit-import.qunit.js 1`] = `
+"sap.ui.require(["qunit"], function (__QUnit) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  function __ui5_require_async(path) {
+    return new Promise(function (resolve, reject) {
+      sap.ui.require([path], function (module) {
+        if (!(module && module.__esModule)) {
+          module = module === null || !(typeof module === "object" && path.endsWith("/library")) ? {
+            default: module
+          } : module;
+          Object.defineProperty(module, "__esModule", {
+            value: true
+          });
+        }
+        resolve(module);
+      }, function (err) {
+        reject(err);
+      });
+    });
+  }
+  const QUnit = _interopRequireDefault(__QUnit);
   QUnit.config.autostart = false;
   void Promise.all([__ui5_require_async("unit/controller/App.qunit")]).then(() => {
     QUnit.start();
@@ -1675,9 +1707,10 @@ exports[`sap-ui-require testsuite-annotation.qunit.js 1`] = `
 `;
 
 exports[`sap-ui-require testsuite-noannotation.qunit.js 1`] = `
-"sap.ui.define([], function () {
-  "use strict";
+""use strict";
 
+QUnit.config.autostart = false;
+sap.ui.define([], function () {
   function __ui5_require_async(path) {
     return new Promise(function (resolve, reject) {
       sap.ui.require([path], function (module) {
@@ -1695,7 +1728,6 @@ exports[`sap-ui-require testsuite-noannotation.qunit.js 1`] = `
       });
     });
   }
-  QUnit.config.autostart = false;
   void Promise.all([__ui5_require_async("unit/controller/App.qunit")]).then(() => {
     QUnit.start();
   });
