@@ -296,7 +296,7 @@ export const ModuleTransformVisitor = {
     }
   },
 
-  ExportDefaultDeclaration(path, { filename }) {
+  ExportDefaultDeclaration(path /*, { filename } */) {
     const { node } = path;
     let { declaration } = node;
     const declarationName = ast.getIdName(declaration);
