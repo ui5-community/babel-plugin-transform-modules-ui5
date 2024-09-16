@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.7.0](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.6.2...v7.7.0) (2024-09-16)
+
+
+### Features
+
+* update dependencies / add peer dependency to @babel/core ([#135](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/135)) ([d155e48](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/d155e48a4a3737ebcf4a7e77318391bbce783e70)), closes [#133](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/133)
+
+
+
+
+
 ## [7.6.2](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.6.1...v7.6.2) (2024-09-14)
 
 
