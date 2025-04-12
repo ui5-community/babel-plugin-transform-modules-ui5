@@ -803,7 +803,8 @@ In general, comments are preserved, but for each class property/method whose pos
 
 - `namespacePrefix` (Default: '') Prefix to apply to namespace derived from directory.
 - `autoConvertAllExtendClasses` (Default false). Converts all classes by default, provided they extend from an imported class. Version 6 default behaviour.
-- `autoConvertControllerClass` (Default true). Converts the classes in a `.controller.js` file by default, if it extends from an imported class. Use `@nonui5` if there are multiple classes in a controller file which extend from an import.
+- `autoConvertControllerClass` (Default true). Converts the classes in a `.controller.js` (or .ts) file by default, if it extends from an imported class. 
+  Use `@nonui5` if there are multiple classes in a controller file which extend from an import.
 - `neverConvertClass` (Default: false) Never convert classes to SAPClass.extend() syntax.
 - `moveControllerPropsToOnInit` (Default: false) Moves class props in a controller to the onInit method instead of constructor.
 - `moveControllerConstructorToOnInit` (Default: false) Moves existing constructor code in a controller to the onInit method. Enabling will auto-enable `moveControllerPropsToOnInit`.
