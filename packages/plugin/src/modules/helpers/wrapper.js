@@ -92,6 +92,11 @@ export function wrap(visitor, programNode, opts) {
     const fullBody = body;
     const newBody = [];
 
+    // If there is no lastBeforeWrapping, the first import is not marked
+    if (!fullBody.find((item) => item.lastBeforeWrapping)) {
+      reachedFirstImport = true;
+    }
+
     for (const item of fullBody) {
       if (reachedFirstImport) {
         newBody.push(item);
