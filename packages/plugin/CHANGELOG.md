@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.7.1](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.7.0...v7.7.1) (2025-05-13)
+
+
+### Bug Fixes
+
+* autoConvertControllerClass to consider controller.ts file as well (not just .js) ([#140](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/140)) ([788705d](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/788705dde44091cfecb47e9f51a5bd294b39af4b)), closes [#139](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/139)
+* noWrapBeforeImport must wrap first import if no code is before ([#141](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/141)) ([d80c070](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/d80c070e181b03546d381d8ee2fb0ddfc09d4e5a))
+
+
+
+
+
 # [7.7.0](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.6.2...v7.7.0) (2024-09-16)
 
 
