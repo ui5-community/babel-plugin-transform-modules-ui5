@@ -1480,6 +1480,28 @@ sap.ui.define(["./foo"], function (__Foo) {
 });"
 `;
 
+exports[`min-wrap min-wrap-test.js 1`] = `
+"sap.ui.define(["../../model/someFile", "../schema/otherFile"], function (____model_someFile, ___schema_otherFile) {
+  "use strict";
+
+  const getElementPath = ____model_someFile["getElementPath"];
+  const createSchema = ___schema_otherFile["createSchema"];
+  getElementPath(createSchema(), "elementSchema");
+});"
+`;
+
+exports[`min-wrap min-wrap-test-wrap.js 1`] = `
+""use strict";
+
+const x = 1;
+sap.ui.define(["../../model/someFile", "../schema/otherFile"], function (____model_someFile, ___schema_otherFile) {
+  const getElementPath = ____model_someFile["getElementPath"];
+  const createSchema = ___schema_otherFile["createSchema"];
+  getElementPath(createSchema(), "elementSchema");
+  console.log(x);
+});"
+`;
+
 exports[`min-wrap min-wrap-ui5.js 1`] = `
 ""use strict";
 
@@ -2108,6 +2130,46 @@ exports[`typescript ts-export-type.ts 1`] = `
 `;
 
 exports[`typescript ts-export-type-only.ts 1`] = `""`;
+
+exports[`typescript ts-export-type-reexport.ts 1`] = `
+"sap.ui.define(["./ts-export-type-reexport-enum"], function (___ts_export_type_reexport_enum) {
+  "use strict";
+
+  var __exports = {
+    __esModule: true
+  };
+  function extendExports(exports, obj) {
+    obj && Object.keys(obj).forEach(function (key) {
+      if (key === "default" || key === "__esModule") return;
+      Object.defineProperty(exports, key, {
+        enumerable: true,
+        get: function get() {
+          return obj[key];
+        }
+      });
+    });
+  }
+  extendExports(__exports, ___ts_export_type_reexport_enum);
+  return __exports;
+});"
+`;
+
+exports[`typescript ts-export-type-reexport-enum.ts 1`] = `
+"sap.ui.define([], function () {
+  "use strict";
+
+  var FemRendererModel = function (FemRendererModel) {
+    FemRendererModel["AppModel"] = "AppModel";
+    FemRendererModel["RouteModel"] = "RouteModel";
+    return FemRendererModel;
+  }(FemRendererModel || {});
+  var __exports = {
+    __esModule: true
+  };
+  __exports.FemRendererModel = FemRendererModel;
+  return __exports;
+});"
+`;
 
 exports[`typescript ts-index.ts 1`] = `
 "sap.ui.define(["./_private_/index"], function (____private__index) {
