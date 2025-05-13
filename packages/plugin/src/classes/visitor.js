@@ -229,8 +229,9 @@ function shouldConvertClass(file, node, opts, classInfo) {
   ) {
     return true;
   }
+  // Convert controller classes
   if (
-    /.*[.]controller[.]js$/.test(file.opts.filename) &&
+    /.*[.]controller[.](js|ts)$/.test(file.opts.filename) &&
     opts.autoConvertControllerClass !== false
   ) {
     return true;
