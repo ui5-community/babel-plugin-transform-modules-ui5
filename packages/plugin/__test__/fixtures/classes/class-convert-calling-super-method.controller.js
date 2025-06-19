@@ -9,7 +9,7 @@ export default class MyController extends Controller {
     }
 
     method(args) {
-        super.init.apply(this, args);
-        super.init?.apply(this, args);
+        super.init(...args);
+        super.init?.(...args);
     }
 }
