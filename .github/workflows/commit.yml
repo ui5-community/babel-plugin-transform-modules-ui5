@@ -23,7 +23,7 @@ jobs:
     if: "! contains(github.event.head_commit.message, '[skip ci]')"
     strategy:
       matrix:
-        node-version: [16.x, 18.x, 20.x]
+        node-version: [16.x, 18.x, 20.x, 22.x]
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
