@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.8.0](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.7.1...v7.8.0) (2025-09-11)
+
+
+### Features
+
+* support optional super call ([#143](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/143)) ([e09f561](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/e09f5617eb98b082e1630caa2d23801d3fc91650))
+
+
+
+
+
 ## [7.7.1](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.7.0...v7.7.1) (2025-05-13)
 
 
