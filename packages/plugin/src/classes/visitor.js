@@ -109,7 +109,7 @@ export const ClassTransformVisitor = {
   /*!
    * Visits function calls.
    */
-  CallExpression(path) {
+  "OptionalCallExpression|CallExpression"(path) {
     const { node } = path;
     const { callee } = node;
     // If the file already has sap.ui.define, get the names of variables it creates to use for the class logic.
@@ -122,9 +122,19 @@ export const ClassTransformVisitor = {
       if (t.isSuper(callee)) {
         replaceConstructorSuperCall(path, node, this.superClassName);
       } else if (t.isSuper(callee.object)) {
-        replaceObjectSuperCall(path, node, this.superClassName);
+        replaceObjectSuperCall(
+          path,
+          node,
+          this.superClassName,
+          path.isOptionalCallExpression()
+        );
       } else if (isSuperApply(callee)) {
-        replaceSuperApplyCall(path, node, this.superClassName);
+        replaceSuperApplyCall(
+          path,
+          node,
+          this.superClassName,
+          path.isOptionalCallExpression()
+        );
       }
     }
   },
@@ -175,24 +185,37 @@ function replaceConstructorSuperCall(path, node, superClassName) {
 /**
  * Replace super.method() call
  */
-function replaceObjectSuperCall(path, node, superClassName) {
-  replaceSuperNamedCall(path, node, superClassName, node.callee.property.name);
+function replaceObjectSuperCall(path, node, superClassName, optional = false) {
+  replaceSuperNamedCall(
+    path,
+    node,
+    superClassName,
+    node.callee.property.name,
+    optional
+  );
 }
 
 /**
  * Replace super.method.apply() call
  */
-function replaceSuperApplyCall(path, node, superClassName) {
+function replaceSuperApplyCall(path, node, superClassName, optional = false) {
   const methodName = node.callee.object.property.name;
+  const op = optional ? "?." : ".";
   path.replaceWith(
     t.callExpression(
-      t.identifier(`${superClassName}.prototype.${methodName}.apply`),
+      t.identifier(`${superClassName}.prototype.${methodName}${op}apply`),
       node.arguments
     )
   );
 }
 
-function replaceSuperNamedCall(path, node, superClassName, methodName) {
+function replaceSuperNamedCall(
+  path,
+  node,
+  superClassName,
+  methodName,
+  optional = false
+) {
   // .call() is better for simple args (or not args) but doesn't work right for spread args
   // if it gets further transpiled by babel spread args transform (will be .call.apply(...).
   const thisEx = t.thisExpression();
@@ -201,9 +224,10 @@ function replaceSuperNamedCall(path, node, superClassName, methodName) {
   const callArgs = hasSpread
     ? [thisEx, t.arrayExpression(node.arguments)]
     : [thisEx, ...node.arguments];
+  const op = optional ? "?." : ".";
   path.replaceWith(
     t.callExpression(
-      t.identifier(`${superClassName}.prototype.${methodName}.${caller}`),
+      t.identifier(`${superClassName}.prototype.${methodName}${op}${caller}`),
       callArgs
     )
   );
