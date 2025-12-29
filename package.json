@@ -2,18 +2,18 @@
   "name": "babel-ui5",
   "private": true,
   "devDependencies": {
-    "@commitlint/cli": "^19.8.1",
-    "@commitlint/config-conventional": "^19.8.1",
+    "@commitlint/cli": "^20.2.0",
+    "@commitlint/config-conventional": "^20.2.0",
     "cz-conventional-changelog": "^3.3.0",
     "eslint": "^8.54.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.1",
     "husky": "^9.1.7",
-    "lerna": "^8"
+    "lerna": "^9.0.3"
   },
   "scripts": {
     "prepare": "npm run prepare:husky && npm run prepare:workspace",
-    "prepare:husky": "node ./.husky/skip.js || husky install",
+    "prepare:husky": "node ./.husky/skip.js || husky",
     "prepare:workspace": "lerna run clean && lerna run lint && lerna run build && lerna run test",
     "hooks:pre-commit": "lerna run lint:staged && lerna run test",
     "hooks:pre-push": "npm run lint:commit",

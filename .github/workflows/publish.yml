@@ -1,0 +1,93 @@
+name: Publish
+
+on:
+  push:
+    tags:
+      - "v*" # Push events to matching v*, i.e. v1.0, v20.15.10
+  workflow_dispatch: # Manual trigger
+  #  inputs:
+  #    confirm:
+  #      description: "Type YES to confirm manual publishing"
+  #      required: true
+  #      default: "NO"
+
+env:
+  HUSKY_SKIP: true
+
+permissions:
+  contents: read
+  id-token: write # REQUIRED for npm trusted publishing
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      # ------------------------------------------------------------
+      # Project checkout
+      # ------------------------------------------------------------
+      - name: Checkout (no history)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # ------------------------------------------------------------
+      # Setup Node.js environment
+      # ------------------------------------------------------------
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+
+      # ------------------------------------------------------------
+      # Detect auth method
+      # ------------------------------------------------------------
+      - name: Detect token usage (optional safety)
+        run: |
+          if npm whoami 2>/dev/null; then
+            echo "::warning::Token-based auth active (expected only for first publish)"
+          else
+            echo "OIDC auth active"
+          fi
+
+      # ------------------------------------------------------------
+      # Install dependencies
+      # ------------------------------------------------------------
+      - name: Install dependencies
+        run: npm ci
+
+      # ------------------------------------------------------------
+      # Bootstrap auth (only needed for first publish per package)
+      # ------------------------------------------------------------
+      - name: Configure npm bootstrap token
+        if: ${{ env.NPM_BOOTSTRAP_TOKEN != '' }}
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${NPM_BOOTSTRAP_TOKEN}" >> ~/.npmrc
+        env:
+          NPM_BOOTSTRAP_TOKEN: ${{ secrets.NPM_BOOTSTRAP_TOKEN }}
+
+      # ------------------------------------------------------------
+      # Safety check for manual publishing
+      # ------------------------------------------------------------
+      #- name: Verify manual confirmation
+      #  if: github.event_name == 'workflow_dispatch'
+      #  run: |
+      #    if [ "${{ inputs.confirm }}" != "YES" ]; then
+      #      echo "::error::Manual publish not confirmed"
+      #      exit 1
+      #    fi
+
+      # ------------------------------------------------------------
+      # Publish
+      # ------------------------------------------------------------
+      - name: Publish packages
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_BOOTSTRAP_TOKEN }}
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "Manual trigger → running release:publish-manual"
+            npm run release:publish-manual
+          else
+            echo "Automatic trigger → running release:publish"
+            npm run release:publish
+          fi
