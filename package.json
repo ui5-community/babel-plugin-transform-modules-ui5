@@ -2,30 +2,33 @@
   "name": "babel-ui5",
   "private": true,
   "devDependencies": {
+    "@changesets/changelog-github": "^0.7.0",
+    "@changesets/cli": "^2.31.0",
     "@commitlint/cli": "^20.2.0",
     "@commitlint/config-conventional": "^20.2.0",
     "cz-conventional-changelog": "^3.3.0",
     "eslint": "^8.54.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.1",
-    "husky": "^9.1.7",
-    "lerna": "^9.0.3"
+    "husky": "^9.1.7"
   },
   "scripts": {
     "prepare": "npm run prepare:husky && npm run prepare:workspace",
     "prepare:husky": "node ./.husky/skip.js || husky",
-    "prepare:workspace": "lerna run clean && lerna run lint && lerna run build && lerna run test",
-    "hooks:pre-commit": "lerna run lint:staged && lerna run test",
+    "prepare:workspace": "npm run clean --workspaces --if-present && npm run lint --workspaces --if-present && npm run build --workspaces --if-present && npm run test --workspaces --if-present",
+    "hooks:pre-commit": "npm run lint:staged --workspaces --if-present && npm run test --workspaces --if-present",
     "hooks:pre-push": "npm run lint:commit",
-    "clean": "lerna run clean",
-    "build": "lerna run build",
-    "lint": "lerna run lint",
+    "clean": "npm run clean --workspaces --if-present",
+    "build": "npm run build --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
     "lint:commit": "commitlint -e",
-    "test": "lerna run test",
-    "test:update-snapshot": "lerna run test:update-snapshot",
-    "release:version": "lerna version",
-    "release:publish": "lerna publish from-git --yes --no-verify-access",
-    "release:publish-manual": "lerna publish from-package --yes --no-verify-access"
+    "test": "npm run test --workspaces --if-present",
+    "test:update-snapshot": "npm run test:update-snapshot --workspaces --if-present",
+    "changeset": "changeset",
+    "changeset:auto": "node ./scripts/auto-changeset.mjs",
+    "changeset:empty": "changeset --empty",
+    "version-packages": "changeset version && npm install --ignore-scripts",
+    "release-publish": "changeset publish"
   },
   "workspaces": [
     "packages/*"
