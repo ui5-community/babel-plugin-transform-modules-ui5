@@ -21,7 +21,6 @@
     "test": "FORCE_COLOR=0 jest __test__ --coverage=no",
     "test:watch": "npm test -- --watch",
     "test:update-snapshot": "FORCE_COLOR=0 jest --updateSnapshot",
-    "prepare": "npm test && npm run build",
     "format": "prettier --write 'src/**/*.js'"
   },
   "keywords": [
