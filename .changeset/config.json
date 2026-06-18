@@ -1,0 +1,14 @@
+{
+  "$schema": "https://unpkg.com/@changesets/config@3.0.0/schema.json",
+  "changelog": [
+    "@changesets/changelog-github",
+    { "repo": "ui5-community/babel-plugin-transform-modules-ui5" }
+  ],
+  "commit": false,
+  "fixed": [["babel-plugin-transform-modules-ui5", "babel-preset-transform-ui5"]],
+  "linked": [],
+  "access": "public",
+  "baseBranch": "main",
+  "updateInternalDependencies": "patch",
+  "ignore": []
+}
