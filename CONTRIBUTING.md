@@ -37,7 +37,7 @@ Other directories worth knowing about:
 
 ## Prerequisites
 
-- **Node.js ≥ 18** (CI runs against 18, 20, 22, and 24 — see
+- **Node.js ≥ 20.19** (CI runs against 20, 22, and 24 — see
   [.github/workflows/commit.yml](.github/workflows/commit.yml)).
 - **npm ≥ 9** (for workspaces support).
 - **git**.
@@ -207,7 +207,7 @@ Push your branch and open a PR against `main`. CI will run:
 
 - commitlint on every commit message in the PR;
 - ESLint;
-- Jest on Node 18, 20, 22, and 24;
+- Jest on Node 20, 22, and 24;
 - a check that pending changesets are present (when applicable).
 
 In the PR description, please include:
