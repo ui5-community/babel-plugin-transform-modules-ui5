@@ -42,6 +42,27 @@ Other directories worth knowing about:
 - **npm ≥ 9** (for workspaces support).
 - **git**.
 
+### Node.js support policy
+
+The minimum supported Node.js version is declared in each package's
+`engines.node` field and enforced by CI. The policy for changing it is:
+
+- We aim to support every Node.js LTS line that is still in **Active LTS**
+  or **Maintenance**. See <https://nodejs.org/en/about/previous-releases>
+  for the current schedule.
+- We do **not** raise the minimum Node.js version in a patch or minor
+  release. Raising the floor is a breaking change for consumers' build
+  pipelines and ships as a **major** plugin version with a dedicated
+  changeset.
+- When picking up a dependency upgrade, the upgrade must remain
+  installable on every Node.js version we still claim to support. A
+  dependency that drops a supported Node line is held back (pinned to the
+  last compatible release) until we decide to raise the floor ourselves.
+
+If you propose raising the minimum Node version, please mention it
+explicitly in the PR description and in the changeset, and update both
+[`CONTRIBUTING.md`](CONTRIBUTING.md) and the workflow matrix.
+
 ## Getting Started
 
 ```sh
