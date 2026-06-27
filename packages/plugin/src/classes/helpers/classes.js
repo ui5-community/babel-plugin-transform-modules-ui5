@@ -1,7 +1,6 @@
 import { types as t } from "@babel/core";
 
 import Path from "path";
-import assignDefined from "object-assign-defined";
 
 import * as th from "../../utils/templates";
 import * as ast from "../../utils/ast";
@@ -443,8 +442,24 @@ export function getClassInfo(path, node, parent, pluginOpts) {
   const decoratorInfo = getDecoratorClassInfo(node);
   const jsDocInfo = getJsDocClassInfo(node, parent);
 
-  // like Object.assign, but ignoring undefined values.
+  // Merge like Object.assign, but ignoring undefined values.
   return assignDefined(defaults, decoratorInfo, jsDocInfo);
+}
+
+/**
+ * Works like Object.assign but skips properties whose value is undefined,
+ * preserving the value from the target (or earlier source).
+ */
+function assignDefined(target, ...sources) {
+  for (const source of sources) {
+    if (!source) continue;
+    for (const key of Object.keys(source)) {
+      if (source[key] !== undefined) {
+        target[key] = source[key];
+      }
+    }
+  }
+  return target;
 }
 
 /**

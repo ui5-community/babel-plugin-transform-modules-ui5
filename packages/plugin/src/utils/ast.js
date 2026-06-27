@@ -1,5 +1,4 @@
 import { types as t } from "@babel/core";
-import { flatten } from "array-flatten";
 
 export function isObjectAssignOrExtendsExpression(node) {
   return isObjectAssignExpression(node) || isExtendsHelperExpression(node);
@@ -84,49 +83,45 @@ export function getInternalStaticThingsOfClass(classNode) {
  *  @return Array<{key, value}>
  */
 export function getOtherPropertiesOfIdentifier(blockScopeNode, idName) {
-  return flatten(
-    blockScopeNode.body
-      .map((node) => {
-        if (t.isExpressionStatement(node)) {
-          // ID = value | ID.key = value | ID.key.nested = value
-          const { left, right } = node.expression;
-          if (t.isAssignmentExpression(node.expression)) {
-            if (t.isIdentifier(left) && left.name === idName) {
-              // ID = value
-              if (t.isObjectExpression(right)) {
-                // ID = {}
-                return right.properties; // Array<ObjectProperty>
-              }
-            } else {
-              const { object, property: key } = left;
-              if (t.isIdentifier(object) && object.name === idName) {
-                // ID.key = value
-                return { key, value: right }; // ObjectProperty-like (key, value)
-              }
+  return blockScopeNode.body
+    .map((node) => {
+      if (t.isExpressionStatement(node)) {
+        // ID = value | ID.key = value | ID.key.nested = value
+        const { left, right } = node.expression;
+        if (t.isAssignmentExpression(node.expression)) {
+          if (t.isIdentifier(left) && left.name === idName) {
+            // ID = value
+            if (t.isObjectExpression(right)) {
+              // ID = {}
+              return right.properties; // Array<ObjectProperty>
+            }
+          } else {
+            const { object, property: key } = left;
+            if (t.isIdentifier(object) && object.name === idName) {
+              // ID.key = value
+              return { key, value: right }; // ObjectProperty-like (key, value)
             }
           }
-        } else if (t.isVariableDeclaration(node)) {
-          return node.declarations
-            .filter((declaration) => declaration.id.name === idName)
-            .map((declaration) => declaration.init)
-            .filter((init) => init)
-            .filter(
-              (init) =>
-                t.isObjectExpression(init) ||
-                isObjectAssignOrExtendsExpression(init)
-            )
-            .map((init) =>
-              t.isObjectExpression(init)
-                ? init.properties
-                : getPropertiesOfObjectAssignOrExtendHelper(
-                    init,
-                    blockScopeNode
-                  )
-            );
         }
-      })
-      .filter((item) => item)
-  );
+      } else if (t.isVariableDeclaration(node)) {
+        return node.declarations
+          .filter((declaration) => declaration.id.name === idName)
+          .map((declaration) => declaration.init)
+          .filter((init) => init)
+          .filter(
+            (init) =>
+              t.isObjectExpression(init) ||
+              isObjectAssignOrExtendsExpression(init)
+          )
+          .map((init) =>
+            t.isObjectExpression(init)
+              ? init.properties
+              : getPropertiesOfObjectAssignOrExtendHelper(init, blockScopeNode)
+          );
+      }
+    })
+    .filter((item) => item)
+    .flat(Infinity);
 }
 
 export function getPropertiesOfObjectAssignOrExtendHelper(
@@ -134,8 +129,8 @@ export function getPropertiesOfObjectAssignOrExtendHelper(
   blockScopeNode
 ) {
   // Check all the args and recursively try to get props of identifiers (although they may be imported)
-  return flatten(
-    node.arguments.map((arg) => {
+  return node.arguments
+    .map((arg) => {
       if (t.isObjectExpression(arg)) {
         return arg.properties;
       } else if (t.isIdentifier(arg)) {
@@ -143,7 +138,7 @@ export function getPropertiesOfObjectAssignOrExtendHelper(
         return getOtherPropertiesOfIdentifier(blockScopeNode, arg.name);
       }
     })
-  );
+    .flat(Infinity);
 }
 
 export function getPropNames(props) {

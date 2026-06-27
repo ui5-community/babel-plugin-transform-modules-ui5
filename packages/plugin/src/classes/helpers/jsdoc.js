@@ -1,6 +1,5 @@
 import { types as t } from "@babel/core";
 import doctrine from "doctrine";
-import ignoreCase from "ignore-case";
 
 const classInfoValueTags = ["alias", "name", "namespace"];
 const classInfoBoolTags = ["nonUI5", "controller", "keepConstructor"];
@@ -80,7 +79,8 @@ function getJsDocTagValue(tags, name) {
 }
 
 function getJsDocTag(tags, name) {
-  return tags.find((t) => ignoreCase.equals(name, t.title));
+  const lower = name.toLowerCase();
+  return tags.find((t) => t.title.toLowerCase() === lower);
 }
 
 function notEmpty(obj) {
