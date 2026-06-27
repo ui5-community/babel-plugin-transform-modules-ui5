@@ -63,6 +63,9 @@ If you propose raising the minimum Node version, please mention it
 explicitly in the PR description and in the changeset, and update both
 [`CONTRIBUTING.md`](CONTRIBUTING.md) and the workflow matrix.
 
+For the full picture of what we depend on, why, and which majors are
+deliberately held back, see [`DEPENDENCIES.md`](DEPENDENCIES.md).
+
 ## Getting Started
 
 ```sh
