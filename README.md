@@ -858,6 +858,18 @@ Some preload plugins:
 Please do! Open an issue, or file a PR.
 Issues also welcome for feature requests.
 
+### Development Setup
+
+After cloning the repository, run:
+
+```sh
+npm run setup
+```
+
+This installs all dependencies (including lifecycle scripts needed by some packages) and sets up [Husky](https://typicode.github.io/husky/) git hooks for commit linting and pre-commit checks.
+
+> **Why not just `npm install`?** The project uses `ignore-scripts=true` in `.npmrc` to protect against malicious postinstall scripts in dependencies. The `setup` script explicitly overrides this for the initial trusted install and then configures the git hooks.
+
 ## License
 
 MIT © 2019-2024 Ryan Murphy, UI5 community and contributors

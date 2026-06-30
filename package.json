@@ -18,6 +18,7 @@
     "lockfile-lint": "5.0.0"
   },
   "scripts": {
+    "setup": "npm ci && npm run prepare",
     "prepare": "node ./.husky/skip.js || husky",
     "hooks:pre-commit": "npm run lint:staged --workspaces --if-present && npm run test --workspaces --if-present",
     "hooks:pre-push": "npm run lint:commit",
