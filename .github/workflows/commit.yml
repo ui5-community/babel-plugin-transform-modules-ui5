@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
 env:
   HUSKY_SKIP: true
 
@@ -17,6 +20,16 @@ jobs:
         with:
           fetch-depth: 0
       - uses: wagoid/commitlint-github-action@b948419dd99f3fd78a6548d48f94e3df7f6bf3ed # v6.2.1
+
+  lockfile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24
+      - run: npm ci
+      - run: npm run lint:lockfile
 
   validate:
     runs-on: ubuntu-latest
