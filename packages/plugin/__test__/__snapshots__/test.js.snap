@@ -415,6 +415,33 @@ exports[`classes class-convert-jsdoc-alias.js 1`] = `
 });"
 `;
 
+exports[`classes class-convert-jsdoc-alias-after-tricky-param.js 1`] = `
+"sap.ui.define(["sap/SAPClass"], function (SAPClass) {
+  "use strict";
+
+  const MyClass = SAPClass.extend("x.y.AliasAfterTrickyParam", {});
+  return MyClass;
+});"
+`;
+
+exports[`classes class-convert-jsdoc-class-then-namespace.js 1`] = `
+"sap.ui.define(["sap/SAPClass"], function (SAPClass) {
+  "use strict";
+
+  const MyClass = SAPClass.extend("x.y.MyClass", {});
+  return MyClass;
+});"
+`;
+
+exports[`classes class-convert-jsdoc-mixed-tags-after-tricky-params.js 1`] = `
+"sap.ui.define(["sap/SAPClass"], function (SAPClass) {
+  "use strict";
+
+  class MyClass extends SAPClass {}
+  return MyClass;
+});"
+`;
+
 exports[`classes class-convert-jsdoc-name.js 1`] = `
 "sap.ui.define(["sap/SAPClass"], function (SAPClass) {
   "use strict";
@@ -1439,7 +1466,7 @@ exports[`imports import-multiple.js 1`] = `
 `;
 
 exports[`imports import-remove-fileext.js 1`] = `
-"sap.ui.define(["@dummy/chart.js", "chart.js", "array-flatten/dist/index", "./_private_/module_js", "./_private_/module_jsx", "./_private_/module_ts", "./_private_/module_tsx", "./_private_/unknown_module.js"], function (___dummy_chartjs, __chartjs, __array_flatten_dist_indexjs, ____private__module_jsjs, ____private__module_jsxjs, ____private__module_tsjs, ____private__module_tsxjs, ____private__unknown_modulejs) {
+"sap.ui.define(["@dummy/chart.js", "chart.js", "comment-parser/es6/index.js", "./_private_/module_js", "./_private_/module_jsx", "./_private_/module_ts", "./_private_/module_tsx", "./_private_/unknown_module.js"], function (___dummy_chartjs, __chartjs, __comment_parser_es6_indexjs, ____private__module_jsjs, ____private__module_jsxjs, ____private__module_tsjs, ____private__module_tsxjs, ____private__unknown_modulejs) {
   "use strict";
 });"
 `;

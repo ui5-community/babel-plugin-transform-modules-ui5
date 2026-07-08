@@ -3,6 +3,9 @@
   "version": "7.8.1",
   "main": "index.js",
   "license": "MIT",
+  "engines": {
+    "node": ">=20.19.0"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/ui5-community/babel-plugin-transform-modules-ui5.git",
@@ -12,7 +15,7 @@
     "babel-plugin-transform-modules-ui5": "^7.8.1"
   },
   "devDependencies": {
-    "prettier": "^3.7.4"
+    "prettier": "^3.9.0"
   },
   "scripts": {
     "format": "prettier  --write index.js"

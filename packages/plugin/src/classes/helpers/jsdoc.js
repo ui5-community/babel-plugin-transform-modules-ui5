@@ -1,19 +1,32 @@
 import { types as t } from "@babel/core";
-import doctrine from "doctrine";
-import ignoreCase from "ignore-case";
+import { parse as parseComment } from "comment-parser";
 
 const classInfoValueTags = ["alias", "name", "namespace"];
 const classInfoBoolTags = ["nonUI5", "controller", "keepConstructor"];
+
+/**
+ * Parse a babel `CommentBlock`'s `.value` (which omits the surrounding
+ * `/*` … `*\/` delimiters) using comment-parser.
+ *
+ * Returns the list of tags as `{ tag, name, description, type, optional }`.
+ * Returns `[]` on empty input or when no tags are present.
+ *
+ * Unlike doctrine, comment-parser does not bail on unknown or malformed
+ * tags — every recognised tag in the block is returned. This is the
+ * fix for issue #150 where doctrine stopped at the first tag it could
+ * not handle (e.g. optional `@param` followed by a bare `@class`).
+ */
+function parseJsDoc(commentValue) {
+  const block = parseComment(`/*${commentValue}*/`)[0];
+  return block ? block.tags : [];
+}
 
 export function getJsDocClassInfo(node, parent) {
   if (node.leadingComments) {
     return node.leadingComments
       .filter(isCommentBlock)
       .map((comment) => {
-        const docAST = doctrine.parse(comment.value, {
-          unwrap: true,
-        });
-        const tags = docAST.tags || [];
+        const tags = parseJsDoc(comment.value);
         const info = {};
         for (const tagName of classInfoValueTags) {
           const value = getJsDocTagValue(tags, tagName);
@@ -55,19 +68,15 @@ export function getTags(comments) {
     if (!isCommentBlock(comment)) {
       continue;
     }
-    const docAST = doctrine.parse(comment.value, {
-      unwrap: true,
-    });
-    const tags = docAST.tags;
-    if (!tags || !tags.length) {
+    const tags = parseJsDoc(comment.value);
+    if (!tags.length) {
       continue;
     }
     const map = {};
     for (const tag of tags) {
-      const title = tag.title;
       let value = tag.name || tag.description || true;
       if (value === "false") value = false;
-      map[title] = value;
+      map[tag.tag] = value;
     }
     return map;
   }
@@ -80,7 +89,8 @@ function getJsDocTagValue(tags, name) {
 }
 
 function getJsDocTag(tags, name) {
-  return tags.find((t) => ignoreCase.equals(name, t.title));
+  const lower = name.toLowerCase();
+  return tags.find((tag) => tag.tag.toLowerCase() === lower);
 }
 
 function notEmpty(obj) {
@@ -92,12 +102,7 @@ export function hasJsdocGlobalExportFlag(node) {
     return false;
   }
   return node.leadingComments.filter(isCommentBlock).some((comment) => {
-    return (
-      doctrine.parse(comment.value, {
-        unwrap: true,
-        tags: ["global"],
-      }).tags.length > 0
-    );
+    return parseJsDoc(comment.value).some((tag) => tag.tag === "global");
   });
 }
 

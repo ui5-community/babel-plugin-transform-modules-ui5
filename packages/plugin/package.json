@@ -9,7 +9,7 @@
     "directory": "packages/plugin"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=20.19.0"
   },
   "scripts": {
     "clean": "rimraf dist",
@@ -56,10 +56,7 @@
     ]
   },
   "dependencies": {
-    "array-flatten": "^3.0.0",
-    "doctrine": "^3.0.0",
-    "ignore-case": "^0.1.0",
-    "object-assign-defined": "^1.2.0"
+    "comment-parser": "^1.4.7"
   },
   "peerDependencies": {
     "@babel/core": "*"
@@ -74,25 +71,24 @@
     "@babel/plugin-syntax-decorators": "^7.27.1",
     "@babel/plugin-syntax-dynamic-import": "^7.8.3",
     "@babel/plugin-syntax-object-rest-spread": "^7.8.3",
-    "@babel/plugin-transform-property-mutators": "^7.27.1",
+    "@babel/plugin-transform-property-mutators": "^7.29.7",
     "@babel/plugin-transform-typescript": "^7.28.5",
     "@babel/preset-env": "^7.28.5",
     "@babel/preset-flow": "^7.27.1",
     "@babel/preset-typescript": "^7.28.5",
-    "babel-eslint": "^10.1.0",
-    "babel-jest": "^30.2.0",
-    "core-js": "^3.47.0",
-    "eslint": "^8.54.0",
-    "eslint-config-standard": "^17.1.0",
+    "babel-jest": "^30.4.1",
+    "core-js": "^3.49.0",
+    "eslint": "^9.39.4",
+    "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import": "^2.32.0",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-prettier": "^5.5.4",
-    "eslint-plugin-promise": "^6.6.0",
-    "eslint-plugin-standard": "^5.0.0",
+    "eslint-plugin-n": "^18.2.1",
+    "eslint-plugin-prettier": "^5.5.6",
+    "eslint-plugin-promise": "^7.3.0",
+    "globals": "^17.7.0",
     "husky": "^9.1.7",
-    "jest": "^30.2.0",
+    "jest": "^30.4.2",
     "lint-staged": "^16.2.7",
-    "prettier": "^3.7.4",
-    "rimraf": "^6.1.2"
+    "prettier": "^3.9.0",
+    "rimraf": "^6.1.3"
   }
 }
