@@ -1,5 +1,66 @@
 # Change Log
 
+## 7.9.0
+
+### Minor Changes
+
+- [#151](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/pull/151) [`ce059b3`](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/ce059b343a43960de9dca8ef1d19a0ab70c51fde) Thanks [@petermuessig](https://github.com/petermuessig)! - Raise minimum Node.js version to 20.19, refresh dev dependencies, and migrate ESLint to v9 flat config.
+
+  - `engines.node` is now `>=20.19.0` for both packages.
+  - ESLint upgraded to 9.x with new `eslint.config.js` (legacy `.eslintrc.js` and `.eslintignore` removed).
+  - `eslint-plugin-node` (unmaintained) replaced by `eslint-plugin-n@17`.
+  - Removed obsolete dev dependencies: `babel-eslint` (superseded by `@babel/eslint-parser`), `eslint-config-standard`, `eslint-plugin-standard`.
+  - Bumped `eslint-config-prettier` to 10.x, `eslint-plugin-prettier` to 5.5.x, `eslint-plugin-promise` to 7.x, `prettier` to 3.8.x, `jest`/`babel-jest` to 30.4.x, `core-js` to 3.49.x.
+  - CI matrix updated from Node 18/20/22/24 to 20/22/24.
+
+  No changes to plugin runtime behavior or production dependencies.
+
+### Patch Changes
+
+- [#151](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/pull/151) [`ce059b3`](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/ce059b343a43960de9dca8ef1d19a0ab70c51fde) Thanks [@petermuessig](https://github.com/petermuessig)! - Bump `eslint-plugin-n` from 17.24 to 18.2.1.
+
+  This stays compatible with our Node 20.19+ floor (the plugin's
+  `engines.node` is `^20.19.0 || ^22.13.0 || >=24`). ESLint 10 itself
+  is deliberately held back — see [`DEPENDENCIES.md`](../DEPENDENCIES.md)
+  for the full reasoning.
+
+- [#151](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/pull/151) [`ce059b3`](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/ce059b343a43960de9dca8ef1d19a0ab70c51fde) Thanks [@petermuessig](https://github.com/petermuessig)! - Bump dev-only dependencies to their latest minor releases:
+
+  - `globals` 17.6 → 17.7
+  - `prettier` 3.8 → 3.9
+
+  Both stay within the Node 20.19+ support window declared in our Node.js
+  support policy. No plugin behavior changes.
+
+- [#151](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/pull/151) [`ce059b3`](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/ce059b343a43960de9dca8ef1d19a0ab70c51fde) Thanks [@petermuessig](https://github.com/petermuessig)! - Drop three small, single-purpose runtime dependencies in favor of built-ins:
+
+  - `array-flatten` → `Array.prototype.flat(Infinity)`
+  - `ignore-case` → `String.prototype.toLowerCase()` comparison
+  - `object-assign-defined` → inlined 8-line helper
+
+  No change in behavior; the plugin's runtime now ships only with `doctrine`
+  as a production dependency.
+
+- [#151](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/pull/151) [`ce059b3`](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/ce059b343a43960de9dca8ef1d19a0ab70c51fde) Thanks [@petermuessig](https://github.com/petermuessig)! - Fix JSDoc parsing failures (issue [#150](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/150)) by replacing the deprecated
+  `doctrine` parser with the actively maintained `comment-parser`.
+
+  `doctrine` has been unmaintained since 2018 and stops parsing a JSDoc
+  block as soon as it encounters a tag it does not recognise (e.g. an
+  optional `@param`, or a bare `@class`). As a result, plugin markers
+  like `@alias`, `@namespace`, `@nonUI5` or `@controller` that appeared
+  after such a tag were silently ignored and the class was left
+  untransformed.
+
+  `comment-parser` is purely structural and never bails — every tag in
+  the block is returned, regardless of order or content. The migration
+  is internal; no plugin option or fixture authoring change is required.
+
+  Three regression fixtures were added under
+  `packages/plugin/__test__/fixtures/classes/` covering the patterns
+  reported in the issue: a value tag (`@alias`) after an optional
+  `@param`, a bool flag (`@nonUI5`) after multiple optional params,
+  and a bare `@class` followed by `@namespace`/`@controller`.
+
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
@@ -7,299 +68,168 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 **Note:** Version bump only for package babel-plugin-transform-modules-ui5
 
-
-
-
-
 # [7.8.0](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.7.1...v7.8.0) (2025-09-11)
-
 
 ### Features
 
-* support optional super call ([#143](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/143)) ([e09f561](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/e09f5617eb98b082e1630caa2d23801d3fc91650))
-
-
-
-
+- support optional super call ([#143](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/143)) ([e09f561](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/e09f5617eb98b082e1630caa2d23801d3fc91650))
 
 ## [7.7.1](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.7.0...v7.7.1) (2025-05-13)
 
-
 ### Bug Fixes
 
-* autoConvertControllerClass to consider controller.ts file as well (not just .js) ([#140](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/140)) ([788705d](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/788705dde44091cfecb47e9f51a5bd294b39af4b)), closes [#139](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/139)
-* noWrapBeforeImport must wrap first import if no code is before ([#141](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/141)) ([d80c070](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/d80c070e181b03546d381d8ee2fb0ddfc09d4e5a))
-
-
-
-
+- autoConvertControllerClass to consider controller.ts file as well (not just .js) ([#140](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/140)) ([788705d](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/788705dde44091cfecb47e9f51a5bd294b39af4b)), closes [#139](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/139)
+- noWrapBeforeImport must wrap first import if no code is before ([#141](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/141)) ([d80c070](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/d80c070e181b03546d381d8ee2fb0ddfc09d4e5a))
 
 # [7.7.0](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.6.2...v7.7.0) (2024-09-16)
 
-
 ### Features
 
-* update dependencies / add peer dependency to @babel/core ([#135](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/135)) ([d155e48](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/d155e48a4a3737ebcf4a7e77318391bbce783e70)), closes [#133](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/133)
-
-
-
-
+- update dependencies / add peer dependency to @babel/core ([#135](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/135)) ([d155e48](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/d155e48a4a3737ebcf4a7e77318391bbce783e70)), closes [#133](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/133)
 
 ## [7.6.2](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.6.1...v7.6.2) (2024-09-14)
 
-
 ### Bug Fixes
 
-* move qunit config autostart out of require/define ([#134](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/134)) ([9643cd0](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/9643cd08314ce54816886df6c618fbb142c1b3e8))
-
-
-
-
+- move qunit config autostart out of require/define ([#134](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/134)) ([9643cd0](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/9643cd08314ce54816886df6c618fbb142c1b3e8))
 
 ## [7.6.1](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.6.0...v7.6.1) (2024-09-13)
 
-
 ### Bug Fixes
 
-* support wrapped controller extension assignments ([dfa51b6](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/dfa51b613259aeedb3f20987f5e5165ca35545d8))
-
-
-
-
+- support wrapped controller extension assignments ([dfa51b6](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/dfa51b613259aeedb3f20987f5e5165ca35545d8))
 
 # [7.6.0](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.5.0...v7.6.0) (2024-07-22)
 
-
 ### Features
 
-* support sap.ui.require for [@sap](https://github.com/sap)UiRequire annotated modules ([#131](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/131)) ([23c4ac6](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/23c4ac67eef5a825692c528852ef62bbd621d13e))
-
-
-
-
+- support sap.ui.require for [@sap](https://github.com/sap)UiRequire annotated modules ([#131](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/131)) ([23c4ac6](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/23c4ac67eef5a825692c528852ef62bbd621d13e))
 
 # [7.5.0](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.4.2...v7.5.0) (2024-07-12)
 
-
 ### Features
 
-* support ControllerExtensions extended with .override(...) ([#128](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/128)) ([f744d9d](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/f744d9db3dd82020712b47a18ce55ed51a13fe89))
-
-
-
-
+- support ControllerExtensions extended with .override(...) ([#128](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/128)) ([f744d9d](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/f744d9db3dd82020712b47a18ce55ed51a13fe89))
 
 ## [7.4.2](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.4.1...v7.4.2) (2024-06-25)
 
-
 ### Bug Fixes
 
-* remove mandatory ESM file extensions from sap.ui.define imports ([#129](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/129)) ([571dfa1](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/571dfa192984c9838c573909546b42a85b71e5b6))
-
-
-
-
+- remove mandatory ESM file extensions from sap.ui.define imports ([#129](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/129)) ([571dfa1](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/571dfa192984c9838c573909546b42a85b71e5b6))
 
 ## [7.4.1](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.4.0...v7.4.1) (2024-06-02)
 
-
 ### Bug Fixes
 
-* ensure to remove file ext .js only from module path ([#127](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/127)) ([c6afb92](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/c6afb92c2f758a245086baa6f77d3274bb4e5466))
-
-
-
-
+- ensure to remove file ext .js only from module path ([#127](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/127)) ([c6afb92](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/c6afb92c2f758a245086baa6f77d3274bb4e5466))
 
 # [7.4.0](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.3.1...v7.4.0) (2024-05-31)
 
-
 ### Bug Fixes
 
-* remove empty export declaration added by TypeScript ([3cb14cf](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/3cb14cf7aefd400d0191d364f457c66452edc32a)), closes [/github.com/babel/babel/blob/main/packages/babel-plugin-transform-typescript/src/index.ts#L399](https://github.com//github.com/babel/babel/blob/main/packages/babel-plugin-transform-typescript/src/index.ts/issues/L399)
-
+- remove empty export declaration added by TypeScript ([3cb14cf](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/3cb14cf7aefd400d0191d364f457c66452edc32a)), closes [/github.com/babel/babel/blob/main/packages/babel-plugin-transform-typescript/src/index.ts#L399](https://github.com//github.com/babel/babel/blob/main/packages/babel-plugin-transform-typescript/src/index.ts/issues/L399)
 
 ### Features
 
-* imports added by other plugins are also included in the sap.ui.define calls ([#126](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/126)) ([895fe62](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/895fe624df66a6db1b9daa5cadce8a984ced5af4))
-
-
-
-
+- imports added by other plugins are also included in the sap.ui.define calls ([#126](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/126)) ([895fe62](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/895fe624df66a6db1b9daa5cadce8a984ced5af4))
 
 ## [7.3.1](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.3.0...v7.3.1) (2024-05-12)
 
-
 ### Bug Fixes
 
-* remove file extensions from imports to avoid redundant extensions ([#125](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/125)) ([e86d6f6](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/e86d6f675451b6eaaaf63f9433200cd7406d0245))
-* support index modules for dependencies ([#123](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/123)) ([f510380](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/f510380f7c201d9aba3e735badea21546f81f03d))
-
-
-
-
+- remove file extensions from imports to avoid redundant extensions ([#125](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/125)) ([e86d6f6](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/e86d6f675451b6eaaaf63f9433200cd7406d0245))
+- support index modules for dependencies ([#123](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/123)) ([f510380](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/f510380f7c201d9aba3e735badea21546f81f03d))
 
 # [7.3.0](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.2.6...v7.3.0) (2024-01-18)
 
-
 ### Bug Fixes
 
-* sanitize variable names for re-exports ([#122](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/122)) ([f475dbc](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/f475dbcb4f8b767a5680a974903e7f97df8dacc7))
-
+- sanitize variable names for re-exports ([#122](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/122)) ([f475dbc](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/f475dbcb4f8b767a5680a974903e7f97df8dacc7))
 
 ### Features
 
-* support using predefined controller extensions ([#120](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/120)) ([d7cb66c](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/d7cb66cd5af422529bb00658669e595af2477615))
-
-
-
-
+- support using predefined controller extensions ([#120](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/120)) ([d7cb66c](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/d7cb66cd5af422529bb00658669e595af2477615))
 
 ## [7.2.6](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.2.5...v7.2.6) (2023-11-23)
 
-
 ### Bug Fixes
 
-* preserve comments for class members ([#117](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/117)) ([b5329cb](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/b5329cb80ea0cade6b85fd1d802befa0bc36fe52))
-
-
-
-
+- preserve comments for class members ([#117](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/117)) ([b5329cb](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/b5329cb80ea0cade6b85fd1d802befa0bc36fe52))
 
 ## [7.2.5](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.2.4...v7.2.5) (2023-08-28)
 
-
 ### Bug Fixes
 
-* by default add "use strict" directive to sap.ui.define ([#115](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/115)) ([7d55cc6](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/7d55cc6126258b60728a00f4070ed19b8ffe9339)), closes [#113](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/113)
-
-
-
-
+- by default add "use strict" directive to sap.ui.define ([#115](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/115)) ([7d55cc6](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/7d55cc6126258b60728a00f4070ed19b8ffe9339)), closes [#113](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/113)
 
 ## [7.2.4](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.2.3...v7.2.4) (2023-07-20)
 
-
 ### Bug Fixes
 
-* ensure template to be ES5 compliant ([#111](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/111)) ([16819bc](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/16819bc91ce1942e0968a0f7efaa4e7cf767b665))
-
-
-
-
+- ensure template to be ES5 compliant ([#111](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/111)) ([16819bc](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/16819bc91ce1942e0968a0f7efaa4e7cf767b665))
 
 ## [7.2.3](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.2.2...v7.2.3) (2023-07-18)
 
-
 ### Bug Fixes
 
-* copyright comment must be appended as leading comment to file ([#108](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/108)) ([8194671](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/81946714f1d48c82a6609ec3fc1c820e5fff9e51))
-
-
-
-
+- copyright comment must be appended as leading comment to file ([#108](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/108)) ([8194671](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/81946714f1d48c82a6609ec3fc1c820e5fff9e51))
 
 ## [7.2.2](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.2.1...v7.2.2) (2023-07-18)
 
-
 ### Bug Fixes
 
-* ensure copyright to be kept after typescript processing ([#107](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/107)) ([da9aa69](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/da9aa69c94017e085d7f5a22abde04b123d9307d))
-
-
-
-
+- ensure copyright to be kept after typescript processing ([#107](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/107)) ([da9aa69](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/da9aa69c94017e085d7f5a22abde04b123d9307d))
 
 ## [7.2.1](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.2.0...v7.2.1) (2023-06-13)
 
-
 ### Bug Fixes
 
-* add support for import.meta.url|resolve ([#106](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/106)) ([afb1e6d](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/afb1e6daa0fcc9896fd184ac9d66990d0a29214a)), closes [#103](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/103)
-* support for anonymous classes ([#105](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/105)) ([64773d1](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/64773d180bf65e544806b9f04b7334cd76831b3d)), closes [#104](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/104)
-
-
-
-
+- add support for import.meta.url|resolve ([#106](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/106)) ([afb1e6d](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/afb1e6daa0fcc9896fd184ac9d66990d0a29214a)), closes [#103](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/103)
+- support for anonymous classes ([#105](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/105)) ([64773d1](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/64773d180bf65e544806b9f04b7334cd76831b3d)), closes [#104](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/104)
 
 # [7.2.0](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.1.5...v7.2.0) (2023-05-30)
 
-
 ### Features
 
-* split class conversion to enable other Babel plugin conversion ([#100](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/100)) ([4ba096b](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/4ba096b1a24d807cda2fd2f57425f3ab4b91a31b)), closes [#23](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/23) [#25](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/25)
-
-
-
-
+- split class conversion to enable other Babel plugin conversion ([#100](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/100)) ([4ba096b](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/4ba096b1a24d807cda2fd2f57425f3ab4b91a31b)), closes [#23](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/23) [#25](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/25)
 
 ## [7.1.5](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.1.4...v7.1.5) (2023-05-30)
 
-
 ### Bug Fixes
 
-* enable support for TS param props ([#99](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/99)) ([2119b41](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/2119b41fbd5fb41ade7e096190cbebad03eecf7c)), closes [#65](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/65)
-* ensure copyright comments to be leading comments ([#97](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/97)) ([39ab194](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/39ab1946f08d3fc33609bd6b9ac6cda9a985c5d7))
-* sap.ui.define without callback function ([#98](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/98)) ([c1cd6a8](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/c1cd6a8f158de9b5036d9c768c48972d66ae20aa)), closes [#50](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/50)
-
-
-
-
+- enable support for TS param props ([#99](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/99)) ([2119b41](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/2119b41fbd5fb41ade7e096190cbebad03eecf7c)), closes [#65](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/65)
+- ensure copyright comments to be leading comments ([#97](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/97)) ([39ab194](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/39ab1946f08d3fc33609bd6b9ac6cda9a985c5d7))
+- sap.ui.define without callback function ([#98](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/98)) ([c1cd6a8](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/c1cd6a8f158de9b5036d9c768c48972d66ae20aa)), closes [#50](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/50)
 
 ## [7.1.4](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.1.3...v7.1.4) (2023-04-11)
 
-
 ### Bug Fixes
 
-* properly handle dynamic import of non-existing modules ([#94](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/94)) ([c443b36](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/c443b36d5035d2e2fa367e074d0732336af8eb78))
-
-
-
-
+- properly handle dynamic import of non-existing modules ([#94](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/94)) ([c443b36](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/c443b36d5035d2e2fa367e074d0732336af8eb78))
 
 ## [7.1.3](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.1.2...v7.1.3) (2023-04-11)
 
-
 ### Bug Fixes
 
-* dynamic import must not handle __esModule flagged modules ([#93](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/93)) ([b269985](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/b26998540cac0c2c2868bd59198d6f9abfaab8f7))
-
-
-
-
+- dynamic import must not handle __esModule flagged modules ([#93](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/93)) ([b269985](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/b26998540cac0c2c2868bd59198d6f9abfaab8f7))
 
 ## [7.1.2](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.1.1...v7.1.2) (2023-04-11)
 
-
 ### Bug Fixes
 
-* dynamic imports of empty modules must not fail ([#92](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/92)) ([a1de75d](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/a1de75dcfcb577bf6fea3669cf448e9183b7d636))
-
-
-
-
+- dynamic imports of empty modules must not fail ([#92](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/92)) ([a1de75d](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/a1de75dcfcb577bf6fea3669cf448e9183b7d636))
 
 ## [7.1.1](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.1.0...v7.1.1) (2023-03-27)
 
-
 ### Bug Fixes
 
-* catch err for dynamic import to sap.ui.require ([#91](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/91)) ([9c7d26e](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/9c7d26e6aeebc77f5d8faec941fbd994b77de222))
-
-
-
-
+- catch err for dynamic import to sap.ui.require ([#91](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/91)) ([9c7d26e](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/9c7d26e6aeebc77f5d8faec941fbd994b77de222))
 
 # [7.1.0](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.0.6...v7.1.0) (2023-03-13)
 
-
 ### Features
 
-* backward compatibility for overrides (overridesToOverride option) ([dac96e6](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/dac96e685548ccf831893c03e083e6db2dae3d4f))
-
-
-
-
+- backward compatibility for overrides (overridesToOverride option) ([dac96e6](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/dac96e685548ccf831893c03e083e6db2dae3d4f))
 
 ## [7.0.6](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/compare/v7.0.5...v7.0.6) (2023-02-21)
 
