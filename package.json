@@ -5,18 +5,20 @@
     "node": ">=20.19.0"
   },
   "devDependencies": {
-    "@changesets/changelog-github": "^0.7.0",
-    "@changesets/cli": "^2.31.0",
-    "@commitlint/cli": "^20.2.0",
-    "@commitlint/config-conventional": "^20.2.0",
-    "cz-conventional-changelog": "^3.3.0",
-    "eslint": "^9.39.4",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-prettier": "^5.5.6",
-    "globals": "^17.7.0",
-    "husky": "^9.1.7"
+    "@changesets/changelog-github": "0.7.0",
+    "@changesets/cli": "2.31.0",
+    "@commitlint/cli": "20.2.0",
+    "@commitlint/config-conventional": "20.2.0",
+    "cz-conventional-changelog": "3.3.0",
+    "eslint": "9.39.4",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-prettier": "5.5.6",
+    "globals": "17.7.0",
+    "husky": "9.1.7",
+    "lockfile-lint": "5.0.0"
   },
   "scripts": {
+    "setup": "npm ci && npm run prepare",
     "prepare": "node ./.husky/skip.js || husky",
     "hooks:pre-commit": "npm run lint:staged --workspaces --if-present && npm run test --workspaces --if-present",
     "hooks:pre-push": "npm run lint:commit",
@@ -24,6 +26,7 @@
     "build": "npm run build --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
     "lint:commit": "commitlint -e",
+    "lint:lockfile": "lockfile-lint --path package-lock.json --type npm --allowed-hosts npm --validate-https",
     "test": "npm run test --workspaces --if-present",
     "test:update-snapshot": "npm run test:update-snapshot --workspaces --if-present",
     "changeset": "changeset",
