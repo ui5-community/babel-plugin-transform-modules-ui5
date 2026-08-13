@@ -92,6 +92,8 @@ export const ModuleTransformVisitor = {
     const { node } = path;
 
     if (node.importKind === "type") return; // flow-type
+    if (this.noWrap) return;
+    if (hasIgnoreImportPragma(node)) return;
 
     const { specifiers, source } = node;
     const src = resolveSource(source.value, filename);
@@ -236,6 +238,8 @@ export const ModuleTransformVisitor = {
     const { node } = path;
     const { specifiers, declaration, source } = node;
 
+    if (this.noWrap) return;
+
     let fromSource = "";
     if (source) {
       // e.g. export { one, two } from 'x'
@@ -297,6 +301,7 @@ export const ModuleTransformVisitor = {
 
   ExportDefaultDeclaration(path /*, { filename } */) {
     const { node } = path;
+    if (this.noWrap) return;
     let { declaration } = node;
     const declarationName = ast.getIdName(declaration);
     if (hasGlobalExportFlag(node)) {
@@ -332,6 +337,7 @@ export const ModuleTransformVisitor = {
   },
 
   ExportAllDeclaration(path, { filename }) {
+    if (this.noWrap) return;
     const src = resolveSource(path.node.source.value, filename);
     const name = cleanImportSource(src);
     const tmpName = tempModuleName(name);
@@ -354,7 +360,9 @@ export const ModuleTransformVisitor = {
   CallExpression(path) {
     const { node } = path;
     const { callee } = node;
+    if (this.noWrap) return;
     if (ast.isImport(callee)) {
+      if (hasIgnoreImportPragma(path.getStatementParent().node)) return;
       this.injectDynamicImportHelper = true;
       path.replaceWith({
         ...node,
@@ -365,6 +373,7 @@ export const ModuleTransformVisitor = {
 
   MemberExpression(path, { filename }) {
     const { node } = path;
+    if (this.noWrap) return;
     if (node?.object?.type === "MetaProperty") {
       // replace all "import.meta.url" with "module.url"
       if (node?.property?.name === "url") {
@@ -385,3 +394,11 @@ export const ModuleTransformVisitor = {
     }
   },
 };
+
+function hasIgnoreImportPragma(node) {
+  return (node.leadingComments ?? []).some(
+    (comment) =>
+      comment.type === "CommentBlock" &&
+      comment.value.trim() === "@ui5-ignore-import"
+  );
+}

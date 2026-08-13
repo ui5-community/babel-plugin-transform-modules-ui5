@@ -46,6 +46,9 @@ module.exports = () => {
         this.imports = [];
         this.namedExports = [];
         this.injectDynamicImportHelper = false;
+        this.noWrap = (path.parent?.comments ?? []).some(
+          (c) => c.type === "CommentBlock" && c.value.trim() === "@ui5-no-wrap"
+        );
 
         // Properties for Class Transform
         this.importNames = [];

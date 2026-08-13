@@ -1603,6 +1603,72 @@ sap.ui.define(["sap/m/Button"], function (Button) {
 });"
 `;
 
+exports[`no-wrap ignore-dynamic-import.js 1`] = `
+"sap.ui.define(["sap/m/Button"], function (Button) {
+  "use strict";
+
+  function __ui5_require_async(path) {
+    return new Promise(function (resolve, reject) {
+      sap.ui.require([path], function (module) {
+        if (!(module && module.__esModule)) {
+          module = module === null || !(typeof module === "object" && path.endsWith("/library")) ? {
+            default: module
+          } : module;
+          Object.defineProperty(module, "__esModule", {
+            value: true
+          });
+        }
+        resolve(module);
+      }, function (err) {
+        reject(err);
+      });
+    });
+  }
+  async function load() {
+    const mod = await import("./lazy-module");
+    foo = await import("./other-module");
+    const normal = await __ui5_require_async("./transformed-module");
+  }
+  return Button;
+});"
+`;
+
+exports[`no-wrap ignore-import-all.js 1`] = `
+"import WorkerUtil from "./worker-util";
+import EventBus from "./event-bus";"
+`;
+
+exports[`no-wrap ignore-import-single.js 1`] = `
+"sap.ui.define(["sap/m/Button"], function (Button) {
+  "use strict";
+
+  import WorkerUtil from "./worker-util";
+  return Button;
+});"
+`;
+
+exports[`no-wrap no-wrap-no-pragma.ts 1`] = `
+"sap.ui.define(["sap/m/Button"], function (Button) {
+  "use strict";
+
+  function createButton(config) {
+    return Button;
+  }
+  Button.createButton = createButton;
+  return Button;
+});"
+`;
+
+exports[`no-wrap no-wrap-only-pragma.js 1`] = `"const workerVersion = "1.0.0";"`;
+
+exports[`no-wrap no-wrap-with-imports.ts 1`] = `
+"import Button from "sap/m/Button";
+export function handleMessage(msg) {
+  console.log(msg.type, msg.payload);
+}
+export default Button;"
+`;
+
 exports[`no-wrap nowrap-existing-sap.ui.define.js 1`] = `
 "sap.ui.define(["JSONModel"], JSONModel => {
   return new JSONModel();
