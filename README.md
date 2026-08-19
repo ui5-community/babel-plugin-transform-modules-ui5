@@ -377,6 +377,71 @@ QUnit.config.autostart = false;
 
 > :bulb: The plugin detects the global usage of `QUnit.config.autostart` and moves this out of the `sap.ui.require` or `sap.ui.define` block automatically to ensure that the config is applied sychronously when loading the module. The move can be supressed with the configuration option `noWrapQUnitConfigAutostart`. If `QUnit` is imported, e.g. `import QUnit from "qunit";` then this is detected and the autostart config is not moved as it must apply locally.
 
+### Excluding Modules or Imports from Transformation
+
+Sometimes a module (or a single import within it) should be left as-is instead of being converted into a UI5 module. Two comment pragmas control this. Both are matched as **block comments** (`/* ... */`) whose trimmed content is **exactly** the pragma text — a `//` line comment or additional words (e.g. `/* @ui5-no-wrap (worker) */`) will not be recognized.
+
+#### `@ui5-no-wrap` — keep a whole module as a native ES module
+
+Adding `/* @ui5-no-wrap */` anywhere in a file leaves the **entire module unwrapped**: it is not wrapped in `sap.ui.define`/`sap.ui.require`, and no `import`, `export`, dynamic `import()` or `import.meta` transformation is applied. TypeScript type annotations are still stripped, so the output stays a valid native ES module. This is useful for code that is loaded outside of the UI5 module system, for example a Web Worker.
+
+Example:
+
+```ts
+/* @ui5-no-wrap */
+
+import Button from "sap/m/Button";
+
+interface WorkerMessage {
+  type: string;
+  payload: unknown;
+}
+
+export function handleMessage(msg: WorkerMessage): void {
+  console.log(msg.type, msg.payload);
+}
+
+export default Button;
+```
+
+will be converted to:
+
+```js
+import Button from "sap/m/Button";
+export function handleMessage(msg) {
+  console.log(msg.type, msg.payload);
+}
+export default Button;
+```
+
+> :warning: The output of a `@ui5-no-wrap` module is a native ES module (`import`/`export` are preserved) and is **not** a UI5 AMD module. It must be consumed accordingly (e.g. as an ES module in a Web Worker), not loaded via `sap.ui.require`/`sap.ui.define`.
+
+#### `@ui5-ignore-import` — exclude a single import
+
+Adding `/* @ui5-ignore-import */` as the leading comment of an individual `import` statement or dynamic `import()` call leaves that one import untouched: it is not added to the `sap.ui.define` dependency array and dynamic imports are not rewritten to `__ui5_require_async(...)`. All other imports in the module are still transformed normally.
+
+Example (static and dynamic imports):
+
+```js
+/* @ui5-ignore-import */
+import WorkerUtil from "./worker-util";
+
+import Button from "sap/m/Button";
+
+async function load() {
+  /* @ui5-ignore-import */
+  const mod = await import("./lazy-module");
+
+  const normal = await import("./transformed-module");
+}
+
+export default Button;
+```
+
+Here `sap/m/Button` becomes a `sap.ui.define` dependency and `./transformed-module` is rewritten to `__ui5_require_async(...)`, while `./worker-util` and `./lazy-module` are left exactly as written.
+
+> :warning: A dynamic `import()` is an expression and is always safe to ignore. A **static** `import` declaration, however, is only valid at the top level of a module — so `@ui5-ignore-import` on a static import produces valid output only when the module is **not** wrapped (i.e. it has no exports, or it also carries `@ui5-no-wrap`). If the module is wrapped in `sap.ui.define`, the ignored `import` is left inside the factory function, which is not valid at runtime.
+
 ### Converting ES classes into Control.extend(..) syntax
 
 By default, the plugin converts ES classes to `Control.extend(..)` syntax if the class extends from a class which has been imported.
