@@ -1,5 +1,6 @@
 ---
 "babel-plugin-transform-modules-ui5": minor
+"babel-preset-transform-ui5": minor
 ---
 
 Add two comment pragmas to opt out of module transformation:
