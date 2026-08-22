@@ -4,6 +4,10 @@ import * as th from "../../utils/templates";
 import * as ast from "../../utils/ast";
 
 export function wrap(visitor, programNode, opts) {
+  if (hasNoWrapPragma(visitor.parent?.comments ?? [])) {
+    return;
+  }
+
   let {
     defaultExport,
     exportGlobal,
@@ -214,6 +218,13 @@ export function wrap(visitor, programNode, opts) {
 function hasUseStrict(node) {
   return (node.directives || []).some(
     (directive) => directive.value.value === "use strict"
+  );
+}
+
+function hasNoWrapPragma(comments) {
+  return comments.some(
+    (comment) =>
+      comment.type === "CommentBlock" && comment.value.trim() === "@ui5-no-wrap"
   );
 }
 
