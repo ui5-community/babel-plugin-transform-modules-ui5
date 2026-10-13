@@ -646,6 +646,26 @@ exports[`classes class-convert-options-namedonly.js 1`] = `
 });"
 `;
 
+exports[`classes class-convert-transitive-ui5-classes BaseController.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  const BaseController = Controller.extend("fixtures.classes.class-convert-transitive-ui5-classes.BaseController", {});
+});"
+`;
+
+exports[`classes class-convert-transitive-ui5-classes MyController.js 1`] = `
+"sap.ui.define(["./BaseController"], function (__BaseController) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const BaseController = _interopRequireDefault(__BaseController);
+  const MyController = BaseController.extend("fixtures.classes.class-convert-transitive-ui5-classes.MyController", {});
+});"
+`;
+
 exports[`classes class-convert-view-basic.view.js 1`] = `
 "sap.ui.define(["sap/ui/core/mvc/JSView"], function (SAPView) {
   "use strict";

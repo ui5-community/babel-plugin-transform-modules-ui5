@@ -1,8 +1,9 @@
 import { types as t } from "@babel/core";
+import * as Path from "path";
 import * as th from "../utils/templates";
 import * as ast from "../utils/ast";
 import * as classes from "./helpers/classes";
-import { getImportDeclaration } from "./helpers/imports";
+import { getImportDeclaration, saveSuperclassImportSource, isSuperclassTransitivelyKnown } from "./helpers/imports";
 
 /**
  * Built-in list of UI5 base-class module paths used by autoConvertKnownUI5Classes.
@@ -285,9 +286,21 @@ function shouldConvertClass(file, node, opts, classInfo) {
     ];
     if (knownPaths.length) {
       const superClassName = node.superClass?.name;
-      const importDecl = getImportDeclaration(file.opts.filename, superClassName);
-      if (importDecl && knownPaths.includes(importDecl.source.value)) {
-        return true;
+      const filename = file.opts.filename;
+      const importDecl = getImportDeclaration(filename, superClassName);
+      if (importDecl) {
+        const importSource = importDecl.source.value;
+        // Record this file's superclass import source so later files can walk the chain
+        saveSuperclassImportSource(filename, importSource);
+        // Direct hit — immediate superclass is a known UI5 base class
+        if (knownPaths.includes(importSource)) return true;
+        // Transitive hit — walk the superclass chain through already-processed local files
+        const sourceRoot = file.opts.sourceRoot
+          ? Path.resolve(process.cwd(), file.opts.sourceRoot)
+          : process.cwd();
+        if (isSuperclassTransitivelyKnown(filename, superClassName, knownPaths, sourceRoot)) {
+          return true;
+        }
       }
     }
   }
