@@ -1,10 +1,13 @@
 // Tags that provide a value for the class info via decorators.
 // The naming tags follow the same conventions as their JSDoc equivalents:
-//   @alias    — recommended for UI5 extend-classes (Component, View, Controller, Control, …);
-//               sets the fully-qualified class name passed to .extend().
-//   @name     — legacy equivalent of @alias; kept for backward compatibility.
-//   @namespace — recommended for static helper classes; sets the namespace prefix only.
-// The following two are decorator-only (not available as JSDoc tags):
+//   @alias     — recommended for named UI5 extend-classes; sets the fully-qualified
+//               class name passed to .extend().
+//   @name      — use for anonymous (unnamed) class expressions where @alias cannot
+//               be used.
+//   @namespace — sets the namespace prefix for converted extend-classes; the ES class
+//               name is appended automatically to form the full FQN.
+// The following two are parsed but their values are not used by the class transformer;
+// metadata and renderer are handled via static class properties instead:
 //   @metadata, @renderer
 const classInfoValueTags = [
   "alias",

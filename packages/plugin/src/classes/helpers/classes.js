@@ -429,12 +429,10 @@ export function convertClassToUI5Extend(
  * Derives the fully-qualified name (FQN) passed to SAPClass.extend("FQN", ...).
  *
  * Precedence:
- *   1. @alias  — full FQN set directly (recommended for UI5 extend-classes)
- *   2. @name   — legacy equivalent of @alias; both produce the same result
+ *   1. @alias  — full FQN set directly; use for named extend-classes (recommended)
+ *   2. @name   — full FQN set directly; use for anonymous class expressions where
+ *               @alias cannot be used (there is no local name to alias)
  *   3. @namespace / fileNamespace — namespace prefix; the ES class name is appended
- *
- * @alias and @name are interchangeable — whichever appears first in the priority order
- * is used. Prefer @alias in new code.
  */
 function getFullyQualifiedName(classInfo) {
   if (classInfo.alias) return classInfo.alias;

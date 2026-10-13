@@ -85,7 +85,7 @@ A more detailed feature list includes:
   - Fixes `constructor` shorthand method, if used.
 - Various options to control the class name string used.
   - JSDoc (alias, namespace, name)
-  - Decorators (alias, namespace, name, metadata, renderer)
+  - Decorators (alias, namespace, name)
   - File path based namespace, including setting a prefix.
 
 ### Converting ES modules (import/export) into sap.ui.define or sap.ui.require
@@ -481,9 +481,7 @@ If the default file-based namespace does not work for you (perhaps the app name 
 
 The simplest way to override the names is to use JSDoc. This approach will also work well with classes output from TypeScript if you configure TypeScript to generate ES6 or higher, and don't enable `removeComments``.
 
-There are two distinct use cases depending on whether the class requires an `.extend()` call:
-
-###### UI5 extend-classes (Component, View, Controller, Control, …)
+###### `@alias` — recommended for named extend-classes
 
 Use **`@alias`** with the fully-qualified class name. `@alias` is the [officially recommended](https://github.com/SAP/openui5) JSDoc property used by UI5 source code itself to declare the module name.
 
@@ -504,41 +502,45 @@ const AController = SAPController.extend("my.app.AController", {
 });
 ```
 
-> :information_source: `@name` is a legacy equivalent of `@alias` — both set the fully-qualified name and behave identically. Prefer `@alias` in new code.
->
-> ```js
-> /**
->  * @name my.app.AController   (legacy — prefer @alias)
->  */
-> class AController extends SAPController {
->     ...
-> }
-> ```
+###### `@name` — for unnamed (anonymous) extend-classes
 
-###### Static helper classes
+Use **`@name`** when the class has no local name (e.g. an anonymous class expression passed to `return`). `@alias` requires a local name to alias; `@name` does not.
 
-Use **`@namespace`** to supply the namespace prefix; the class name is derived automatically from the ES class name.
+```js
+/**
+ * @name my.app.AController
+ */
+return class extends SAPController {
+    ...
+}
+```
+
+###### `@namespace` — namespace prefix for extend-classes
+
+Use **`@namespace`** to set only the namespace prefix; the class name is derived automatically from the ES class name. This is useful when the file-based namespace does not match the desired UI5 namespace.
 
 ```js
 /**
  * @namespace my.app
  */
-class AHelper {
+class AController extends SAPController {
     ...
 }
 ```
 
-outputs a module with the name `my.app.AHelper`.
+outputs:
 
-> :information_source: **JSDoc / Decorator tag parity:** `@metadata` and `@renderer` are supported as **decorators only**. They are not available as JSDoc tags (i.e. `/** @metadata ... */` will have no effect).
+```js
+const AController = SAPController.extend("my.app.AController", {
+    ...
+});
+```
 
 ##### Decorators
 
-Alternatively, you can use decorators to override the namespace or name used. The same naming conventions as for JSDoc apply — use `@alias` for UI5 extend-classes and `@namespace` for static helper classes — but pass the value as a string literal argument to the decorator function.
+Alternatively, you can use decorators to override the namespace or name used. Pass the value as a string literal argument to the decorator function.
 
 NOTE that using a variable is currently not supported.
-
-###### UI5 extend-classes (Component, View, Controller, Control, …)
 
 ```js
 @alias('my.app.AController')
@@ -547,33 +549,7 @@ class AController extends SAPController {
 }
 ```
 
-> :information_source: `@name` is the legacy equivalent. Prefer `@alias` in new code.
->
-> ```js
-> @name('my.app.AController')   // legacy — prefer @alias
-> class AController extends SAPController {
->     ...
-> }
-> ```
-
-Decorators also support `@metadata` and `@renderer`, which are **decorator-only** (not available as JSDoc tags):
-
-```js
-@metadata({ /* ... */ })
-@renderer(MyRenderer)
-class MyControl extends SAPControl {
-    ...
-}
-```
-
-###### Static helper classes
-
-```js
-@namespace('my.app')
-class AHelper {
-    ...
-}
-```
+> :information_source: Use `@name('my.app.AController')` when the class has no local name (anonymous class expression). Use `@namespace('my.app')` to supply only the namespace prefix and have the class name derived automatically.
 
 ### Don't convert class
 
