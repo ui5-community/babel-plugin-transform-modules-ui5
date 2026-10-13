@@ -84,8 +84,8 @@ A more detailed feature list includes:
 - Existing `sap.ui.define` calls don't get wrapped but classes within can still be converted.
   - Fixes `constructor` shorthand method, if used.
 - Various options to control the class name string used.
-  - JSDoc (name, namespace, alias)
-  - Decorators (name, namespace, alias)
+  - JSDoc (alias, namespace, name)
+  - Decorators (alias, namespace, name, metadata, renderer)
   - File path based namespace, including setting a prefix.
 
 ### Converting ES modules (import/export) into sap.ui.define or sap.ui.require
@@ -481,9 +481,11 @@ If the default file-based namespace does not work for you (perhaps the app name 
 
 The simplest way to override the names is to use JSDoc. This approach will also work well with classes output from TypeScript if you configure TypeScript to generate ES6 or higher, and don't enable `removeComments``.
 
-You can set the `@name`/`@alias` directly or just the `@namespace` and have the name derived from the ES class name.
+There are two distinct use cases depending on whether the class requires an `.extend()` call:
 
-`@name` and `@alias` behave the same; `@name` was used originally but the `@alias` JSDoc property is used in UI5 source code, so support for that was added.
+###### UI5 extend-classes (Component, View, Controller, Control, …)
+
+Use **`@alias`** with the fully-qualified class name. `@alias` is the [officially recommended](https://github.com/SAP/openui5) JSDoc property used by UI5 source code itself to declare the module name.
 
 ```js
 /**
@@ -492,53 +494,85 @@ You can set the `@name`/`@alias` directly or just the `@namespace` and have the 
 class AController extends SAPController {
     ...
 }
+```
 
-/**
- * @name my.app.AController
- */
-class AController extends SAPController {
-    ...
-}
+outputs:
 
-/**
- * @namespace my.app
- */
-class AController extends SAPController {
-    ...
-}
-
-Will all output:
-
+```js
 const AController = SAPController.extend("my.app.AController", {
     ...
 });
 ```
 
+> :information_source: `@name` is a legacy equivalent of `@alias` — both set the fully-qualified name and behave identically. Prefer `@alias` in new code.
+>
+> ```js
+> /**
+>  * @name my.app.AController   (legacy — prefer @alias)
+>  */
+> class AController extends SAPController {
+>     ...
+> }
+> ```
+
+###### Static helper classes
+
+Use **`@namespace`** to supply the namespace prefix; the class name is derived automatically from the ES class name.
+
+```js
+/**
+ * @namespace my.app
+ */
+class AHelper {
+    ...
+}
+```
+
+outputs a module with the name `my.app.AHelper`.
+
+> :information_source: **JSDoc / Decorator tag parity:** `@metadata` and `@renderer` are supported as **decorators only**. They are not available as JSDoc tags (i.e. `/** @metadata ... */` will have no effect).
+
 ##### Decorators
 
-Alternatively, you can use decorators to override the namespace or name used. The same properties as JSDoc will work, but instead of a space, pass the string literal to the decorator function.
+Alternatively, you can use decorators to override the namespace or name used. The same naming conventions as for JSDoc apply — use `@alias` for UI5 extend-classes and `@namespace` for static helper classes — but pass the value as a string literal argument to the decorator function.
 
 NOTE that using a variable is currently not supported.
+
+###### UI5 extend-classes (Component, View, Controller, Control, …)
 
 ```js
 @alias('my.app.AController')
 class AController extends SAPController {
     ...
 }
+```
 
-@name('my.app.AController')
-class AController extends SAPController {
+> :information_source: `@name` is the legacy equivalent. Prefer `@alias` in new code.
+>
+> ```js
+> @name('my.app.AController')   // legacy — prefer @alias
+> class AController extends SAPController {
+>     ...
+> }
+> ```
+
+Decorators also support `@metadata` and `@renderer`, which are **decorator-only** (not available as JSDoc tags):
+
+```js
+@metadata({ /* ... */ })
+@renderer(MyRenderer)
+class MyControl extends SAPControl {
     ...
 }
+```
 
+###### Static helper classes
+
+```js
 @namespace('my.app')
-class AController extends SAPController {
+class AHelper {
     ...
 }
-
-const AController = SAPController.extend("my.app.AController", {
-    ...
-});
 ```
 
 ### Don't convert class
