@@ -9,8 +9,8 @@ import { parse as parseComment } from "comment-parser";
 //   @name   — use when the class has no local name (anonymous class expression, e.g.
 //             `return class extends SAPController {}`). @alias requires a local name
 //             to alias; @name does not.
-//   @namespace — sets the namespace prefix for converted extend-classes; the ES class
-//             name is appended automatically to form the full FQN.
+//   @namespace — sets the namespace prefix; the ES class name is appended automatically
+//             to form the full FQN passed to .extend().
 const classInfoValueTags = ["alias", "name", "namespace"];
 const classInfoBoolTags = ["nonUI5", "controller", "keepConstructor"];
 

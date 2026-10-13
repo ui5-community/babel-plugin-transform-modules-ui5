@@ -4,8 +4,8 @@
 //               class name passed to .extend().
 //   @name      — use for anonymous (unnamed) class expressions where @alias cannot
 //               be used.
-//   @namespace — sets the namespace prefix for converted extend-classes; the ES class
-//               name is appended automatically to form the full FQN.
+//   @namespace — sets the namespace prefix; the ES class name is appended automatically
+//               to form the full FQN passed to .extend().
 // The following two are parsed but their values are not used by the class transformer;
 // metadata and renderer are handled via static class properties instead:
 //   @metadata, @renderer
