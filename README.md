@@ -878,8 +878,10 @@ In general, comments are preserved, but for each class property/method whose pos
 
 - `namespacePrefix` (Default: '') Prefix to apply to namespace derived from directory.
 - `autoConvertAllExtendClasses` (Default false). Converts all classes by default, provided they extend from an imported class. Version 6 default behaviour.
-- `autoConvertControllerClass` (Default true). Converts the classes in a `.controller.js` (or .ts) file by default, if it extends from an imported class. 
-  Use `@nonui5` if there are multiple classes in a controller file which extend from an import.
+- `autoConvertUI5FileTypes` (Default true). Converts classes in files whose name ends with a recognised UI5 file-type suffix, provided the class extends an imported class. Covers `.controller.(js|ts)` and `.view.(js|ts|jsx|tsx)` by default.
+- `autoConvertControllerClass` (Default true). Backward-compatible override: set to `false` to suppress auto-conversion for `.controller.*` files even when `autoConvertUI5FileTypes` is enabled.
+- `autoConvertKnownUI5Classes` (Default false). Converts classes that extend a UI5 base class imported from a known module path (e.g. `sap/ui/core/mvc/Controller`, `sap/ui/core/Control`, `sap/ui/base/ManagedObject`, and others — see the built-in list in `src/classes/visitor.js`), without requiring an explicit `@alias` or `@namespace` annotation.
+- `additionalUI5Classes` (Default: []). Additional module paths to treat as known UI5 base classes, supplementing the built-in list used by `autoConvertKnownUI5Classes`. Useful for project-specific base classes (e.g. `"my/app/BaseController"`). Works independently of `autoConvertKnownUI5Classes` — you can supply additional paths without enabling the built-in list.
 - `neverConvertClass` (Default: false) Never convert classes to SAPClass.extend() syntax.
 - `moveControllerPropsToOnInit` (Default: false) Moves class props in a controller to the onInit method instead of constructor.
 - `moveControllerConstructorToOnInit` (Default: false) Moves existing constructor code in a controller to the onInit method. Enabling will auto-enable `moveControllerPropsToOnInit`.
