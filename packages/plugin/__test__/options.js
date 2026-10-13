@@ -82,6 +82,9 @@ const Options = {
     libs: {
       libs: ["^sap/"],
     },
+    "class-convert-transitive-ui5-classes": {
+      autoConvertKnownUI5Classes: true,
+    },
   },
 };
 
