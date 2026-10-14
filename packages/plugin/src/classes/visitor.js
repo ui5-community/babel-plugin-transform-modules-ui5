@@ -321,8 +321,8 @@ function shouldConvertClass(file, node, opts, classInfo) {
   }
   // Convert classes in recognised UI5 file types based on filename suffix.
   // autoConvertUI5FileTypes defaults to true; opt out by setting it to false.
-  // autoConvertControllerClass is kept for backward compatibility — if explicitly
-  // set to false it overrides controller detection regardless of autoConvertUI5FileTypes.
+  // autoConvertControllerClass and autoConvertViewClass mirror each other —
+  // if explicitly set to false they suppress the respective detection independently.
   if (opts.autoConvertUI5FileTypes !== false) {
     const filename = file.opts.filename || "";
     // .controller.(js|ts) — controllers are plain classes, no JSX
@@ -333,7 +333,10 @@ function shouldConvertClass(file, node, opts, classInfo) {
       return true;
     }
     // .view.(js|ts|jsx|tsx) — views may use JSX syntax
-    if (/.*[.]view[.](js|ts|jsx|tsx)$/.test(filename)) {
+    if (
+      /.*[.]view[.](js|ts|jsx|tsx)$/.test(filename) &&
+      opts.autoConvertViewClass !== false
+    ) {
       return true;
     }
   }

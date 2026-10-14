@@ -9,6 +9,9 @@ let importDeclarations = {};
 let superclassImportSources = {};
 
 export const saveImports = (file) => {
+  // Clear any stale superclass entry so watch-mode rebuilds don't carry over
+  // a previously recorded superclass that no longer applies to this file.
+  delete superclassImportSources[file.opts.filename];
   // save all import declarations before "unneeded" ones are removed by the TypeScript plugin
   importDeclarations[file.opts.filename] = file.ast.program.body.filter(
     t.isImportDeclaration

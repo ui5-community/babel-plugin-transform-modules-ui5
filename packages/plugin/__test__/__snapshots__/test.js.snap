@@ -675,10 +675,17 @@ exports[`classes class-convert-view-basic.view.js 1`] = `
 `;
 
 exports[`classes class-convert-view-basic.view.jsx 1`] = `
-"sap.ui.define(["sap/ui/core/mvc/JSView"], function (SAPView) {
+"sap.ui.define(["sap/ui/core/mvc/JSView", "sap/m/Button"], function (JSView, Button) {
   "use strict";
 
-  const MyView = SAPView.extend("fixtures.classes.MyView", {});
+  const MyView = JSView.extend("fixtures.classes.MyView", {
+    getControllerName: function _getControllerName() {
+      return "fixtures.classes.MyView";
+    },
+    createContent: function _createContent(oController) {
+      return <Button text="Press me" press={oController.onPress} />;
+    }
+  });
 });"
 `;
 
@@ -691,10 +698,17 @@ exports[`classes class-convert-view-basic.view.ts 1`] = `
 `;
 
 exports[`classes class-convert-view-basic.view.tsx 1`] = `
-"sap.ui.define(["sap/ui/core/mvc/JSView"], function (SAPView) {
+"sap.ui.define(["sap/ui/core/mvc/JSView", "sap/m/Button"], function (JSView, Button) {
   "use strict";
 
-  const MyView = SAPView.extend("fixtures.classes.MyView", {});
+  const MyView = JSView.extend("fixtures.classes.MyView", {
+    getControllerName: function _getControllerName() {
+      return "fixtures.classes.MyView";
+    },
+    createContent: function _createContent(oController) {
+      return <Button text="Press me" press={oController.onPress} />;
+    }
+  });
 });"
 `;
 
