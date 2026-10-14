@@ -1,6 +1,16 @@
 import { types as t } from "@babel/core";
 import { parse as parseComment } from "comment-parser";
 
+// Tags that provide a value for the class info:
+//   @alias  — recommended for named UI5 extend-classes (Component, View, Controller,
+//             Control, …); sets the fully-qualified class name passed to .extend().
+//             This is the JSDoc property used by UI5 source code and is the officially
+//             recommended way to declare the module name.
+//   @name   — use when the class has no local name (anonymous class expression, e.g.
+//             `return class extends SAPController {}`). @alias requires a local name
+//             to alias; @name does not.
+//   @namespace — sets the namespace prefix; the ES class name is appended automatically
+//             to form the full FQN passed to .extend().
 const classInfoValueTags = ["alias", "name", "namespace"];
 const classInfoBoolTags = ["nonUI5", "controller", "keepConstructor"];
 

@@ -84,8 +84,8 @@ A more detailed feature list includes:
 - Existing `sap.ui.define` calls don't get wrapped but classes within can still be converted.
   - Fixes `constructor` shorthand method, if used.
 - Various options to control the class name string used.
-  - JSDoc (name, namespace, alias)
-  - Decorators (name, namespace, alias)
+  - JSDoc (alias, namespace, name)
+  - Decorators (alias, namespace, name)
   - File path based namespace, including setting a prefix.
 
 ### Converting ES modules (import/export) into sap.ui.define or sap.ui.require
@@ -481,9 +481,9 @@ If the default file-based namespace does not work for you (perhaps the app name 
 
 The simplest way to override the names is to use JSDoc. This approach will also work well with classes output from TypeScript if you configure TypeScript to generate ES6 or higher, and don't enable `removeComments``.
 
-You can set the `@name`/`@alias` directly or just the `@namespace` and have the name derived from the ES class name.
+###### `@alias` — recommended for named extend-classes
 
-`@name` and `@alias` behave the same; `@name` was used originally but the `@alias` JSDoc property is used in UI5 source code, so support for that was added.
+Use **`@alias`** with the fully-qualified class name. `@alias` is the [officially recommended](https://github.com/SAP/openui5) JSDoc property used by UI5 source code itself to declare the module name.
 
 ```js
 /**
@@ -492,23 +492,45 @@ You can set the `@name`/`@alias` directly or just the `@namespace` and have the 
 class AController extends SAPController {
     ...
 }
+```
 
+outputs:
+
+```js
+const AController = SAPController.extend("my.app.AController", {
+    ...
+});
+```
+
+###### `@name` — for unnamed (anonymous) extend-classes
+
+Use **`@name`** when the class has no local name (e.g. an anonymous class expression passed to `return`). `@alias` requires a local name to alias; `@name` does not.
+
+```js
 /**
  * @name my.app.AController
  */
-class AController extends SAPController {
+return class extends SAPController {
     ...
 }
+```
 
+###### `@namespace` — namespace prefix for extend-classes
+
+Use **`@namespace`** to set only the namespace prefix; the class name is derived automatically from the ES class name. This is useful when the file-based namespace does not match the desired UI5 namespace.
+
+```js
 /**
  * @namespace my.app
  */
 class AController extends SAPController {
     ...
 }
+```
 
-Will all output:
+outputs:
 
+```js
 const AController = SAPController.extend("my.app.AController", {
     ...
 });
@@ -516,7 +538,7 @@ const AController = SAPController.extend("my.app.AController", {
 
 ##### Decorators
 
-Alternatively, you can use decorators to override the namespace or name used. The same properties as JSDoc will work, but instead of a space, pass the string literal to the decorator function.
+Alternatively, you can use decorators to override the namespace or name used. Pass the value as a string literal argument to the decorator function.
 
 NOTE that using a variable is currently not supported.
 
@@ -525,21 +547,9 @@ NOTE that using a variable is currently not supported.
 class AController extends SAPController {
     ...
 }
-
-@name('my.app.AController')
-class AController extends SAPController {
-    ...
-}
-
-@namespace('my.app')
-class AController extends SAPController {
-    ...
-}
-
-const AController = SAPController.extend("my.app.AController", {
-    ...
-});
 ```
+
+> :information_source: Use `@name('my.app.AController')` when the class has no local name (anonymous class expression). Use `@namespace('my.app')` to supply only the namespace prefix and have the class name derived automatically.
 
 ### Don't convert class
 
