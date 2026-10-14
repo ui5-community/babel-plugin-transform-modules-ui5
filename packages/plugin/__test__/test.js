@@ -49,6 +49,10 @@ function processDirectory(dir) {
             presets.push(["@babel/preset-typescript"]);
           }
 
+          if (filePath.endsWith(".jsx")) {
+            plugins.push("@babel/plugin-syntax-jsx");
+          }
+
           if (filePath.includes("flow")) {
             presets.push(["@babel/preset-flow"]);
           }
