@@ -305,8 +305,9 @@ function shouldConvertClass(file, node, opts, classInfo) {
       const importDecl = getImportDeclaration(filename, superClassName);
       if (importDecl) {
         const importSource = importDecl.source.value;
-        // Record this file's superclass import source so later files can walk the chain
-        saveSuperclassImportSource(filename, importSource);
+        // Record this file's superclass import source keyed by local name so that
+        // multiple classes in the same file each get their own entry
+        saveSuperclassImportSource(filename, superClassName, importSource);
         // Direct hit — immediate superclass is a known UI5 base class
         if (knownPaths.includes(importSource)) return true;
         // Transitive hit — walk the superclass chain through already-processed local files
