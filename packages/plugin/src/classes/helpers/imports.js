@@ -1,13 +1,38 @@
 import { types as t } from "@babel/core";
+import * as Path from "path";
 
 let importDeclarations = {};
 
+// Maps "filename\0superclassLocalName" → the import source path of that superclass.
+// Keyed by both filename and the local name of the superclass so that multiple classes
+// in the same file each get their own entry — avoiding the overwrite bug where a later
+// class would clobber the entry of an earlier one.
+// Populated by saveSuperclassImportSource(); used by isSuperclassTransitivelyKnown().
+let superclassImportSources = {};
+
 export const saveImports = (file) => {
+  // Clear any stale superclass entries for this file so watch-mode rebuilds
+  // don't carry over superclasses that no longer apply.
+  const prefix = file.opts.filename + "\0";
+  for (const key of Object.keys(superclassImportSources)) {
+    if (key.startsWith(prefix)) delete superclassImportSources[key];
+  }
   // save all import declarations before "unneeded" ones are removed by the TypeScript plugin
   importDeclarations[file.opts.filename] = file.ast.program.body.filter(
     t.isImportDeclaration
   ); // right now even the removed import still exists later and can be re-added. Otherwise do: .map(decl => t.cloneNode(decl));
 };
+
+/**
+ * Record the import source of a file's class superclass.
+ * Called from the visitor when a class extending an import is encountered.
+ * Used later for transitive resolution.
+ */
+export function saveSuperclassImportSource(filename, superclassLocalName, superclassImportSource) {
+  if (filename && superclassLocalName && superclassImportSource) {
+    superclassImportSources[filename + "\0" + superclassLocalName] = superclassImportSource;
+  }
+}
 
 // can be called from visitor to access previously present declarations
 export function getImportDeclaration(filename, typeName) {
@@ -40,4 +65,121 @@ export function getImportDeclaration(filename, typeName) {
     }
   );
   return filteredDeclarations[0]; // should be exactly one
+}
+
+/**
+ * Try to resolve a module import source (as written in the source, e.g. "my/app/BaseController")
+ * to the absolute filename key used in importDeclarations. Returns the key if a matching
+ * file was already processed in this Babel run, or null otherwise.
+ *
+ * Handles:
+ *  - Relative imports ("./BaseController", "../controllers/Base") — resolved from currentFilename's dir
+ *  - Module-path imports ("my/app/BaseController") — resolved from sourceRoot
+ *    When namespacePrefix is set (e.g. "my.app"), module-path imports are first tried with
+ *    the prefix stripped (dots→slashes), so "my/app/BaseController" → "BaseController"
+ *    is resolved as sourceRoot + "/BaseController" rather than sourceRoot + "/my/app/BaseController".
+ *
+ * Third-party / SAP module paths like "sap/ui/core/mvc/Controller" are never on disk
+ * and will always return null (no key in importDeclarations).
+ */
+function resolveImportSourceToFilename(importSource, currentFilename, sourceRoot, namespacePrefix) {
+  if (!importSource || !currentFilename) return null;
+
+  const extensions = [".js", ".ts", ".jsx", ".tsx", ".mjs"];
+
+  const bases = [];
+  if (importSource.startsWith("./") || importSource.startsWith("../")) {
+    bases.push(Path.resolve(Path.dirname(currentFilename), importSource));
+  } else if (sourceRoot) {
+    bases.push(Path.resolve(sourceRoot, importSource));
+    // When namespacePrefix is configured, module paths include the prefix as a leading
+    // path segment. Strip it so "my/app/controller/Base" resolves to
+    // sourceRoot/controller/Base instead of sourceRoot/my/app/controller/Base.
+    if (namespacePrefix) {
+      const prefixPath = namespacePrefix.replace(/\./g, "/");
+      if (importSource.startsWith(prefixPath + "/")) {
+        const stripped = importSource.slice(prefixPath.length + 1);
+        bases.push(Path.resolve(sourceRoot, stripped));
+      }
+    }
+  }
+
+  for (const base of bases) {
+    if (importDeclarations[base]) return base;
+    for (const ext of extensions) {
+      const candidate = base + ext;
+      if (importDeclarations[candidate]) return candidate;
+    }
+  }
+  return null;
+}
+
+/**
+ * Walk the superclass import chain transitively to check whether any ancestor class
+ * is imported from a path in knownPaths. Stops at maxDepth to avoid infinite loops.
+ *
+ * Requires that ancestor files were processed before the current file in this Babel run
+ * AND that saveSuperclassImportSource() was called for each of them, which happens
+ * automatically in visitor.js when a class extending an import is encountered.
+ *
+ * Example chain:
+ *   MyController.js  extends BaseController  → import "my/app/BaseController"
+ *   BaseController.js extends Controller     → import "sap/ui/core/mvc/Controller" ✓ known
+ *
+ * Called with:
+ *   isSuperclassTransitivelyKnown("MyController.js", "BaseController", knownPaths, sourceRoot, namespacePrefix)
+ * → returns true
+ */
+export function isSuperclassTransitivelyKnown(
+  filename,
+  superclassLocalName,
+  knownPaths,
+  sourceRoot,
+  namespacePrefix = null,
+  maxDepth = 3
+) {
+  if (!filename || !superclassLocalName || !knownPaths?.length || maxDepth <= 0) {
+    return false;
+  }
+
+  const importDecl = getImportDeclaration(filename, superclassLocalName);
+  if (!importDecl) return false;
+
+  const importSource = importDecl.source.value;
+
+  // Direct hit — immediate superclass is in the known list
+  if (knownPaths.includes(importSource)) return true;
+
+  // Try to resolve to a local file processed earlier in this Babel run
+  const resolvedFile = resolveImportSourceToFilename(importSource, filename, sourceRoot, namespacePrefix);
+  if (!resolvedFile) return false;
+
+  // Look up what that file's class itself extends (stored by saveSuperclassImportSource).
+  // We need to find the local name used in resolvedFile for its own superclass.
+  // Walk that file's imports to find which default specifier's local name was recorded.
+  const ancestorImports = importDeclarations[resolvedFile] || [];
+  for (const decl of ancestorImports) {
+    for (const specifier of decl.specifiers) {
+      if (
+        t.isImportDefaultSpecifier(specifier) ||
+        t.isImportNamespaceSpecifier(specifier)
+      ) {
+        const localName = specifier.local.name;
+        const key = resolvedFile + "\0" + localName;
+        if (superclassImportSources[key] !== undefined) {
+          const ancestorSuperImportSource = superclassImportSources[key];
+          if (knownPaths.includes(ancestorSuperImportSource)) return true;
+          return isSuperclassTransitivelyKnown(
+            resolvedFile,
+            localName,
+            knownPaths,
+            sourceRoot,
+            namespacePrefix,
+            maxDepth - 1
+          );
+        }
+      }
+    }
+  }
+  return false;
 }

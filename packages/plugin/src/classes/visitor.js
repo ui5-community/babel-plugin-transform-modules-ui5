@@ -1,7 +1,30 @@
 import { types as t } from "@babel/core";
+import * as Path from "path";
 import * as th from "../utils/templates";
 import * as ast from "../utils/ast";
 import * as classes from "./helpers/classes";
+import { getImportDeclaration, saveSuperclassImportSource, isSuperclassTransitivelyKnown } from "./helpers/imports";
+
+/**
+ * Built-in list of UI5 base-class module paths used by autoConvertKnownUI5Classes.
+ * A class whose superclass is imported from one of these paths will be auto-converted
+ * to .extend() syntax without requiring an explicit @alias/@namespace annotation.
+ */
+const KNOWN_UI5_BASE_CLASSES = [
+  "sap/ui/core/mvc/Controller",
+  "sap/ui/core/mvc/View",
+  "sap/ui/core/mvc/XMLView",
+  "sap/ui/core/mvc/JSView",
+  "sap/ui/core/mvc/HTMLView",
+  "sap/ui/core/mvc/JSONView",
+  "sap/ui/core/UIComponent",
+  "sap/ui/core/Component",
+  "sap/ui/core/Control",
+  "sap/ui/core/Element",
+  "sap/ui/base/ManagedObject",
+  "sap/ui/base/Object",
+  "sap/ui/core/mvc/ControllerExtension",
+];
 
 const CONSTRUCTOR = "constructor";
 
@@ -49,6 +72,16 @@ export const ClassTransformVisitor = {
         if (className) {
           this.classInfo = this.classInfo || {};
           this.classInfo[className] = classInfo;
+        }
+        // Record this file's superclass import source unconditionally so that
+        // descendants in other files can use transitive detection even when this
+        // class was converted via an explicit annotation (not autoConvertKnownUI5Classes).
+        const superClassName = node.superClass?.name;
+        if (superClassName) {
+          const importDecl = getImportDeclaration(file.opts.filename, superClassName);
+          if (importDecl) {
+            saveSuperclassImportSource(file.opts.filename, superClassName, importDecl.source.value);
+          }
         }
       }
     },
@@ -253,12 +286,70 @@ function shouldConvertClass(file, node, opts, classInfo) {
   ) {
     return true;
   }
-  // Convert controller classes
-  if (
-    /.*[.]controller[.](js|ts)$/.test(file.opts.filename) &&
-    opts.autoConvertControllerClass !== false
-  ) {
-    return true;
+
+  // For all auto-conversion paths below, require a non-empty namespace so the
+  // generated FQN is not a bare class name. fileNamespace is derived from the
+  // file path relative to sourceRoot (+ namespacePrefix if set).
+  if (!classInfo.fileNamespace) {
+    return false;
+  }
+
+  // Don't auto-convert when unknown (non-UI5) decorators remain on the class —
+  // those decorators may transform the class in ways incompatible with .extend().
+  // Explicit @alias/@namespace annotations (handled above) still take precedence.
+  if (node.decorators?.length) {
+    return false;
+  }
+
+  // Convert classes whose superclass is imported from a known UI5 base-class module.
+  // autoConvertKnownUI5Classes defaults to true; opt out by setting it to false.
+  // additionalUI5Classes: extra module paths added on top of the built-in list.
+  if (opts.autoConvertKnownUI5Classes !== false || opts.additionalUI5Classes?.length) {
+    const knownPaths = [
+      ...(opts.autoConvertKnownUI5Classes !== false ? KNOWN_UI5_BASE_CLASSES : []),
+      ...(opts.additionalUI5Classes || []),
+    ];
+    if (knownPaths.length) {
+      const superClassName = node.superClass?.name;
+      const filename = file.opts.filename;
+      const importDecl = getImportDeclaration(filename, superClassName);
+      if (importDecl) {
+        const importSource = importDecl.source.value;
+        // Record this file's superclass import source keyed by local name so that
+        // multiple classes in the same file each get their own entry
+        saveSuperclassImportSource(filename, superClassName, importSource);
+        // Direct hit — immediate superclass is a known UI5 base class
+        if (knownPaths.includes(importSource)) return true;
+        // Transitive hit — walk the superclass chain through already-processed local files
+        const sourceRoot = file.opts.sourceRoot
+          ? Path.resolve(process.cwd(), file.opts.sourceRoot)
+          : process.cwd();
+        if (isSuperclassTransitivelyKnown(filename, superClassName, knownPaths, sourceRoot, opts.namespacePrefix || null)) {
+          return true;
+        }
+      }
+    }
+  }
+  // Convert classes in recognised UI5 file types based on filename suffix.
+  // autoConvertUI5FileTypes defaults to true; opt out by setting it to false.
+  // autoConvertControllerClass and autoConvertViewClass mirror each other —
+  // if explicitly set to false they suppress the respective detection independently.
+  if (opts.autoConvertUI5FileTypes !== false) {
+    const filename = file.opts.filename || "";
+    // .controller.(js|ts) — controllers are plain classes, no JSX
+    if (
+      /.*[.]controller[.](js|ts)$/.test(filename) &&
+      opts.autoConvertControllerClass !== false
+    ) {
+      return true;
+    }
+    // .view.(js|ts|jsx|tsx) — views may use JSX syntax
+    if (
+      /.*[.]view[.](js|ts|jsx|tsx)$/.test(filename) &&
+      opts.autoConvertViewClass !== false
+    ) {
+      return true;
+    }
   }
   return false;
 }

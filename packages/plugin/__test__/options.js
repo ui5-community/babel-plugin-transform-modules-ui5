@@ -36,6 +36,12 @@ const Options = {
     "class-convert-all": {
       autoConvertAllExtendClasses: true,
     },
+    "class-convert-known-ui5-classes": {
+      autoConvertKnownUI5Classes: true,
+    },
+    "class-convert-additional-ui5-classes": {
+      additionalUI5Classes: ["my/app/BaseController"],
+    },
     "class-convert-constructor-move.controller": {
       moveControllerConstructorToOnInit: true,
     },
@@ -75,6 +81,9 @@ const Options = {
     },
     libs: {
       libs: ["^sap/"],
+    },
+    "class-convert-transitive-ui5-classes": {
+      autoConvertKnownUI5Classes: true,
     },
   },
 };
