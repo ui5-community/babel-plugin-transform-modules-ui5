@@ -3,15 +3,20 @@ import * as Path from "path";
 
 let importDeclarations = {};
 
-// Maps filename → the import source path of that file's primary class's superclass.
-// Populated by saveSuperclassImport() when visitor.js identifies a class that extends
-// from an import. Used by isSuperclassTransitivelyKnown() for transitive chain walking.
+// Maps "filename\0superclassLocalName" → the import source path of that superclass.
+// Keyed by both filename and the local name of the superclass so that multiple classes
+// in the same file each get their own entry — avoiding the overwrite bug where a later
+// class would clobber the entry of an earlier one.
+// Populated by saveSuperclassImportSource(); used by isSuperclassTransitivelyKnown().
 let superclassImportSources = {};
 
 export const saveImports = (file) => {
-  // Clear any stale superclass entry so watch-mode rebuilds don't carry over
-  // a previously recorded superclass that no longer applies to this file.
-  delete superclassImportSources[file.opts.filename];
+  // Clear any stale superclass entries for this file so watch-mode rebuilds
+  // don't carry over superclasses that no longer apply.
+  const prefix = file.opts.filename + "\0";
+  for (const key of Object.keys(superclassImportSources)) {
+    if (key.startsWith(prefix)) delete superclassImportSources[key];
+  }
   // save all import declarations before "unneeded" ones are removed by the TypeScript plugin
   importDeclarations[file.opts.filename] = file.ast.program.body.filter(
     t.isImportDeclaration
@@ -23,9 +28,9 @@ export const saveImports = (file) => {
  * Called from the visitor when a class extending an import is encountered.
  * Used later for transitive resolution.
  */
-export function saveSuperclassImportSource(filename, superclassImportSource) {
-  if (filename && superclassImportSource) {
-    superclassImportSources[filename] = superclassImportSource;
+export function saveSuperclassImportSource(filename, superclassLocalName, superclassImportSource) {
+  if (filename && superclassLocalName && superclassImportSource) {
+    superclassImportSources[filename + "\0" + superclassLocalName] = superclassImportSource;
   }
 }
 
@@ -135,30 +140,29 @@ export function isSuperclassTransitivelyKnown(
   const resolvedFile = resolveImportSourceToFilename(importSource, filename, sourceRoot);
   if (!resolvedFile) return false;
 
-  // Look up what that file's class itself extends (stored by saveSuperclassImportSource)
-  const ancestorSuperImportSource = superclassImportSources[resolvedFile];
-  if (!ancestorSuperImportSource) return false;
-
-  // Direct hit at one level up
-  if (knownPaths.includes(ancestorSuperImportSource)) return true;
-
-  // Recurse: find the local name the ancestor's superclass is imported as,
-  // so we can walk further up
+  // Look up what that file's class itself extends (stored by saveSuperclassImportSource).
+  // We need to find the local name used in resolvedFile for its own superclass.
+  // Walk that file's imports to find which default specifier's local name was recorded.
   const ancestorImports = importDeclarations[resolvedFile] || [];
   for (const decl of ancestorImports) {
-    if (decl.source.value !== ancestorSuperImportSource) continue;
     for (const specifier of decl.specifiers) {
       if (
         t.isImportDefaultSpecifier(specifier) ||
         t.isImportNamespaceSpecifier(specifier)
       ) {
-        return isSuperclassTransitivelyKnown(
-          resolvedFile,
-          specifier.local.name,
-          knownPaths,
-          sourceRoot,
-          maxDepth - 1
-        );
+        const localName = specifier.local.name;
+        const key = resolvedFile + "\0" + localName;
+        if (superclassImportSources[key] !== undefined) {
+          const ancestorSuperImportSource = superclassImportSources[key];
+          if (knownPaths.includes(ancestorSuperImportSource)) return true;
+          return isSuperclassTransitivelyKnown(
+            resolvedFile,
+            localName,
+            knownPaths,
+            sourceRoot,
+            maxDepth - 1
+          );
+        }
       }
     }
   }
