@@ -73,6 +73,16 @@ export const ClassTransformVisitor = {
           this.classInfo = this.classInfo || {};
           this.classInfo[className] = classInfo;
         }
+        // Record this file's superclass import source unconditionally so that
+        // descendants in other files can use transitive detection even when this
+        // class was converted via an explicit annotation (not autoConvertKnownUI5Classes).
+        const superClassName = node.superClass?.name;
+        if (superClassName) {
+          const importDecl = getImportDeclaration(file.opts.filename, superClassName);
+          if (importDecl) {
+            saveSuperclassImportSource(file.opts.filename, superClassName, importDecl.source.value);
+          }
+        }
       }
     },
     exit(path, { opts = {} }) {
@@ -314,7 +324,7 @@ function shouldConvertClass(file, node, opts, classInfo) {
         const sourceRoot = file.opts.sourceRoot
           ? Path.resolve(process.cwd(), file.opts.sourceRoot)
           : process.cwd();
-        if (isSuperclassTransitivelyKnown(filename, superClassName, knownPaths, sourceRoot)) {
+        if (isSuperclassTransitivelyKnown(filename, superClassName, knownPaths, sourceRoot, opts.namespacePrefix || null)) {
           return true;
         }
       }
