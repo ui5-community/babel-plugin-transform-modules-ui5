@@ -75,11 +75,14 @@ export function getImportDeclaration(filename, typeName) {
  * Handles:
  *  - Relative imports ("./BaseController", "../controllers/Base") — resolved from currentFilename's dir
  *  - Module-path imports ("my/app/BaseController") — resolved from sourceRoot
+ *    When namespacePrefix is set (e.g. "my.app"), module-path imports are first tried with
+ *    the prefix stripped (dots→slashes), so "my/app/BaseController" → "BaseController"
+ *    is resolved as sourceRoot + "/BaseController" rather than sourceRoot + "/my/app/BaseController".
  *
  * Third-party / SAP module paths like "sap/ui/core/mvc/Controller" are never on disk
  * and will always return null (no key in importDeclarations).
  */
-function resolveImportSourceToFilename(importSource, currentFilename, sourceRoot) {
+function resolveImportSourceToFilename(importSource, currentFilename, sourceRoot, namespacePrefix) {
   if (!importSource || !currentFilename) return null;
 
   const extensions = [".js", ".ts", ".jsx", ".tsx", ".mjs"];
@@ -89,6 +92,16 @@ function resolveImportSourceToFilename(importSource, currentFilename, sourceRoot
     bases.push(Path.resolve(Path.dirname(currentFilename), importSource));
   } else if (sourceRoot) {
     bases.push(Path.resolve(sourceRoot, importSource));
+    // When namespacePrefix is configured, module paths include the prefix as a leading
+    // path segment. Strip it so "my/app/controller/Base" resolves to
+    // sourceRoot/controller/Base instead of sourceRoot/my/app/controller/Base.
+    if (namespacePrefix) {
+      const prefixPath = namespacePrefix.replace(/\./g, "/");
+      if (importSource.startsWith(prefixPath + "/")) {
+        const stripped = importSource.slice(prefixPath.length + 1);
+        bases.push(Path.resolve(sourceRoot, stripped));
+      }
+    }
   }
 
   for (const base of bases) {
@@ -114,7 +127,7 @@ function resolveImportSourceToFilename(importSource, currentFilename, sourceRoot
  *   BaseController.js extends Controller     → import "sap/ui/core/mvc/Controller" ✓ known
  *
  * Called with:
- *   isSuperclassTransitivelyKnown("MyController.js", "BaseController", knownPaths, sourceRoot)
+ *   isSuperclassTransitivelyKnown("MyController.js", "BaseController", knownPaths, sourceRoot, namespacePrefix)
  * → returns true
  */
 export function isSuperclassTransitivelyKnown(
@@ -122,6 +135,7 @@ export function isSuperclassTransitivelyKnown(
   superclassLocalName,
   knownPaths,
   sourceRoot,
+  namespacePrefix = null,
   maxDepth = 3
 ) {
   if (!filename || !superclassLocalName || !knownPaths?.length || maxDepth <= 0) {
@@ -137,7 +151,7 @@ export function isSuperclassTransitivelyKnown(
   if (knownPaths.includes(importSource)) return true;
 
   // Try to resolve to a local file processed earlier in this Babel run
-  const resolvedFile = resolveImportSourceToFilename(importSource, filename, sourceRoot);
+  const resolvedFile = resolveImportSourceToFilename(importSource, filename, sourceRoot, namespacePrefix);
   if (!resolvedFile) return false;
 
   // Look up what that file's class itself extends (stored by saveSuperclassImportSource).
@@ -160,6 +174,7 @@ export function isSuperclassTransitivelyKnown(
             localName,
             knownPaths,
             sourceRoot,
+            namespacePrefix,
             maxDepth - 1
           );
         }
