@@ -646,6 +646,42 @@ exports[`classes class-convert-options-namedonly.js 1`] = `
 });"
 `;
 
+exports[`classes class-convert-transitive-default-export-nonui5 NativeBase.js 1`] = `
+"sap.ui.define([], function () {
+  "use strict";
+
+  class NativeBase {}
+  return NativeBase;
+});"
+`;
+
+exports[`classes class-convert-transitive-default-export-nonui5 UIBase.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller", "./NativeBase"], function (Controller, __NativeBase) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const NativeBase = _interopRequireDefault(__NativeBase);
+  const Helper = Controller.extend("fixtures.classes.class-convert-transitive-default-export-nonui5.Helper", {});
+  class UIBase extends NativeBase {}
+  return UIBase;
+});"
+`;
+
+exports[`classes class-convert-transitive-default-export-nonui5 ZChild.js 1`] = `
+"sap.ui.define(["./UIBase"], function (__UIBase) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const UIBase = _interopRequireDefault(__UIBase);
+  class ZChild extends UIBase {}
+  return ZChild;
+});"
+`;
+
 exports[`classes class-convert-transitive-ui5-classes BaseController.js 1`] = `
 "sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
   "use strict";

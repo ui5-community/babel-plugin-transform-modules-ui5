@@ -18,7 +18,8 @@ emptyDirSync(join(__dirname, OUT_DIR_NAME));
 
 function processDirectory(dir) {
   const items = readdirSync(dir);
-  // Process Files first
+  // Process Files first (sorted for deterministic ordering, which matters for transitive
+  // superclass resolution — ancestor files must sort before descendant files)
   items
     .filter(
       (item) =>
@@ -27,6 +28,7 @@ function processDirectory(dir) {
         item.endsWith(".jsx") ||
         item.endsWith(".tsx")
     )
+    .sort()
     .forEach((filename) => {
       test(filename, () => {
         const filePath = join(dir, filename);

@@ -85,6 +85,9 @@ const Options = {
     "class-convert-transitive-ui5-classes": {
       autoConvertKnownUI5Classes: true,
     },
+    "class-convert-transitive-default-export-nonui5": {
+      autoConvertKnownUI5Classes: true,
+    },
   },
 };
 
