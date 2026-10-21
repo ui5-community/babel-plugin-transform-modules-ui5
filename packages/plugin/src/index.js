@@ -1,6 +1,8 @@
 import { ClassTransformVisitor } from "./classes/visitor";
 import { ClassPre } from "./classes/pre";
 import { ModuleTransformVisitor } from "./modules/visitor";
+import { clearImports } from "./classes/helpers/imports";
+import { escapeRegExp } from "./utils/ast";
 
 import { wrap } from "./modules/helpers/wrapper";
 
@@ -19,7 +21,7 @@ module.exports = () => {
         if (this.ran) return;
         this.ran = true;
 
-        if (opts.onlyConvertNamedClass == false) {
+        if (opts.onlyConvertNamedClass === false) {
           throw new Error(
             "ERROR: onlyConvertNamedClass=false is no longer supported. Use autoConvertAllExtendClassesByDefault=true"
           );
@@ -33,7 +35,9 @@ module.exports = () => {
         this.namespacePrefix = opts.namespacePrefix;
         this.noImportInteropPrefixes = opts.noImportInteropPrefixes || ["sap/"];
         this.noImportInteropPrefixesRegexp = new RegExp(
-          this.noImportInteropPrefixes.map((p) => `(^${p}.*)`).join("|")
+          this.noImportInteropPrefixes
+            .map((p) => `(^${escapeRegExp(p)}.*)`)
+            .join("|")
         );
 
         // Properties for Module Transform
@@ -73,5 +77,8 @@ module.exports = () => {
   return {
     pre: ClassPre,
     visitor: UI5Visitor,
+    post({ opts }) {
+      if (opts.filename) clearImports(opts.filename);
+    },
   };
 };

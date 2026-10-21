@@ -11,7 +11,7 @@ const resolveSource = (src, filename) => {
   src = src.replace(/\\/g, "/");
   const dir = dirname(filename);
   const absoluteSrc = join(dir, src);
-  if (existsSync(absoluteSrc) && statSync(absoluteSrc).isDirectory) {
+  if (existsSync(absoluteSrc) && statSync(absoluteSrc).isDirectory()) {
     if (
       existsSync(join(absoluteSrc, "index.js")) ||
       existsSync(join(absoluteSrc, "index.jsx")) ||
@@ -55,7 +55,7 @@ const addImport = (imports, imp, filename, first) => {
           modulePath = require.resolve(absModuleSrc);
         }
         // detect removal of file extension and log a hint
-        if (modulePath.endsWith(imp.src.split("/").pop())) {
+        if (modulePath && modulePath.endsWith(imp.src.split("/").pop())) {
           console.log(
             `\x1b[33mHint:\x1b[0m Removed file extension for dependency "\x1b[34m${imp.src}\x1b[0m" found in \x1b[90m${filename}\x1b[0m`
           );
@@ -194,7 +194,11 @@ export const ModuleTransformVisitor = {
           th.buildNamedImportDestructor({
             MODULE: t.identifier(imp.tmpName),
             LOCAL: specifier.local,
-            IMPORTED: t.stringLiteral(specifier.imported.name),
+            IMPORTED: t.stringLiteral(
+              t.isStringLiteral(specifier.imported)
+                ? specifier.imported.value
+                : specifier.imported.name
+            ),
           })
         );
       } else {

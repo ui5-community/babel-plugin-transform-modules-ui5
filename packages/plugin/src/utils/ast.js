@@ -1,5 +1,9 @@
 import { types as t } from "@babel/core";
 
+// Escapes regex metacharacters (. * + ? ^ $ { } ( ) | [ ] \) so a plain string
+// can be safely embedded inside a RegExp pattern without unintended wildcard behaviour.
+export const escapeRegExp = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
 export function isObjectAssignOrExtendsExpression(node) {
   return isObjectAssignExpression(node) || isExtendsHelperExpression(node);
 }
@@ -141,15 +145,25 @@ export function getPropertiesOfObjectAssignOrExtendHelper(
     .flat(Infinity);
 }
 
+function getPropKeyName(key) {
+  if (!key) return undefined;
+  if (key.type === "StringLiteral") return key.value;
+  if (key.type === "Identifier") return key.name;
+  return undefined;
+}
+
 export function getPropNames(props) {
-  return props.map((prop) => prop.key.name);
+  return props.map((prop) => getPropKeyName(prop.key)).filter(Boolean);
 }
 
 export function groupPropertiesByName(properties) {
   return (
     properties &&
     properties.reduce((accumulator, property) => {
-      accumulator[property.key.name] = property.value;
+      const name = getPropKeyName(property.key);
+      if (name !== undefined) {
+        accumulator[name] = property.value;
+      }
       return accumulator;
     }, {})
   );
