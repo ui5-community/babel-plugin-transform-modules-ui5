@@ -13,6 +13,10 @@ Babel Types (t.*) https://github.com/babel/babel/tree/master/packages/babel-type
 AST Explorer: https://astexplorer.net/
 */
 
+// Tracks whether we have already registered the process.on('exit') handler for the
+// additionalUI5Classes unmatched-path warning. One handler per Babel process is enough.
+let exitHandlerRegistered = false;
+
 module.exports = () => {
   const UI5Visitor = {
     Program: {
@@ -73,14 +77,23 @@ module.exports = () => {
 
   return {
     pre: ClassPre,
-    post({ opts }) {
-      const unmatched = getUnmatchedAdditionalUI5Classes(
-        opts.additionalUI5Classes
-      );
-      for (const path of unmatched) {
-        console.warn(
-          `\x1b[33mWarn:\x1b[0m additionalUI5Classes: path "\x1b[34m${path}\x1b[0m" was never matched by any import in this build. Check for typos.`
-        );
+    post() {
+      // F5: use this.opts (plugin options), not the Babel file opts passed as argument.
+      // F6: defer the warning to process exit so it fires once after all files are done,
+      //     avoiding false positives when a valid path is only imported in a later file.
+      const additionalUI5Classes = this.opts?.additionalUI5Classes;
+      if (!additionalUI5Classes?.length) return;
+      if (!exitHandlerRegistered) {
+        exitHandlerRegistered = true;
+        process.on("exit", () => {
+          const unmatched =
+            getUnmatchedAdditionalUI5Classes(additionalUI5Classes);
+          for (const p of unmatched) {
+            console.warn(
+              `\x1b[33mWarn:\x1b[0m additionalUI5Classes: path "\x1b[34m${p}\x1b[0m" was never matched by any import in this build. Check for typos.`
+            );
+          }
+        });
       }
     },
     visitor: UI5Visitor,

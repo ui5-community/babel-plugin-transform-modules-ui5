@@ -699,6 +699,47 @@ exports[`classes class-convert-transitive-default-export-nonui5 ZChild.js 1`] = 
 });"
 `;
 
+exports[`classes class-convert-transitive-explicit-ext BaseController.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  const BaseController = Controller.extend("fixtures.classes.class-convert-transitive-explicit-ext.BaseController", {});
+});"
+`;
+
+exports[`classes class-convert-transitive-explicit-ext MyController.js 1`] = `
+"sap.ui.define(["./BaseController"], function (__BaseController) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const BaseController = _interopRequireDefault(__BaseController);
+  const MyController = BaseController.extend("fixtures.classes.class-convert-transitive-explicit-ext.MyController", {});
+});"
+`;
+
+exports[`classes class-convert-transitive-renamed-import ActualBase.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  const ActualBase = Controller.extend("fixtures.classes.class-convert-transitive-renamed-import.ActualBase", {});
+  return ActualBase;
+});"
+`;
+
+exports[`classes class-convert-transitive-renamed-import MyController.js 1`] = `
+"sap.ui.define(["./ActualBase"], function (__Base) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const Base = _interopRequireDefault(__Base);
+  const MyController = Base.extend("fixtures.classes.class-convert-transitive-renamed-import.MyController", {});
+});"
+`;
+
 exports[`classes class-convert-transitive-reverse-order AChild.js 1`] = `
 "sap.ui.define(["./ZBase"], function (__ZBase) {
   "use strict";

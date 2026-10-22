@@ -302,12 +302,11 @@ function shouldConvertClass(file, node, opts, classInfo) {
     return true;
   }
 
-  // Filename-suffix opt-outs take precedence over every auto-conversion path below
-  // (including autoConvertKnownUI5Classes). A user who explicitly disables controller
-  // or view conversion must not have it silently re-enabled just because the class
-  // extends a known UI5 base — autoConvertControllerClass/autoConvertViewClass are
-  // documented as backward-compatible overrides.
-  if (opts.autoConvertUI5FileTypes !== false) {
+  // Filename-suffix opt-outs are authoritative overrides — honor them regardless of
+  // whether autoConvertUI5FileTypes is on or off. A user who explicitly disables
+  // controller or view conversion must not have it silently re-enabled by the
+  // known-class branch or any other detection path.
+  {
     const filename = file.opts.filename || "";
     if (
       /.*[.]controller[.](js|ts)$/.test(filename) &&
@@ -384,22 +383,24 @@ function shouldConvertClass(file, node, opts, classInfo) {
           }
           return true;
         }
-        // Transitive hit — walk the superclass chain through already-processed local files
+        // Transitive hit — walk the superclass chain through already-processed local files.
+        // isSuperclassTransitivelyKnown returns the matched importSource string (or null).
         const sourceRoot = file.opts.sourceRoot
           ? Path.resolve(process.cwd(), file.opts.sourceRoot)
           : process.cwd();
-        if (
-          isSuperclassTransitivelyKnown(
-            filename,
-            superClassName,
-            knownPaths,
-            sourceRoot,
-            opts.namespacePrefix || null
-          )
-        ) {
-          // The matching path may be anywhere in the chain; mark all additionalUI5Classes
-          // paths as seen to avoid spurious "unmatched" warnings for transitive matches.
-          opts.additionalUI5Classes?.forEach(recordAdditionalUI5ClassMatch);
+        const transitiveMatch = isSuperclassTransitivelyKnown(
+          filename,
+          superClassName,
+          knownPaths,
+          sourceRoot,
+          opts.namespacePrefix || null
+        );
+        if (transitiveMatch) {
+          // F4: mark only the path that was actually matched, not every additionalUI5Classes
+          // entry — to avoid suppressing valid "never matched" warnings for typo paths.
+          if (opts.additionalUI5Classes?.includes(transitiveMatch)) {
+            recordAdditionalUI5ClassMatch(transitiveMatch);
+          }
           return true;
         }
       }

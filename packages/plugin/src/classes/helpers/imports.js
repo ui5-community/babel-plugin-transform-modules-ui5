@@ -67,10 +67,12 @@ function recordAncestry(filename, programBody) {
 
   for (const stmt of programBody) {
     // Handle: class Foo extends Bar {} and export default class Foo extends Bar {}
+    const isDefaultExport =
+      t.isExportDefaultDeclaration(stmt) &&
+      t.isClassDeclaration(stmt.declaration);
     const classNode = t.isClassDeclaration(stmt)
       ? stmt
-      : t.isExportDefaultDeclaration(stmt) &&
-          t.isClassDeclaration(stmt.declaration)
+      : isDefaultExport
         ? stmt.declaration
         : null;
     if (!classNode) continue;
@@ -81,6 +83,12 @@ function recordAncestry(filename, programBody) {
     if (importSource) {
       superclassImportSources[filename + "\0" + superName] = importSource;
       classSuperclassNames[filename + "\0" + className] = superName;
+      // F2: also store a "\0default" sentinel for default-exported classes so that a
+      // descendant importing the class under a different local alias can still find the
+      // superclass chain (e.g. `import Base from "./ActualBase"` where class is ActualBase).
+      if (isDefaultExport) {
+        classSuperclassNames[filename + "\0default"] = superName;
+      }
     }
   }
 }
@@ -253,6 +261,9 @@ function resolveImportSourceToFilename(
   // isSuperclassTransitivelyKnown checks knownPaths.includes(importSource) first,
   // before resolveImportSourceToFilename is ever called.
   for (const base of bases) {
+    // F1: try the exact path first — handles explicit-extension imports like "./Base.js"
+    // where `base` is already the full resolved path and appending an extension would be wrong.
+    if (readAndRecordFile(base)) return base;
     for (const ext of extensions) {
       const candidate = base + ext;
       if (readAndRecordFile(candidate)) return candidate;
@@ -289,21 +300,21 @@ export function isSuperclassTransitivelyKnown(
   _visited = null
 ) {
   if (!filename || !superclassLocalName || !knownPaths?.length) {
-    return false;
+    return null;
   }
 
   const visited = _visited ?? new Set();
   const key = filename + "\0" + superclassLocalName;
-  if (visited.has(key)) return false; // cycle detected
+  if (visited.has(key)) return null; // cycle detected
   visited.add(key);
 
   const importDecl = getImportDeclaration(filename, superclassLocalName);
-  if (!importDecl) return false;
+  if (!importDecl) return null;
 
   const importSource = importDecl.source.value;
 
-  // Direct hit — immediate superclass is in the known list
-  if (knownPaths.includes(importSource)) return true;
+  // Direct hit — immediate superclass is in the known list; return the matched path
+  if (knownPaths.includes(importSource)) return importSource;
 
   // Try to resolve to a local file processed earlier in this Babel run
   const resolvedFile = resolveImportSourceToFilename(
@@ -312,7 +323,7 @@ export function isSuperclassTransitivelyKnown(
     sourceRoot,
     namespacePrefix
   );
-  if (!resolvedFile) return false;
+  if (!resolvedFile) return null;
 
   // Look up what that file's class itself extends (stored by saveSuperclassImportSource).
   //
@@ -321,15 +332,23 @@ export function isSuperclassTransitivelyKnown(
   // gives the ancestor's superclass binding name in that file (e.g. "Controller"). This correctly
   // follows the exported class's chain rather than any sibling class's chain, fixing the bug where
   // a file with a local UI5 helper and a non-UI5 default export would wrongly match the helper.
-  const ancestorSuperLocalName =
+  let ancestorSuperLocalName =
     classSuperclassNames[resolvedFile + "\0" + superclassLocalName];
-  if (!ancestorSuperLocalName) return false;
+  if (!ancestorSuperLocalName) {
+    // F2: the import may be a renamed default (e.g. `import Base from "./ActualBase"` where
+    // the class is declared `export default class ActualBase`). Fall back to the "\0default"
+    // sentinel entry recorded for that file's default export.
+    ancestorSuperLocalName = classSuperclassNames[resolvedFile + "\0default"];
+  }
+  if (!ancestorSuperLocalName) return null;
 
   const ancestorSuperImportSource =
     superclassImportSources[resolvedFile + "\0" + ancestorSuperLocalName];
-  if (!ancestorSuperImportSource) return false;
+  if (!ancestorSuperImportSource) return null;
 
-  if (knownPaths.includes(ancestorSuperImportSource)) return true;
+  // One-hop hit: ancestor's superclass is directly known; return the matched path
+  if (knownPaths.includes(ancestorSuperImportSource))
+    return ancestorSuperImportSource;
   return isSuperclassTransitivelyKnown(
     resolvedFile,
     ancestorSuperLocalName,
