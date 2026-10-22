@@ -15,6 +15,18 @@ let superclassImportSources = {};
 // superclass chain rather than any sibling class's chain.
 let classSuperclassNames = {};
 
+// PM1: Per-file key index for O(1) cache invalidation.
+// Maps filename → array of keys currently stored in superclassImportSources and
+// classSuperclassNames for that file. Allows clearFileFromCache to visit only
+// the relevant keys rather than scanning all entries (which was O(N²) across N files).
+let ancestryCacheKeys = {};
+
+// PM2: Tracks which files were populated by readAndRecordFile (on-demand disk reads)
+// rather than by saveImports (Babel-opened files). On-demand entries are evicted at the
+// start of every saveImports call for any file, so that a changed ancestor is re-read
+// next time a descendant needs it rather than serving stale cached data.
+const onDemandCachedFiles = new Set();
+
 // Tracks which additionalUI5Classes module paths were actually matched during this
 // Babel run. Used by getUnmatchedAdditionalUI5Classes() to warn about misconfigured paths.
 const matchedAdditionalUI5ClassPaths = new Set();
@@ -85,14 +97,21 @@ function recordAncestry(filename, programBody) {
     if (!className || !superName) continue;
     const importSource = importBindings.get(superName);
     if (importSource) {
-      superclassImportSources[filename + "\0" + superName] = importSource;
-      classSuperclassNames[filename + "\0" + className] = superName;
+      const srcKey = filename + "\0" + superName;
+      const clsKey = filename + "\0" + className;
+      superclassImportSources[srcKey] = importSource;
+      classSuperclassNames[clsKey] = superName;
+      // PM1: track keys for O(1) invalidation
+      ancestryCacheKeys[filename] = ancestryCacheKeys[filename] || [];
+      ancestryCacheKeys[filename].push(srcKey, clsKey);
       localClassSuperMap.set(className, superName);
       // For inline `export default class Foo extends Bar {}`, record the sentinel
       // immediately. This will be overwritten below if an identifier-style default
       // export names a different class (identifier-style takes precedence).
       if (isDefaultExport) {
-        classSuperclassNames[filename + "\0default"] = superName;
+        const defKey = filename + "\0default";
+        classSuperclassNames[defKey] = superName;
+        ancestryCacheKeys[filename].push(defKey);
       }
     }
   }
@@ -109,8 +128,14 @@ function recordAncestry(filename, programBody) {
       const exportedName = stmt.declaration.name;
       const superName = localClassSuperMap.get(exportedName);
       if (superName) {
+        const defKey = filename + "\0default";
         // Overwrite any sentinel from an inline export default class above.
-        classSuperclassNames[filename + "\0default"] = superName;
+        classSuperclassNames[defKey] = superName;
+        // PM1: only push if not already present (idempotent for identifier-style overwrites)
+        if (!ancestryCacheKeys[filename]?.includes(defKey)) {
+          ancestryCacheKeys[filename] = ancestryCacheKeys[filename] || [];
+          ancestryCacheKeys[filename].push(defKey);
+        }
       }
     }
   }
@@ -145,6 +170,9 @@ function readAndRecordFile(absPath) {
       },
     });
     recordAncestry(absPath, ast.program.body);
+    // PM2: mark as on-demand so saveImports evicts it on the next rebuild,
+    // preventing a changed ancestor from serving stale cached data indefinitely.
+    onDemandCachedFiles.add(absPath);
     return true;
   } catch {
     return false; // unparseable ancestor → degrade silently, never throw
@@ -153,6 +181,14 @@ function readAndRecordFile(absPath) {
 
 export const saveImports = (file, additionalUI5Classes) => {
   const filename = file.opts.filename;
+  // PM2: evict any on-demand (disk-read) ancestor cache entries before re-populating.
+  // An ancestor loaded via readAndRecordFile is never refreshed unless evicted here.
+  // By clearing all on-demand entries at the start of each saveImports call we ensure
+  // that a changed ancestor is re-read from disk next time a descendant needs it.
+  for (const f of onDemandCachedFiles) {
+    clearFileFromCache(f);
+    onDemandCachedFiles.delete(f);
+  }
   // Clear ALL stale cache entries for this file before re-populating, so watch-mode
   // rebuilds never carry over data from a previous version of the file.
   clearFileFromCache(filename);
@@ -177,13 +213,13 @@ export const saveImports = (file, additionalUI5Classes) => {
  */
 export function clearFileFromCache(filename) {
   delete importDeclarations[filename];
-  const prefix = filename + "\0";
-  for (const key of Object.keys(superclassImportSources)) {
-    if (key.startsWith(prefix)) delete superclassImportSources[key];
+  // PM1: use the per-file key index for O(own-keys) cleanup instead of scanning all entries.
+  for (const key of ancestryCacheKeys[filename] ?? []) {
+    delete superclassImportSources[key];
+    delete classSuperclassNames[key];
   }
-  for (const key of Object.keys(classSuperclassNames)) {
-    if (key.startsWith(prefix)) delete classSuperclassNames[key];
-  }
+  delete ancestryCacheKeys[filename];
+  onDemandCachedFiles.delete(filename);
 }
 
 /**
@@ -203,9 +239,16 @@ export function saveSuperclassImportSource(
   superclassImportSource
 ) {
   if (filename && className && superclassLocalName && superclassImportSource) {
-    superclassImportSources[filename + "\0" + superclassLocalName] =
-      superclassImportSource;
-    classSuperclassNames[filename + "\0" + className] = superclassLocalName;
+    const srcKey = filename + "\0" + superclassLocalName;
+    const clsKey = filename + "\0" + className;
+    superclassImportSources[srcKey] = superclassImportSource;
+    classSuperclassNames[clsKey] = superclassLocalName;
+    // PM1: register keys so clearFileFromCache can find them without a full scan
+    ancestryCacheKeys[filename] = ancestryCacheKeys[filename] || [];
+    if (!ancestryCacheKeys[filename].includes(srcKey))
+      ancestryCacheKeys[filename].push(srcKey);
+    if (!ancestryCacheKeys[filename].includes(clsKey))
+      ancestryCacheKeys[filename].push(clsKey);
   }
 }
 
@@ -258,7 +301,7 @@ export function getImportDeclaration(filename, typeName) {
  * Third-party / SAP module paths like "sap/ui/core/mvc/Controller" are never on disk
  * and will always return null (no key in importDeclarations, existsSync false).
  */
-function resolveImportSourceToFilename(
+export function resolveImportSourceToFilename(
   importSource,
   currentFilename,
   sourceRoot,
@@ -365,18 +408,27 @@ export function isSuperclassTransitivelyKnown(
 
   // Look up what that file's class itself extends (stored by saveSuperclassImportSource).
   //
-  // The descendant's local import name (superclassLocalName, e.g. "BaseController") equals
-  // the class's own name in the ancestor file. classSuperclassNames[resolvedFile\0superclassLocalName]
-  // gives the ancestor's superclass binding name in that file (e.g. "Controller"). This correctly
-  // follows the exported class's chain rather than any sibling class's chain, fixing the bug where
-  // a file with a local UI5 helper and a non-UI5 default export would wrongly match the helper.
-  let ancestorSuperLocalName =
-    classSuperclassNames[resolvedFile + "\0" + superclassLocalName];
-  if (!ancestorSuperLocalName) {
-    // F2: the import may be a renamed default (e.g. `import Base from "./ActualBase"` where
-    // the class is declared `export default class ActualBase`). Fall back to the "\0default"
-    // sentinel entry recorded for that file's default export.
-    ancestorSuperLocalName = classSuperclassNames[resolvedFile + "\0default"];
+  // N1: For default imports the descendant's local alias (superclassLocalName) is irrelevant
+  // to the ancestry stored in the resolved file — prefer the "\0default" sentinel, which
+  // always points to the class actually exported as default. Only fall back to by-name lookup
+  // when no default export was recorded (bare class declaration without `export default`,
+  // consumed via interop). This prevents a local sibling class sharing the alias name from
+  // being matched instead of the actual default export.
+  // For named imports the by-name lookup is always correct.
+  const isDefaultImport = importDecl.specifiers.some((s) =>
+    t.isImportDefaultSpecifier(s)
+  );
+  let ancestorSuperLocalName;
+  if (isDefaultImport) {
+    // Prefer the "\0default" sentinel; fall back to by-name only when no explicit default
+    // export exists in the ancestor file (interop-consumed bare class declarations).
+    ancestorSuperLocalName =
+      classSuperclassNames[resolvedFile + "\0default"] ??
+      classSuperclassNames[resolvedFile + "\0" + superclassLocalName];
+  } else {
+    // Named import: the local binding name equals the class name in the ancestor file.
+    ancestorSuperLocalName =
+      classSuperclassNames[resolvedFile + "\0" + superclassLocalName];
   }
   if (!ancestorSuperLocalName) return null;
 
