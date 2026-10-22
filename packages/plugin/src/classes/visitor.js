@@ -7,6 +7,7 @@ import {
   getImportDeclaration,
   saveSuperclassImportSource,
   isSuperclassTransitivelyKnown,
+  recordAdditionalUI5ClassMatch,
 } from "./helpers/imports";
 
 /**
@@ -377,7 +378,12 @@ function shouldConvertClass(file, node, opts, classInfo) {
           importSource
         );
         // Direct hit — immediate superclass is a known UI5 base class
-        if (knownPaths.includes(importSource)) return true;
+        if (knownPaths.includes(importSource)) {
+          if (opts.additionalUI5Classes?.includes(importSource)) {
+            recordAdditionalUI5ClassMatch(importSource);
+          }
+          return true;
+        }
         // Transitive hit — walk the superclass chain through already-processed local files
         const sourceRoot = file.opts.sourceRoot
           ? Path.resolve(process.cwd(), file.opts.sourceRoot)
@@ -391,6 +397,9 @@ function shouldConvertClass(file, node, opts, classInfo) {
             opts.namespacePrefix || null
           )
         ) {
+          // The matching path may be anywhere in the chain; mark all additionalUI5Classes
+          // paths as seen to avoid spurious "unmatched" warnings for transitive matches.
+          opts.additionalUI5Classes?.forEach(recordAdditionalUI5ClassMatch);
           return true;
         }
       }

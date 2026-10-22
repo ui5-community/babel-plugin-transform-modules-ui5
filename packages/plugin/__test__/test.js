@@ -8,7 +8,7 @@ import {
 } from "fs-extra";
 import { join, resolve } from "path";
 import { transformFileSync } from "@babel/core";
-import { get as getOpts } from "./options";
+import { get as getOpts, getBabelOpts } from "./options";
 import plugin from "../src";
 
 const FIXTURE_DIR_NAME = "fixtures";
@@ -84,6 +84,7 @@ function processDirectory(dir) {
             plugins,
             presets,
             sourceRoot: __dirname,
+            ...getBabelOpts(filePath),
             comments:
               filePath.includes("comments") || filename.includes("copyright") || filename.includes("controller-extension-usage"),
             babelrc: false,
