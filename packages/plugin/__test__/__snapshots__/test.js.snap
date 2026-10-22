@@ -776,6 +776,51 @@ exports[`classes class-convert-transitive-identifier-default-export MyController
 });"
 `;
 
+exports[`classes class-convert-transitive-named-export-default BaseController.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  const Base = Controller.extend("fixtures.classes.class-convert-transitive-named-export-default.Base", {});
+  return Base;
+});"
+`;
+
+exports[`classes class-convert-transitive-named-export-default MyController.js 1`] = `
+"sap.ui.define(["./BaseController"], function (__Base) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const Base = _interopRequireDefault(__Base);
+  const MyController = Base.extend("fixtures.classes.class-convert-transitive-named-export-default.MyController", {});
+  return MyController;
+});"
+`;
+
+exports[`classes class-convert-transitive-no-super-default-collision MixedModule.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  const Helper = Controller.extend("fixtures.classes.class-convert-transitive-no-super-default-collision.Helper", {});
+  class AppBase {}
+  return AppBase;
+});"
+`;
+
+exports[`classes class-convert-transitive-no-super-default-collision ZChild.js 1`] = `
+"sap.ui.define(["./MixedModule"], function (__Helper) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const Helper = _interopRequireDefault(__Helper);
+  class ZChild extends Helper {}
+  return ZChild;
+});"
+`;
+
 exports[`classes class-convert-transitive-renamed-import ActualBase.js 1`] = `
 "sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
   "use strict";

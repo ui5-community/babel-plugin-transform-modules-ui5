@@ -398,11 +398,11 @@ function shouldConvertClass(file, node, opts, classInfo) {
         );
         if (transitiveMatch) {
           // N2: verify the direct ancestor (the class this file imports) would itself be
-          // convertible — specifically that it has a non-empty namespace relative to
-          // sourceRoot. If the ancestor sits at the root of sourceRoot with no
-          // namespacePrefix it has no namespace and remains a native ES class, so calling
-          // .extend() on it at runtime would throw. The importSource for the direct ancestor
-          // is the import declaration we already resolved above.
+          // convertible — specifically that it has either a non-empty namespace or is a
+          // legacy controller file (which converts even at the root without a namespace,
+          // matching the shouldConvertClass exemption). An ancestor with an empty namespace
+          // that is NOT a controller file remains a native ES class, so calling .extend()
+          // on it at runtime would throw.
           const importDecl2 = getImportDeclaration(filename, superClassName);
           if (importDecl2) {
             const ancestorFile = resolveImportSourceToFilename(
@@ -419,7 +419,13 @@ function shouldConvertClass(file, node, opts, classInfo) {
                 ...(opts.namespacePrefix ? [opts.namespacePrefix] : []),
                 ...dir.split(Path.sep).filter(Boolean),
               ].join(".");
-              if (!ancestorNamespace) {
+              // Legacy .controller.(js|ts) files convert even with an empty namespace
+              // (preserves the same exemption as shouldConvertClass for the controller path).
+              const isControllerFile =
+                opts.autoConvertUI5FileTypes !== false &&
+                opts.autoConvertControllerClass !== false &&
+                /.*[.]controller[.](js|ts)$/.test(ancestorFile);
+              if (!ancestorNamespace && !isControllerFile) {
                 // Ancestor would remain a native class — do not convert this descendant.
                 return false;
               }

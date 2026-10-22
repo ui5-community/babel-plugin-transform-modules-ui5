@@ -27,6 +27,14 @@ let ancestryCacheKeys = {};
 // next time a descendant needs it rather than serving stale cached data.
 const onDemandCachedFiles = new Set();
 
+// N1: Tracks files that have any explicit `export default` declaration. Used to decide
+// whether by-name fallback is safe in isSuperclassTransitivelyKnown for default imports:
+// the fallback is only allowed when no default export exists (i.e. the class is consumed
+// via module interop, and the import alias matches the class name). When a file HAS a
+// default export, the "\0default" sentinel is authoritative — if it's absent, the default
+// export has no convertible UI5 ancestry and the by-name fallback must not fire.
+let filesWithDefaultExport = new Set();
+
 // Tracks which additionalUI5Classes module paths were actually matched during this
 // Babel run. Used by getUnmatchedAdditionalUI5Classes() to warn about misconfigured paths.
 const matchedAdditionalUI5ClassPaths = new Set();
@@ -83,18 +91,35 @@ function recordAncestry(filename, programBody) {
 
   for (const stmt of programBody) {
     // Handle: class Foo extends Bar {} and export default class Foo extends Bar {}
+    // Also handle: export class Foo extends Bar {} (ExportNamedDeclaration wrapping a class).
+    // ExportNamedDeclaration must be unwrapped here so that a subsequent identifier-style
+    // `export default Foo` can find Foo in localClassSuperMap.
     const isDefaultExport =
       t.isExportDefaultDeclaration(stmt) &&
       t.isClassDeclaration(stmt.declaration);
+    const isNamedExport =
+      t.isExportNamedDeclaration(stmt) &&
+      t.isClassDeclaration(stmt.declaration);
     const classNode = t.isClassDeclaration(stmt)
       ? stmt
-      : isDefaultExport
+      : isDefaultExport || isNamedExport
         ? stmt.declaration
         : null;
     if (!classNode) continue;
     const className = classNode.id?.name;
     const superName = classNode.superClass?.name;
-    if (!className || !superName) continue;
+    if (!className) continue;
+    // N1: Record which classes are declared in this file, even if they have no imported
+    // superclass, so localClassSuperMap contains every class name for the default-export pass.
+    localClassSuperMap.set(className, superName || null);
+    // N1: Mark the file as having an explicit default export when the class is directly
+    // exported as default (inline form). Do this before the superName guard so it fires
+    // even when the default-exported class has no superclass.
+    // The identifier-style `export default Foo` pass below handles the other form.
+    if (isDefaultExport) {
+      filesWithDefaultExport.add(filename);
+    }
+    if (!superName) continue;
     const importSource = importBindings.get(superName);
     if (importSource) {
       const srcKey = filename + "\0" + superName;
@@ -104,7 +129,6 @@ function recordAncestry(filename, programBody) {
       // PM1: track keys for O(1) invalidation
       ancestryCacheKeys[filename] = ancestryCacheKeys[filename] || [];
       ancestryCacheKeys[filename].push(srcKey, clsKey);
-      localClassSuperMap.set(className, superName);
       // For inline `export default class Foo extends Bar {}`, record the sentinel
       // immediately. This will be overwritten below if an identifier-style default
       // export names a different class (identifier-style takes precedence).
@@ -126,7 +150,12 @@ function recordAncestry(filename, programBody) {
       t.isIdentifier(stmt.declaration)
     ) {
       const exportedName = stmt.declaration.name;
+      // N1: Mark this file as having an explicit default export regardless of whether the
+      // exported identifier names a class — blocking the by-name fallback in transitive lookup.
+      filesWithDefaultExport.add(filename);
       const superName = localClassSuperMap.get(exportedName);
+      // localClassSuperMap stores null for classes with no imported superclass (set above).
+      // Only record the "\0default" sentinel when there IS a superclass to follow.
       if (superName) {
         const defKey = filename + "\0default";
         // Overwrite any sentinel from an inline export default class above.
@@ -219,6 +248,7 @@ export function clearFileFromCache(filename) {
     delete classSuperclassNames[key];
   }
   delete ancestryCacheKeys[filename];
+  filesWithDefaultExport.delete(filename);
   onDemandCachedFiles.delete(filename);
 }
 
@@ -411,20 +441,33 @@ export function isSuperclassTransitivelyKnown(
   // N1: For default imports the descendant's local alias (superclassLocalName) is irrelevant
   // to the ancestry stored in the resolved file — prefer the "\0default" sentinel, which
   // always points to the class actually exported as default. Only fall back to by-name lookup
-  // when no default export was recorded (bare class declaration without `export default`,
-  // consumed via interop). This prevents a local sibling class sharing the alias name from
-  // being matched instead of the actual default export.
+  // when the ancestor file has NO explicit default export at all (bare class declaration
+  // without any export default, consumed via module interop). When a file HAS an export
+  // default the sentinel is authoritative: if it's absent, the exported class has no
+  // convertible UI5 ancestry. This prevents a local sibling class sharing the import alias
+  // from being matched instead of the actual default export (including the case where the
+  // default-exported class has no superclass — which previously left no sentinel, causing
+  // the by-name fallback to fire against the wrong sibling).
   // For named imports the by-name lookup is always correct.
   const isDefaultImport = importDecl.specifiers.some((s) =>
     t.isImportDefaultSpecifier(s)
   );
   let ancestorSuperLocalName;
   if (isDefaultImport) {
-    // Prefer the "\0default" sentinel; fall back to by-name only when no explicit default
-    // export exists in the ancestor file (interop-consumed bare class declarations).
-    ancestorSuperLocalName =
-      classSuperclassNames[resolvedFile + "\0default"] ??
-      classSuperclassNames[resolvedFile + "\0" + superclassLocalName];
+    // Prefer the "\0default" sentinel.
+    // Fall back to by-name ONLY when no explicit default export exists (interop case).
+    const hasSentinel = resolvedFile + "\0default" in classSuperclassNames;
+    const hasDefaultExport = filesWithDefaultExport.has(resolvedFile);
+    if (hasDefaultExport) {
+      // File has an explicit default export — sentinel is authoritative.
+      // If the sentinel is absent it means the default-exported class has no UI5 ancestry.
+      ancestorSuperLocalName = classSuperclassNames[resolvedFile + "\0default"];
+    } else {
+      // No explicit default export — by-name fallback is safe (interop / bare class).
+      ancestorSuperLocalName = hasSentinel
+        ? classSuperclassNames[resolvedFile + "\0default"]
+        : classSuperclassNames[resolvedFile + "\0" + superclassLocalName];
+    }
   } else {
     // Named import: the local binding name equals the class name in the ancestor file.
     ancestorSuperLocalName =
