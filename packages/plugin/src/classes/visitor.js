@@ -412,13 +412,16 @@ function shouldConvertClass(file, node, opts, classInfo) {
               opts.namespacePrefix || null
             );
             if (ancestorFile) {
-              const { dir } = Path.parse(
-                Path.relative(sourceRoot, ancestorFile)
-              );
-              const ancestorNamespace = [
-                ...(opts.namespacePrefix ? [opts.namespacePrefix] : []),
-                ...dir.split(Path.sep).filter(Boolean),
-              ].join(".");
+              const ancestorInsideSourceRoot =
+                ancestorFile.startsWith(sourceRoot);
+              const ancestorNamespace = ancestorInsideSourceRoot
+                ? [
+                    ...(opts.namespacePrefix ? [opts.namespacePrefix] : []),
+                    ...Path.parse(Path.relative(sourceRoot, ancestorFile))
+                      .dir.split(Path.sep)
+                      .filter(Boolean),
+                  ].join(".")
+                : "";
               // Legacy .controller.(js|ts) files convert even with an empty namespace
               // (preserves the same exemption as shouldConvertClass for the controller path).
               const isControllerFile =
