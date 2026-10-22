@@ -18,6 +18,12 @@ AST Explorer: https://astexplorer.net/
 // configured paths — even those from different plugin instances in the same build — are
 // covered. Without this, the closure in the first post() call would only see the first
 // invocation's options array.
+//
+// NOTE: The warning fires once per Node process (at exit), not once per build. In a
+// long-lived process that runs many builds (watch mode, programmatic transform loops) the
+// paths accumulate across all of them and the warning reports the union at process exit.
+// There is no reliable per-build boundary at the Babel plugin level to scope this to a
+// single build, so the per-process behaviour is intentional for the common one-shot CLI case.
 let allConfiguredUI5ClassPaths = null;
 let exitHandlerRegistered = false;
 

@@ -471,8 +471,15 @@ function getFileBaseNamespace(path, pluginOpts) {
   const sourceRoot = opts.sourceRoot
     ? Path.resolve(process.cwd(), opts.sourceRoot)
     : process.cwd();
-  if (filename.startsWith(sourceRoot)) {
-    const filenameRelative = Path.relative(sourceRoot, filename);
+  // Containment check via Path.relative rather than startsWith(sourceRoot): a plain
+  // prefix match would wrongly treat a sibling dir like "<sourceRoot>-legacy/" as inside
+  // sourceRoot. The ancestor is inside only when the relative path doesn't escape upward
+  // ("..") and isn't absolute (absolute happens on Windows across drives).
+  const filenameRelative = Path.relative(sourceRoot, filename);
+  const insideSourceRoot =
+    filenameRelative === "" ||
+    (!filenameRelative.startsWith("..") && !Path.isAbsolute(filenameRelative));
+  if (insideSourceRoot) {
     const { dir } = Path.parse(filenameRelative);
     const namespaceParts = dir.split(Path.sep);
     if (pluginOpts.namespacePrefix) {
