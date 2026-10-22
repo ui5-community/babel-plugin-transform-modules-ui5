@@ -403,35 +403,41 @@ function shouldConvertClass(file, node, opts, classInfo) {
           // matching the shouldConvertClass exemption). An ancestor with an empty namespace
           // that is NOT a controller file remains a native ES class, so calling .extend()
           // on it at runtime would throw.
-          const importDecl2 = getImportDeclaration(filename, superClassName);
-          if (importDecl2) {
-            const ancestorFile = resolveImportSourceToFilename(
-              importDecl2.source.value,
-              filename,
-              sourceRoot,
-              opts.namespacePrefix || null
-            );
-            if (ancestorFile) {
-              const ancestorInsideSourceRoot =
-                ancestorFile.startsWith(sourceRoot);
-              const ancestorNamespace = ancestorInsideSourceRoot
-                ? [
-                    ...(opts.namespacePrefix ? [opts.namespacePrefix] : []),
-                    ...Path.parse(Path.relative(sourceRoot, ancestorFile))
-                      .dir.split(Path.sep)
-                      .filter(Boolean),
-                  ].join(".")
-                : "";
-              // Legacy .controller.(js|ts) files convert even with an empty namespace
-              // (preserves the same exemption as shouldConvertClass for the controller path).
-              const isControllerFile =
-                opts.autoConvertUI5FileTypes !== false &&
-                opts.autoConvertControllerClass !== false &&
-                /.*[.]controller[.](js|ts)$/.test(ancestorFile);
-              if (!ancestorNamespace && !isControllerFile) {
-                // Ancestor would remain a native class — do not convert this descendant.
-                return false;
-              }
+          //
+          // Reuse importDecl/importSource from above: importDeclarations[filename] is not
+          // mutated between there and here, so a re-fetch would return the same declaration.
+          const ancestorFile = resolveImportSourceToFilename(
+            importSource,
+            filename,
+            sourceRoot,
+            opts.namespacePrefix || null
+          );
+          if (ancestorFile) {
+            // Containment check via Path.relative: the ancestor is inside sourceRoot
+            // only when the relative path doesn't escape upward ("..") and isn't absolute
+            // (absolute happens on Windows across drives). A plain startsWith(sourceRoot)
+            // would wrongly match a sibling dir like "<sourceRoot>-legacy/".
+            const ancestorRel = Path.relative(sourceRoot, ancestorFile);
+            const ancestorInsideSourceRoot =
+              ancestorRel === "" ||
+              (!ancestorRel.startsWith("..") && !Path.isAbsolute(ancestorRel));
+            const ancestorNamespace = ancestorInsideSourceRoot
+              ? [
+                  ...(opts.namespacePrefix ? [opts.namespacePrefix] : []),
+                  ...Path.parse(ancestorRel)
+                    .dir.split(Path.sep)
+                    .filter(Boolean),
+                ].join(".")
+              : "";
+            // Legacy .controller.(js|ts) files convert even with an empty namespace
+            // (preserves the same exemption as shouldConvertClass for the controller path).
+            const isControllerFile =
+              opts.autoConvertUI5FileTypes !== false &&
+              opts.autoConvertControllerClass !== false &&
+              /.*[.]controller[.](js|ts)$/.test(ancestorFile);
+            if (!ancestorNamespace && !isControllerFile) {
+              // Ancestor would remain a native class — do not convert this descendant.
+              return false;
             }
           }
           // F4: mark only the path that was actually matched, not every additionalUI5Classes

@@ -37,6 +37,14 @@ let filesWithDefaultExport = new Set();
 
 // Tracks which additionalUI5Classes module paths were actually matched during this
 // Babel run. Used by getUnmatchedAdditionalUI5Classes() to warn about misconfigured paths.
+//
+// Lifetime note: like allConfiguredUI5ClassPaths in index.js, this accumulates for the
+// whole Node process. The unmatched-path warning fires once at process exit and reports
+// the union across every build, so "configured" and "matched" are intentionally tracked
+// on the same process-lifetime basis — they stay consistent with each other. A long-lived
+// watch process never reaches process exit, so the warning is effectively a one-shot-CLI
+// feature. resetAdditionalUI5ClassMatchTracking() is provided for programmatic callers and
+// tests that drive multiple independent runs in one process and want a clean slate.
 const matchedAdditionalUI5ClassPaths = new Set();
 
 /**
@@ -44,6 +52,16 @@ const matchedAdditionalUI5ClassPaths = new Set();
  */
 export function recordAdditionalUI5ClassMatch(modulePath) {
   matchedAdditionalUI5ClassPaths.add(modulePath);
+}
+
+/**
+ * Clear the matched-path tracking. Intended for programmatic/test callers that run
+ * several independent transforms in a single process and need the next run's
+ * unmatched-path check to start fresh. Not called during a normal CLI build (where
+ * process-lifetime accumulation is the desired behaviour — see the note above).
+ */
+export function resetAdditionalUI5ClassMatchTracking() {
+  matchedAdditionalUI5ClassPaths.clear();
 }
 
 /**
@@ -237,9 +255,10 @@ export const saveImports = (file, additionalUI5Classes) => {
   // An ancestor loaded via readAndRecordFile is never refreshed unless evicted here.
   // By clearing all on-demand entries at the start of each saveImports call we ensure
   // that a changed ancestor is re-read from disk next time a descendant needs it.
-  for (const f of onDemandCachedFiles) {
+  // clearFileFromCache also removes the entry from onDemandCachedFiles, so a snapshot
+  // of the keys is taken first to avoid mutating the Set while iterating it.
+  for (const f of [...onDemandCachedFiles]) {
     clearFileFromCache(f);
-    onDemandCachedFiles.delete(f);
   }
   // Clear ALL stale cache entries for this file before re-populating, so watch-mode
   // rebuilds never carry over data from a previous version of the file.
@@ -314,7 +333,7 @@ export function getImportDeclaration(filename, typeName) {
   const typeNameParts = typeName.split(".");
 
   // find the declaration importing the typeName among the collected import declarations in this file
-  const filteredDeclarations = importDeclarations[filename].filter(
+  const filteredDeclarations = (importDeclarations[filename] ?? []).filter(
     (importDeclaration) => {
       // each import declaration can import several entities, so let's check all of them
       for (let specifier of importDeclaration.specifiers) {
@@ -408,7 +427,9 @@ export function resolveImportSourceToFilename(
 
 /**
  * Walk the superclass import chain transitively to check whether any ancestor class
- * is imported from a path in knownPaths. Stops at maxDepth to avoid infinite loops.
+ * is imported from a path in knownPaths. Cycle detection is handled by the `_visited`
+ * Set (keyed by "filename\0superclassLocalName"), so circular inheritance chains never
+ * cause infinite recursion.
  *
  * Ancestor files are populated via two paths:
  *  1. Eagerly, when Babel opens the file: the `pre` hook calls saveImports, which calls

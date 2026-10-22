@@ -940,6 +940,28 @@ exports[`classes class-convert-transitive-reverse-order ZBase.js 1`] = `
 });"
 `;
 
+exports[`classes class-convert-transitive-sibling-sourceroot app SiblingSourcerootApp.js 1`] = `
+"sap.ui.define(["../../class-convert-transitive-sibling-sourceroot-legacy/Base"], function (__Base) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const Base = _interopRequireDefault(__Base);
+  class SiblingSourcerootApp extends Base {}
+  return SiblingSourcerootApp;
+});"
+`;
+
+exports[`classes class-convert-transitive-sibling-sourceroot-legacy Base.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  const Base = Controller.extend("fixtures.classes.class-convert-transitive-sibling-sourceroot-legacy.Base", {});
+  return Base;
+});"
+`;
+
 exports[`classes class-convert-transitive-ts-ancestor BaseController.ts 1`] = `
 "sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
   "use strict";
@@ -1247,6 +1269,26 @@ exports[`comments preserve-for-class-members.js 1`] = `
 });"
 `;
 
+exports[`decorators bare-value-tag-decorator.js 1`] = `
+"sap.ui.define(["sap/ui/core/Control"], function (Control) {
+  "use strict";
+
+  var _class;
+  let My = alias(_class = class My extends Control {}) || _class;
+  return My;
+});"
+`;
+
+exports[`decorators member-expression-decorator.js 1`] = `
+"sap.ui.define(["sap/ui/core/Control"], function (Control) {
+  "use strict";
+
+  var _dec, _class;
+  let My = (_dec = foo.bar(), _dec(_class = class My extends Control {}) || _class);
+  return My;
+});"
+`;
+
 exports[`decorators mixin.js 1`] = `
 "sap.ui.define(["sap/ui/core/mvc/Controller", "../lib/decorators", "../lib/RoutingSupport"], function (Controller, ___lib_decorators, __RoutingSupport) {
   "use strict";
@@ -1508,6 +1550,8 @@ exports[`export-collapse object.assign-variable.js 1`] = `
 exports[`export-error error-assign-var.js 1`] = `"Unsafe mixing of conflicting default and named exports. The following named exports are conflicting: (foo)."`;
 
 exports[`export-error error-assign-var-recurs.js 1`] = `"Unsafe mixing of conflicting default and named exports. The following named exports are conflicting: (foo)."`;
+
+exports[`export-error error-noextend-mixed-exports.js 1`] = `"Unsafe mixing of conflicting default and named exports. The following named exports are conflicting: (b)."`;
 
 exports[`export-error error-obj-method.js 1`] = `"Unsafe mixing of conflicting default and named exports. The following named exports are conflicting: (a)."`;
 
@@ -1876,6 +1920,12 @@ exports[`imports import-multiple.js 1`] = `
 
 exports[`imports import-remove-fileext.js 1`] = `
 "sap.ui.define(["@dummy/chart.js", "chart.js", "comment-parser/es6/index.js", "./_private_/module_js", "./_private_/module_jsx", "./_private_/module_ts", "./_private_/module_tsx", "./_private_/unknown_module.js"], function (___dummy_chartjs, __chartjs, __comment_parser_es6_indexjs, ____private__module_jsjs, ____private__module_jsxjs, ____private__module_tsjs, ____private__module_tsxjs, ____private__unknown_modulejs) {
+  "use strict";
+});"
+`;
+
+exports[`imports import-remove-fileext-suppressed.js 1`] = `
+"sap.ui.define(["./_private_/module_js", "./_private_/module_jsx", "./_private_/module_ts", "./_private_/module_tsx", "./_private_/unknown_module.js"], function (____private__module_jsjs, ____private__module_jsxjs, ____private__module_tsjs, ____private__module_tsxjs, ____private__unknown_modulejs) {
   "use strict";
 });"
 `;

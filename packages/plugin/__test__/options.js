@@ -65,6 +65,15 @@ const Options = {
     "class-convert-only-move-this-binding": {
       onlyMoveClassPropsUsingThis: true,
     },
+    "SiblingSourcerootApp": {
+      autoConvertKnownUI5Classes: true,
+    },
+    "error-noextend-mixed-exports": {
+      noExportExtend: true,
+    },
+    "import-remove-fileext-suppressed": {
+      suppressImportResolutionHints: true,
+    },
   },
   dirs: {
     comments: {
@@ -129,6 +138,17 @@ const Options = {
       sourceRoot: resolve(
         __dirname,
         "fixtures/classes/class-convert-known-ui5-classes-no-namespace"
+      ),
+    },
+    "SiblingSourcerootApp": {
+      // Point sourceRoot at the fixture root so SiblingSourcerootApp.js (in app/) has a
+      // non-empty namespace ("app") and reaches the transitive known-class branch, while
+      // its ancestor Base.js lives in a SIBLING dir (".../-legacy") that shares sourceRoot
+      // as a string prefix but is NOT contained in it. Exercises the Path.relative
+      // containment check: the sibling must be treated as outside sourceRoot.
+      sourceRoot: resolve(
+        __dirname,
+        "fixtures/classes/class-convert-transitive-sibling-sourceroot"
       ),
     },
   },
