@@ -103,6 +103,12 @@ const Options = {
     "class-convert-transitive-explicit-ext": {
       autoConvertKnownUI5Classes: true,
     },
+    "class-convert-transitive-identifier-default-export": {
+      autoConvertKnownUI5Classes: true,
+    },
+    "class-convert-transitive-ts-ancestor": {
+      autoConvertKnownUI5Classes: true,
+    },
   },
   // Babel-level option overrides keyed by file/dir name.
   // Use sparingly — only when the test needs a different sourceRoot than __dirname.
