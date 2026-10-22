@@ -500,6 +500,23 @@ exports[`classes class-convert-known-ui5-classes.js 1`] = `
 });"
 `;
 
+exports[`classes class-convert-known-ui5-classes-disabled.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller", "sap/ui/core/Control"], function (Controller, Control) {
+  "use strict";
+
+  class MyController extends Controller {}
+  class MyControl extends Control {}
+});"
+`;
+
+exports[`classes class-convert-known-ui5-classes-no-namespace MyController.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  class MyController extends Controller {}
+});"
+`;
+
 exports[`classes class-convert-metadata-assign.js 1`] = `
 "sap.ui.define(["sap/SAPClass"], function (SAPClass) {
   "use strict";
@@ -679,6 +696,28 @@ exports[`classes class-convert-transitive-default-export-nonui5 ZChild.js 1`] = 
   const UIBase = _interopRequireDefault(__UIBase);
   class ZChild extends UIBase {}
   return ZChild;
+});"
+`;
+
+exports[`classes class-convert-transitive-reverse-order AChild.js 1`] = `
+"sap.ui.define(["./ZBase"], function (__ZBase) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const ZBase = _interopRequireDefault(__ZBase);
+  const AChild = ZBase.extend("fixtures.classes.class-convert-transitive-reverse-order.AChild", {});
+  return AChild;
+});"
+`;
+
+exports[`classes class-convert-transitive-reverse-order ZBase.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  const ZBase = Controller.extend("fixtures.classes.class-convert-transitive-reverse-order.ZBase", {});
+  return ZBase;
 });"
 `;
 

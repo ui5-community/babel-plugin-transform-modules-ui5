@@ -1,4 +1,4 @@
-import { parse } from "path";
+import { parse, resolve } from "path";
 
 /**
  * Provides the ability to set options per test file or directory.
@@ -38,6 +38,9 @@ const Options = {
     },
     "class-convert-known-ui5-classes": {
       autoConvertKnownUI5Classes: true,
+    },
+    "class-convert-known-ui5-classes-disabled": {
+      autoConvertKnownUI5Classes: false,
     },
     "class-convert-additional-ui5-classes": {
       additionalUI5Classes: ["my/app/BaseController"],
@@ -88,6 +91,25 @@ const Options = {
     "class-convert-transitive-default-export-nonui5": {
       autoConvertKnownUI5Classes: true,
     },
+    "class-convert-transitive-reverse-order": {
+      autoConvertKnownUI5Classes: true,
+    },
+    "class-convert-known-ui5-classes-no-namespace": {
+      autoConvertKnownUI5Classes: true,
+    },
+  },
+  // Babel-level option overrides keyed by file/dir name.
+  // Use sparingly — only when the test needs a different sourceRoot than __dirname.
+  babelOpts: {
+    "class-convert-known-ui5-classes-no-namespace": {
+      // Point sourceRoot to the fixture dir itself so the file's dir resolves to ""
+      // and fileNamespace becomes "" — triggering the namespace guard, which prevents
+      // autoConvertKnownUI5Classes from converting the class.
+      sourceRoot: resolve(
+        __dirname,
+        "fixtures/classes/class-convert-known-ui5-classes-no-namespace"
+      ),
+    },
   },
 };
 
@@ -113,4 +135,10 @@ export function get(filePath) {
     };
   }
   return options;
+}
+
+export function getBabelOpts(filePath) {
+  const { name, dir: dirPath } = parse(filePath);
+  const { base: dir } = parse(dirPath);
+  return Options.babelOpts[name] || Options.babelOpts[dir] || {};
 }

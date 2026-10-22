@@ -1,5 +1,6 @@
 import { ClassTransformVisitor } from "./classes/visitor";
 import { ClassPre } from "./classes/pre";
+import { getUnmatchedAdditionalUI5Classes } from "./classes/helpers/imports";
 import { ModuleTransformVisitor } from "./modules/visitor";
 
 import { wrap } from "./modules/helpers/wrapper";
@@ -72,6 +73,16 @@ module.exports = () => {
 
   return {
     pre: ClassPre,
+    post({ opts }) {
+      const unmatched = getUnmatchedAdditionalUI5Classes(
+        opts.additionalUI5Classes
+      );
+      for (const path of unmatched) {
+        console.warn(
+          `\x1b[33mWarn:\x1b[0m additionalUI5Classes: path "\x1b[34m${path}\x1b[0m" was never matched by any import in this build. Check for typos.`
+        );
+      }
+    },
     visitor: UI5Visitor,
   };
 };

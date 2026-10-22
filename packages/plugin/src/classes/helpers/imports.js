@@ -1,5 +1,6 @@
-import { types as t } from "@babel/core";
+import { types as t, parse } from "@babel/core";
 import * as Path from "path";
+import { readFileSync, existsSync } from "fs";
 
 let importDeclarations = {};
 
@@ -14,19 +15,36 @@ let superclassImportSources = {};
 // superclass chain rather than any sibling class's chain.
 let classSuperclassNames = {};
 
-export const saveImports = (file) => {
-  const filename = file.opts.filename;
-  // Clear any stale superclass entries for this file so watch-mode rebuilds
-  // don't carry over superclasses that no longer apply.
-  const prefix = filename + "\0";
-  for (const key of Object.keys(superclassImportSources)) {
-    if (key.startsWith(prefix)) delete superclassImportSources[key];
-  }
-  for (const key of Object.keys(classSuperclassNames)) {
-    if (key.startsWith(prefix)) delete classSuperclassNames[key];
-  }
+// Tracks which additionalUI5Classes module paths were actually matched during this
+// Babel run. Used by getUnmatchedAdditionalUI5Classes() to warn about misconfigured paths.
+const matchedAdditionalUI5ClassPaths = new Set();
+
+/**
+ * Record that `modulePath` (from additionalUI5Classes) was matched by an import in this run.
+ */
+export function recordAdditionalUI5ClassMatch(modulePath) {
+  matchedAdditionalUI5ClassPaths.add(modulePath);
+}
+
+/**
+ * Return any paths from `additionalUI5Classes` that were never matched by an import
+ * during this Babel run. Call once in the plugin's post hook per file; unmatched entries
+ * that remain at the end of the run indicate a likely misconfiguration (e.g. a typo).
+ */
+export function getUnmatchedAdditionalUI5Classes(additionalUI5Classes) {
+  if (!additionalUI5Classes?.length) return [];
+  return additionalUI5Classes.filter(
+    (path) => !matchedAdditionalUI5ClassPaths.has(path)
+  );
+}
+
+/**
+ * Populate the three ancestry caches for `filename` from a parsed program body.
+ * Called from saveImports (eager path) and readAndRecordFile (on-demand path).
+ */
+function recordAncestry(filename, programBody) {
   // save all import declarations before "unneeded" ones are removed by the TypeScript plugin
-  const imports = file.ast.program.body.filter(t.isImportDeclaration);
+  const imports = programBody.filter(t.isImportDeclaration);
   // right now even the removed import still exists later and can be re-added. Otherwise do: .map(decl => t.cloneNode(decl));
   importDeclarations[filename] = imports;
 
@@ -47,7 +65,7 @@ export const saveImports = (file) => {
     }
   }
 
-  for (const stmt of file.ast.program.body) {
+  for (const stmt of programBody) {
     // Handle: class Foo extends Bar {} and export default class Foo extends Bar {}
     const classNode = t.isClassDeclaration(stmt)
       ? stmt
@@ -65,7 +83,62 @@ export const saveImports = (file) => {
       classSuperclassNames[filename + "\0" + className] = superName;
     }
   }
+}
+
+/**
+ * Read `absPath` from disk, parse it minimally, and populate the ancestry caches.
+ * Returns true if the file was read and recorded (or was already cached), false otherwise.
+ * Degrades silently on missing or unparseable files — never throws.
+ */
+function readAndRecordFile(absPath) {
+  if (importDeclarations[absPath]) return true; // already cached
+  if (!existsSync(absPath)) return false;
+  try {
+    const code = readFileSync(absPath, "utf8");
+    const ast = parse(code, {
+      sourceType: "module",
+      babelrc: false,
+      configFile: false,
+      parserOpts: {
+        errorRecovery: true,
+        plugins: [
+          "typescript",
+          "jsx",
+          ["decorators", { legacy: true }],
+          "classProperties",
+        ],
+      },
+    });
+    recordAncestry(absPath, ast.program.body);
+    return true;
+  } catch {
+    return false; // unparseable ancestor → degrade silently, never throw
+  }
+}
+
+export const saveImports = (file) => {
+  const filename = file.opts.filename;
+  // Clear ALL stale cache entries for this file before re-populating, so watch-mode
+  // rebuilds never carry over data from a previous version of the file.
+  clearFileFromCache(filename);
+  recordAncestry(filename, file.ast.program.body);
 };
+
+/**
+ * Remove all cache entries associated with `filename`.
+ * Call this when a file is renamed or deleted mid-watch to prevent stale ancestry
+ * data from persisting for the lifetime of the Babel process.
+ */
+export function clearFileFromCache(filename) {
+  delete importDeclarations[filename];
+  const prefix = filename + "\0";
+  for (const key of Object.keys(superclassImportSources)) {
+    if (key.startsWith(prefix)) delete superclassImportSources[key];
+  }
+  for (const key of Object.keys(classSuperclassNames)) {
+    if (key.startsWith(prefix)) delete classSuperclassNames[key];
+  }
+}
 
 /**
  * Record the superclass import source and superclass name for a class in a file.
@@ -126,7 +199,8 @@ export function getImportDeclaration(filename, typeName) {
 /**
  * Try to resolve a module import source (as written in the source, e.g. "my/app/BaseController")
  * to the absolute filename key used in importDeclarations. Returns the key if a matching
- * file was already processed in this Babel run, or null otherwise.
+ * file was already processed in this Babel run or can be read from disk on demand, or null
+ * otherwise.
  *
  * Handles:
  *  - Relative imports ("./BaseController", "../controllers/Base") — resolved from currentFilename's dir
@@ -136,7 +210,7 @@ export function getImportDeclaration(filename, typeName) {
  *    is resolved as sourceRoot + "/BaseController" rather than sourceRoot + "/my/app/BaseController".
  *
  * Third-party / SAP module paths like "sap/ui/core/mvc/Controller" are never on disk
- * and will always return null (no key in importDeclarations).
+ * and will always return null (no key in importDeclarations, existsSync false).
  */
 function resolveImportSourceToFilename(
   importSource,
@@ -172,6 +246,18 @@ function resolveImportSourceToFilename(
       if (importDeclarations[candidate]) return candidate;
     }
   }
+  // Nothing cached — try reading candidate files from disk on demand.
+  // This makes transitive detection order-independent: a descendant processed before
+  // its ancestor can still discover the ancestor's superclass chain via a disk read.
+  // Bare module specifiers (e.g. "sap/ui/core/mvc/Controller") never reach here because
+  // isSuperclassTransitivelyKnown checks knownPaths.includes(importSource) first,
+  // before resolveImportSourceToFilename is ever called.
+  for (const base of bases) {
+    for (const ext of extensions) {
+      const candidate = base + ext;
+      if (readAndRecordFile(candidate)) return candidate;
+    }
+  }
   return null;
 }
 
@@ -179,9 +265,12 @@ function resolveImportSourceToFilename(
  * Walk the superclass import chain transitively to check whether any ancestor class
  * is imported from a path in knownPaths. Stops at maxDepth to avoid infinite loops.
  *
- * Ancestor files must have been seen by Babel's `pre` hook in this run (which happens
- * as soon as Babel opens the file, before any visitor traversal). File-processing order
- * therefore does not matter — classSuperclassNames is populated eagerly in saveImports.
+ * Ancestor files are populated via two paths:
+ *  1. Eagerly, when Babel opens the file: the `pre` hook calls saveImports, which calls
+ *     recordAncestry. This is the fast path; file-processing order doesn't matter here.
+ *  2. On demand, when the ancestor hasn't been seen yet: resolveImportSourceToFilename
+ *     tries to read and parse the ancestor file from disk (readAndRecordFile). This
+ *     makes transitive detection fully order-independent.
  *
  * Example chain:
  *   MyController.js  extends BaseController  → import "my/app/BaseController"
@@ -197,16 +286,16 @@ export function isSuperclassTransitivelyKnown(
   knownPaths,
   sourceRoot,
   namespacePrefix = null,
-  maxDepth = 3
+  _visited = null
 ) {
-  if (
-    !filename ||
-    !superclassLocalName ||
-    !knownPaths?.length ||
-    maxDepth <= 0
-  ) {
+  if (!filename || !superclassLocalName || !knownPaths?.length) {
     return false;
   }
+
+  const visited = _visited ?? new Set();
+  const key = filename + "\0" + superclassLocalName;
+  if (visited.has(key)) return false; // cycle detected
+  visited.add(key);
 
   const importDecl = getImportDeclaration(filename, superclassLocalName);
   if (!importDecl) return false;
@@ -247,6 +336,6 @@ export function isSuperclassTransitivelyKnown(
     knownPaths,
     sourceRoot,
     namespacePrefix,
-    maxDepth - 1
+    visited
   );
 }
