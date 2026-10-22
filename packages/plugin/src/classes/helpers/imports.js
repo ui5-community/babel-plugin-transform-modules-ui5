@@ -65,6 +65,10 @@ function recordAncestry(filename, programBody) {
     }
   }
 
+  // Maps className → superclassLocalName for classes defined in this file.
+  // Used below to resolve identifier-style default exports to their superclass.
+  const localClassSuperMap = new Map();
+
   for (const stmt of programBody) {
     // Handle: class Foo extends Bar {} and export default class Foo extends Bar {}
     const isDefaultExport =
@@ -83,10 +87,29 @@ function recordAncestry(filename, programBody) {
     if (importSource) {
       superclassImportSources[filename + "\0" + superName] = importSource;
       classSuperclassNames[filename + "\0" + className] = superName;
-      // F2: also store a "\0default" sentinel for default-exported classes so that a
-      // descendant importing the class under a different local alias can still find the
-      // superclass chain (e.g. `import Base from "./ActualBase"` where class is ActualBase).
+      localClassSuperMap.set(className, superName);
+      // For inline `export default class Foo extends Bar {}`, record the sentinel
+      // immediately. This will be overwritten below if an identifier-style default
+      // export names a different class (identifier-style takes precedence).
       if (isDefaultExport) {
+        classSuperclassNames[filename + "\0default"] = superName;
+      }
+    }
+  }
+
+  // PM3: handle identifier-style default exports: `export default ActualBase`.
+  // These are a separate statement from the class declaration, so the loop above misses them.
+  // Also fixes the sibling-collision issue: the sentinel must point to the class that is
+  // actually exported as default, not to whichever inline export default class appeared last.
+  for (const stmt of programBody) {
+    if (
+      t.isExportDefaultDeclaration(stmt) &&
+      t.isIdentifier(stmt.declaration)
+    ) {
+      const exportedName = stmt.declaration.name;
+      const superName = localClassSuperMap.get(exportedName);
+      if (superName) {
+        // Overwrite any sentinel from an inline export default class above.
         classSuperclassNames[filename + "\0default"] = superName;
       }
     }
@@ -103,6 +126,10 @@ function readAndRecordFile(absPath) {
   if (!existsSync(absPath)) return false;
   try {
     const code = readFileSync(absPath, "utf8");
+    // Don't enable JSX for plain .ts files: Babel's JSX parser treats the legacy
+    // TypeScript type-assertion syntax `<SomeType>expr` as JSX and fails to parse it.
+    // Only enable JSX for .jsx/.tsx files where it is expected.
+    const isTsOnly = /\.ts$/.test(absPath);
     const ast = parse(code, {
       sourceType: "module",
       babelrc: false,
@@ -111,7 +138,7 @@ function readAndRecordFile(absPath) {
         errorRecovery: true,
         plugins: [
           "typescript",
-          "jsx",
+          ...(isTsOnly ? [] : ["jsx"]),
           ["decorators", { legacy: true }],
           "classProperties",
         ],
@@ -124,12 +151,23 @@ function readAndRecordFile(absPath) {
   }
 }
 
-export const saveImports = (file) => {
+export const saveImports = (file, additionalUI5Classes) => {
   const filename = file.opts.filename;
   // Clear ALL stale cache entries for this file before re-populating, so watch-mode
   // rebuilds never carry over data from a previous version of the file.
   clearFileFromCache(filename);
   recordAncestry(filename, file.ast.program.body);
+  // PM1: record matches for any import whose source is in additionalUI5Classes.
+  // This runs unconditionally — before any class-conversion decision — so opt-outs like
+  // autoConvertControllerClass:false don't suppress valid match recording and produce
+  // false "never matched" warnings.
+  if (additionalUI5Classes?.length) {
+    for (const decl of importDeclarations[filename] ?? []) {
+      if (additionalUI5Classes.includes(decl.source.value)) {
+        recordAdditionalUI5ClassMatch(decl.source.value);
+      }
+    }
+  }
 };
 
 /**

@@ -13,8 +13,12 @@ Babel Types (t.*) https://github.com/babel/babel/tree/master/packages/babel-type
 AST Explorer: https://astexplorer.net/
 */
 
-// Tracks whether we have already registered the process.on('exit') handler for the
-// additionalUI5Classes unmatched-path warning. One handler per Babel process is enough.
+// Accumulates every additionalUI5Classes path seen across all post() invocations.
+// A single process.on('exit') handler (registered once) checks this set so that all
+// configured paths — even those from different plugin instances in the same build — are
+// covered. Without this, the closure in the first post() call would only see the first
+// invocation's options array.
+let allConfiguredUI5ClassPaths = null;
 let exitHandlerRegistered = false;
 
 module.exports = () => {
@@ -83,11 +87,16 @@ module.exports = () => {
       //     avoiding false positives when a valid path is only imported in a later file.
       const additionalUI5Classes = this.opts?.additionalUI5Classes;
       if (!additionalUI5Classes?.length) return;
+      // Accumulate all configured paths across every post() invocation so that builds
+      // using multiple Babel configs or programmatic transforms don't miss any list.
+      if (!allConfiguredUI5ClassPaths) allConfiguredUI5ClassPaths = new Set();
+      for (const p of additionalUI5Classes) allConfiguredUI5ClassPaths.add(p);
       if (!exitHandlerRegistered) {
         exitHandlerRegistered = true;
         process.on("exit", () => {
-          const unmatched =
-            getUnmatchedAdditionalUI5Classes(additionalUI5Classes);
+          const unmatched = getUnmatchedAdditionalUI5Classes([
+            ...allConfiguredUI5ClassPaths,
+          ]);
           for (const p of unmatched) {
             console.warn(
               `\x1b[33mWarn:\x1b[0m additionalUI5Classes: path "\x1b[34m${p}\x1b[0m" was never matched by any import in this build. Check for typos.`
