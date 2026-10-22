@@ -808,6 +808,16 @@ exports[`classes class-convert-transitive-no-super-default-collision MixedModule
 });"
 `;
 
+exports[`classes class-convert-transitive-no-super-default-collision MixedModuleFunction.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  const Helper = Controller.extend("fixtures.classes.class-convert-transitive-no-super-default-collision.Helper", {});
+  function NativeBase() {}
+  return NativeBase;
+});"
+`;
+
 exports[`classes class-convert-transitive-no-super-default-collision ZChild.js 1`] = `
 "sap.ui.define(["./MixedModule"], function (__Helper) {
   "use strict";
@@ -818,6 +828,19 @@ exports[`classes class-convert-transitive-no-super-default-collision ZChild.js 1
   const Helper = _interopRequireDefault(__Helper);
   class ZChild extends Helper {}
   return ZChild;
+});"
+`;
+
+exports[`classes class-convert-transitive-no-super-default-collision ZChildFunction.js 1`] = `
+"sap.ui.define(["./MixedModuleFunction"], function (__Helper) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const Helper = _interopRequireDefault(__Helper);
+  class ZChildFunction extends Helper {}
+  return ZChildFunction;
 });"
 `;
 

@@ -68,6 +68,15 @@ function recordAncestry(filename, programBody) {
   // right now even the removed import still exists later and can be re-added. Otherwise do: .map(decl => t.cloneNode(decl));
   importDeclarations[filename] = imports;
 
+  // N1: Mark the file as having a default export unconditionally — before filtering
+  // by class type or class name. This covers every form of `export default …`:
+  // named classes, anonymous classes (`export default class {}`), function declarations,
+  // expressions, and literals. The by-name fallback in isSuperclassTransitivelyKnown
+  // is suppressed whenever this file is in filesWithDefaultExport.
+  if (programBody.some(t.isExportDefaultDeclaration)) {
+    filesWithDefaultExport.add(filename);
+  }
+
   // Eagerly record class→superclass relationships from the AST so that transitive
   // detection works regardless of file-processing order. The class visitor also calls
   // saveSuperclassImportSource() for classes it converts, but that happens too late
@@ -112,13 +121,6 @@ function recordAncestry(filename, programBody) {
     // N1: Record which classes are declared in this file, even if they have no imported
     // superclass, so localClassSuperMap contains every class name for the default-export pass.
     localClassSuperMap.set(className, superName || null);
-    // N1: Mark the file as having an explicit default export when the class is directly
-    // exported as default (inline form). Do this before the superName guard so it fires
-    // even when the default-exported class has no superclass.
-    // The identifier-style `export default Foo` pass below handles the other form.
-    if (isDefaultExport) {
-      filesWithDefaultExport.add(filename);
-    }
     if (!superName) continue;
     const importSource = importBindings.get(superName);
     if (importSource) {
@@ -150,9 +152,7 @@ function recordAncestry(filename, programBody) {
       t.isIdentifier(stmt.declaration)
     ) {
       const exportedName = stmt.declaration.name;
-      // N1: Mark this file as having an explicit default export regardless of whether the
-      // exported identifier names a class — blocking the by-name fallback in transitive lookup.
-      filesWithDefaultExport.add(filename);
+      // N1: filesWithDefaultExport was already populated by the upfront scan above.
       const superName = localClassSuperMap.get(exportedName);
       // localClassSuperMap stores null for classes with no imported superclass (set above).
       // Only record the "\0default" sentinel when there IS a superclass to follow.
