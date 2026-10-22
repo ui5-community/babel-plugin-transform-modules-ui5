@@ -71,9 +71,20 @@ function recordAncestry(filename, programBody) {
   // N1: Mark the file as having a default export unconditionally — before filtering
   // by class type or class name. This covers every form of `export default …`:
   // named classes, anonymous classes (`export default class {}`), function declarations,
-  // expressions, and literals. The by-name fallback in isSuperclassTransitivelyKnown
-  // is suppressed whenever this file is in filesWithDefaultExport.
-  if (programBody.some(t.isExportDefaultDeclaration)) {
+  // expressions, and literals. Also covers `export { Foo as default }` (ExportNamedDeclaration
+  // with a default-named specifier), which is NOT an ExportDefaultDeclaration.
+  // The by-name fallback in isSuperclassTransitivelyKnown is suppressed whenever this file
+  // is in filesWithDefaultExport.
+  if (
+    programBody.some(t.isExportDefaultDeclaration) ||
+    programBody.some(
+      (s) =>
+        t.isExportNamedDeclaration(s) &&
+        s.specifiers?.some(
+          (sp) => t.isExportSpecifier(sp) && sp.exported.name === "default"
+        )
+    )
+  ) {
     filesWithDefaultExport.add(filename);
   }
 
@@ -146,25 +157,37 @@ function recordAncestry(filename, programBody) {
   // These are a separate statement from the class declaration, so the loop above misses them.
   // Also fixes the sibling-collision issue: the sentinel must point to the class that is
   // actually exported as default, not to whichever inline export default class appeared last.
+  // Also handles `export { Foo as default }` (ExportNamedDeclaration with a default specifier).
   for (const stmt of programBody) {
+    let exportedName = null;
     if (
       t.isExportDefaultDeclaration(stmt) &&
       t.isIdentifier(stmt.declaration)
     ) {
-      const exportedName = stmt.declaration.name;
-      // N1: filesWithDefaultExport was already populated by the upfront scan above.
-      const superName = localClassSuperMap.get(exportedName);
-      // localClassSuperMap stores null for classes with no imported superclass (set above).
-      // Only record the "\0default" sentinel when there IS a superclass to follow.
-      if (superName) {
-        const defKey = filename + "\0default";
-        // Overwrite any sentinel from an inline export default class above.
-        classSuperclassNames[defKey] = superName;
-        // PM1: only push if not already present (idempotent for identifier-style overwrites)
-        if (!ancestryCacheKeys[filename]?.includes(defKey)) {
-          ancestryCacheKeys[filename] = ancestryCacheKeys[filename] || [];
-          ancestryCacheKeys[filename].push(defKey);
+      // `export default ActualBase`
+      exportedName = stmt.declaration.name;
+    } else if (t.isExportNamedDeclaration(stmt)) {
+      // `export { Foo as default }` — specifier form
+      for (const sp of stmt.specifiers ?? []) {
+        if (t.isExportSpecifier(sp) && sp.exported.name === "default") {
+          exportedName = sp.local.name;
+          break;
         }
+      }
+    }
+    if (!exportedName) continue;
+    // N1: filesWithDefaultExport was already populated by the upfront scan above.
+    const superName = localClassSuperMap.get(exportedName);
+    // localClassSuperMap stores null for classes with no imported superclass (set above).
+    // Only record the "\0default" sentinel when there IS a superclass to follow.
+    if (superName) {
+      const defKey = filename + "\0default";
+      // Overwrite any sentinel from an inline export default class above.
+      classSuperclassNames[defKey] = superName;
+      // PM1: only push if not already present (idempotent for identifier-style overwrites)
+      if (!ancestryCacheKeys[filename]?.includes(defKey)) {
+        ancestryCacheKeys[filename] = ancestryCacheKeys[filename] || [];
+        ancestryCacheKeys[filename].push(defKey);
       }
     }
   }

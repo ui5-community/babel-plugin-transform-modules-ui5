@@ -785,6 +785,19 @@ exports[`classes class-convert-transitive-named-export-default BaseController.js
 });"
 `;
 
+exports[`classes class-convert-transitive-named-export-default BaseControllerSpecifier.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  const UIBase = Controller.extend("fixtures.classes.class-convert-transitive-named-export-default.UIBase", {});
+  var __exports = {
+    __esModule: true
+  };
+  __exports.default = UIBase;
+  return __exports;
+});"
+`;
+
 exports[`classes class-convert-transitive-named-export-default MyController.js 1`] = `
 "sap.ui.define(["./BaseController"], function (__Base) {
   "use strict";
@@ -795,6 +808,19 @@ exports[`classes class-convert-transitive-named-export-default MyController.js 1
   const Base = _interopRequireDefault(__Base);
   const MyController = Base.extend("fixtures.classes.class-convert-transitive-named-export-default.MyController", {});
   return MyController;
+});"
+`;
+
+exports[`classes class-convert-transitive-named-export-default MyControllerSpecifier.js 1`] = `
+"sap.ui.define(["./BaseControllerSpecifier"], function (__Base) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const Base = _interopRequireDefault(__Base);
+  const MyControllerSpecifier = Base.extend("fixtures.classes.class-convert-transitive-named-export-default.MyControllerSpecifier", {});
+  return MyControllerSpecifier;
 });"
 `;
 
@@ -815,6 +841,20 @@ exports[`classes class-convert-transitive-no-super-default-collision MixedModule
   const Helper = Controller.extend("fixtures.classes.class-convert-transitive-no-super-default-collision.Helper", {});
   function NativeBase() {}
   return NativeBase;
+});"
+`;
+
+exports[`classes class-convert-transitive-no-super-default-collision MixedModuleSpecifier.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  const Helper = Controller.extend("fixtures.classes.class-convert-transitive-no-super-default-collision.Helper", {});
+  class AppBase {}
+  var __exports = {
+    __esModule: true
+  };
+  __exports.default = AppBase;
+  return __exports;
 });"
 `;
 
@@ -841,6 +881,19 @@ exports[`classes class-convert-transitive-no-super-default-collision ZChildFunct
   const Helper = _interopRequireDefault(__Helper);
   class ZChildFunction extends Helper {}
   return ZChildFunction;
+});"
+`;
+
+exports[`classes class-convert-transitive-no-super-default-collision ZChildSpecifier.js 1`] = `
+"sap.ui.define(["./MixedModuleSpecifier"], function (__Helper) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const Helper = _interopRequireDefault(__Helper);
+  class ZChildSpecifier extends Helper {}
+  return ZChildSpecifier;
 });"
 `;
 
