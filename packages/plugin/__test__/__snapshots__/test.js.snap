@@ -663,6 +663,42 @@ exports[`classes class-convert-options-namedonly.js 1`] = `
 });"
 `;
 
+exports[`classes class-convert-transitive-default-alias-collision MixedModule.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller", "./NativePlatform"], function (Controller, __NativePlatform) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const NativePlatform = _interopRequireDefault(__NativePlatform);
+  const Helper = Controller.extend("fixtures.classes.class-convert-transitive-default-alias-collision.Helper", {});
+  class AppBase extends NativePlatform {}
+  return AppBase;
+});"
+`;
+
+exports[`classes class-convert-transitive-default-alias-collision NativePlatform.js 1`] = `
+"sap.ui.define([], function () {
+  "use strict";
+
+  class NativePlatform {}
+  return NativePlatform;
+});"
+`;
+
+exports[`classes class-convert-transitive-default-alias-collision ZChild.js 1`] = `
+"sap.ui.define(["./MixedModule"], function (__Helper) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const Helper = _interopRequireDefault(__Helper);
+  class ZChild extends Helper {}
+  return ZChild;
+});"
+`;
+
 exports[`classes class-convert-transitive-default-export-nonui5 NativeBase.js 1`] = `
 "sap.ui.define([], function () {
   "use strict";

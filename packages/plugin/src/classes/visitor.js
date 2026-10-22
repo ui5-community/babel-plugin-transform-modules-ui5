@@ -7,6 +7,7 @@ import {
   getImportDeclaration,
   saveSuperclassImportSource,
   isSuperclassTransitivelyKnown,
+  resolveImportSourceToFilename,
   recordAdditionalUI5ClassMatch,
 } from "./helpers/imports";
 
@@ -396,6 +397,34 @@ function shouldConvertClass(file, node, opts, classInfo) {
           opts.namespacePrefix || null
         );
         if (transitiveMatch) {
+          // N2: verify the direct ancestor (the class this file imports) would itself be
+          // convertible — specifically that it has a non-empty namespace relative to
+          // sourceRoot. If the ancestor sits at the root of sourceRoot with no
+          // namespacePrefix it has no namespace and remains a native ES class, so calling
+          // .extend() on it at runtime would throw. The importSource for the direct ancestor
+          // is the import declaration we already resolved above.
+          const importDecl2 = getImportDeclaration(filename, superClassName);
+          if (importDecl2) {
+            const ancestorFile = resolveImportSourceToFilename(
+              importDecl2.source.value,
+              filename,
+              sourceRoot,
+              opts.namespacePrefix || null
+            );
+            if (ancestorFile) {
+              const { dir } = Path.parse(
+                Path.relative(sourceRoot, ancestorFile)
+              );
+              const ancestorNamespace = [
+                ...(opts.namespacePrefix ? [opts.namespacePrefix] : []),
+                ...dir.split(Path.sep).filter(Boolean),
+              ].join(".");
+              if (!ancestorNamespace) {
+                // Ancestor would remain a native class — do not convert this descendant.
+                return false;
+              }
+            }
+          }
           // F4: mark only the path that was actually matched, not every additionalUI5Classes
           // entry — to avoid suppressing valid "never matched" warnings for typo paths.
           if (opts.additionalUI5Classes?.includes(transitiveMatch)) {
