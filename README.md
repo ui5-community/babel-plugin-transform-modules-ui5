@@ -42,9 +42,9 @@ Or if you want to supply plugin options, use the array syntax.
 }
 ```
 
-At the time of writing the babel version is 7.3, which does not natively support class property syntax. To use that syntax also add the plugin `@babel/plugin-syntax-class-properties`.
+Class property syntax (`static metadata = {}`) is supported natively by recent Babel versions. If you are on an older Babel 7 setup, add `@babel/plugin-proposal-class-properties` (Babel < 7.12) or rely on `@babel/preset-env` (Babel ≥ 7.12, where it is included automatically).
 
-It is also recommended to use [@babel/preset-env](https://babeljs.io/docs/en/next/babel-preset-env.html) to control which ES version the final code is transformed to.
+It is also recommended to use [@babel/preset-env](https://babeljs.io/docs/babel-preset-env) to control which ES version the final code is transformed to.
 
 The order of presets is important and `@babel/preset-env` should be higher in the array than this one. Babel applies them in reverse order for legacy reasons, so this preset will be applied first.
 
@@ -365,7 +365,7 @@ will be converted to:
 "use strict";
 
 QUnit.config.autostart = false;
-"sap.ui.require([], function () {
+sap.ui.require([], function () {
   function __ui5_require_async(path) { /* ... */ }
   void Promise.all([__ui5_require_async("unit/controller/App.qunit")]).then(() => {
     QUnit.start();
@@ -459,13 +459,31 @@ The default behaviour if no JSDoc or Decorator overrides are given is to use the
 
 This is based on the relative path from either the babelrc `sourceRoot` property or the current working directory.
 
-The plugin also supports supplying a namespace prefix in this mode, in case the desired namespace root is not a directory in the filesystem.
+**For library and app projects with a dedicated source folder** (e.g. `src/`, `test/`, `webapp/`), use the `sourceFolders` option to map each folder to its namespace prefix. The folder name is stripped from the namespace and replaced by the mapped prefix:
 
-In order to pass the namespace prefix, pass it as a plugin option, and not a top-level babel option. Passing plugin options requires the array format for the plugin itself (within the outer plugins array).
-
-```js
+```json
 {
-    "sourceRoot" "src/",
+    "plugins": [
+        ["transform-modules-ui5", {
+            "sourceFolders": {
+                "src": "my.lib",
+                "test": "my.lib.test"
+            }
+        }]
+    ]
+}
+```
+
+With this configuration:
+- `src/control/MyButton.js` → FQN `my.lib.control.MyButton`
+- `test/integration/opaTest.js` → FQN `my.lib.test.integration.opaTest`
+- A file in a folder **not listed** in `sourceFolders` gets an empty namespace and will **not** be auto-converted.
+
+For simpler single-root projects you can still use `namespacePrefix` together with Babel's `sourceRoot`:
+
+```json
+{
+    "sourceRoot": "src/",
     "plugins": [
         ["transform-modules-ui5", {
             "namespacePrefix": "my.app"
@@ -867,7 +885,8 @@ In general, comments are preserved, but for each class property/method whose pos
 
 ### Class Conversion
 
-- `namespacePrefix` (Default: '') Prefix to apply to namespace derived from directory.
+- `sourceFolders` (Default: `{}`). Maps source-folder names to namespace prefixes. When set, the file's leading folder segment (relative to `sourceRoot` / cwd) is looked up in this map. The matched folder is stripped from the namespace path and the mapped value becomes the namespace prefix. Files whose leading folder is **not** in the map get an empty namespace and will not be auto-converted. Use this for library or app projects where sources live under `src/`, `test/`, or `webapp/`. Example: `{ "src": "my.lib", "test": "my.lib.test" }`.
+- `namespacePrefix` (Default: '') Prefix to apply to namespace derived from directory. When `sourceFolders` is set, `namespacePrefix` is used as fallback only for files not matched by `sourceFolders`.
 - `autoConvertAllExtendClasses` (Default false). Converts all classes by default, provided they extend from an imported class. Version 6 default behaviour.
 - `autoConvertUI5FileTypes` (Default true). Converts classes in files whose name ends with a recognised UI5 file-type suffix, provided the class extends an imported class and has a resolvable namespace. Covers `.controller.(js|ts)` and `.view.(js|ts|jsx|tsx)` by default.
 - `autoConvertControllerClass` (Default true). Backward-compatible override: set to `false` to suppress auto-conversion for `.controller.*` files even when `autoConvertUI5FileTypes` is enabled. Use `@nonui5` on individual classes if a controller file has multiple classes extending an import but only some should be converted.
@@ -884,7 +903,7 @@ In general, comments are preserved, but for each class property/method whose pos
 
 \* 'collapsing' named exports is a combination of simply ignoring them if their definition is the same as a property on the default export, and also assigning them to the default export.
 
-\*\* This plugin also makes use of babel's standard `sourceRoot` option.
+> **Note:** The plugin also makes use of Babel's standard `sourceRoot` option for file-path-based namespace computation (see [File based namespace](#file-based-namespace-default) above).
 
 TODO: more options and better description.
 
@@ -941,4 +960,4 @@ This installs all dependencies (including lifecycle scripts needed by some packa
 
 ## License
 
-MIT © 2019-2024 Ryan Murphy, UI5 community and contributors
+MIT © 2019-2026 Ryan Murphy, UI5 community and contributors
