@@ -48,6 +48,44 @@ let filesWithDefaultExport = new Set();
 const matchedAdditionalUI5ClassPaths = new Set();
 
 /**
+ * Resolve the effective namespace prefix for a given file path, respecting `sourceFolders`.
+ *
+ * When `opts.sourceFolders` (a `{ folderName: "prefix" }` map) is set:
+ *   - The file's leading folder segment (relative to `sourceRoot`) is looked up in the map.
+ *   - If matched, the mapped prefix is returned (may be an empty string).
+ *   - If unmatched but a leading folder exists, `null` is returned (signals: no namespace).
+ * Falls back to `opts.namespacePrefix` when `sourceFolders` is absent.
+ *
+ * @param {string} filename   Absolute path of the file.
+ * @param {string} sourceRoot Absolute source-root path.
+ * @param {object} opts       Plugin options (sourceFolders, namespacePrefix).
+ * @returns {string|null}     The effective prefix string, "" for an empty-string mapping,
+ *                            or null when the file's folder is present but unmapped.
+ */
+export function getEffectiveNamespacePrefix(filename, sourceRoot, opts) {
+  const sourceFolders = opts && opts.sourceFolders;
+  if (!sourceFolders || typeof sourceFolders !== "object") {
+    return opts && opts.namespacePrefix != null ? opts.namespacePrefix : null;
+  }
+  const filenameRelative = Path.relative(sourceRoot, filename);
+  const { dir } = Path.parse(filenameRelative);
+  const parts = dir.split(Path.sep);
+  const leadingFolder = parts[0];
+  if (
+    leadingFolder &&
+    Object.prototype.hasOwnProperty.call(sourceFolders, leadingFolder)
+  ) {
+    return sourceFolders[leadingFolder]; // "" or a namespace string
+  }
+  if (leadingFolder) {
+    // Present but not mapped → caller should treat as empty namespace
+    return null;
+  }
+  // File is directly inside sourceRoot with no sub-folder — use namespacePrefix fallback
+  return opts && opts.namespacePrefix != null ? opts.namespacePrefix : null;
+}
+
+/**
  * Record that `modulePath` (from additionalUI5Classes) was matched by an import in this run.
  */
 export function recordAdditionalUI5ClassMatch(modulePath) {

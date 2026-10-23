@@ -68,6 +68,14 @@ const Options = {
     "SiblingSourcerootApp": {
       autoConvertKnownUI5Classes: true,
     },
+    "SourceFolderApp.controller": {
+      autoConvertKnownUI5Classes: true,
+      sourceFolders: { src: "my.app" },
+    },
+    "UnmatchedFolderApp": {
+      autoConvertKnownUI5Classes: true,
+      sourceFolders: { src: "my.app" }, // "other" is not mapped → empty namespace → no auto-convert
+    },
     "error-noextend-mixed-exports": {
       noExportExtend: true,
     },
@@ -149,6 +157,22 @@ const Options = {
       sourceRoot: resolve(
         __dirname,
         "fixtures/classes/class-convert-transitive-sibling-sourceroot"
+      ),
+    },
+    "SourceFolderApp.controller": {
+      // Point sourceRoot at the fixture root so the file's leading folder is "src"
+      // (matching the sourceFolders key) rather than "fixtures".
+      sourceRoot: resolve(
+        __dirname,
+        "fixtures/classes/class-convert-source-folders"
+      ),
+    },
+    "UnmatchedFolderApp": {
+      // Point sourceRoot at the fixture root so the file's leading folder is "other"
+      // (NOT a key in sourceFolders: { src: "my.app" }) → empty namespace → no auto-convert.
+      sourceRoot: resolve(
+        __dirname,
+        "fixtures/classes/class-convert-source-folders-unmatched"
       ),
     },
   },

@@ -9,6 +9,7 @@ import {
   isSuperclassTransitivelyKnown,
   resolveImportSourceToFilename,
   recordAdditionalUI5ClassMatch,
+  getEffectiveNamespacePrefix,
 } from "./helpers/imports";
 
 /**
@@ -389,12 +390,17 @@ function shouldConvertClass(file, node, opts, classInfo) {
         const sourceRoot = file.opts.sourceRoot
           ? Path.resolve(process.cwd(), file.opts.sourceRoot)
           : process.cwd();
+        // Use the effective namespace prefix for the current file (respects sourceFolders).
+        const effectivePrefix =
+          getEffectiveNamespacePrefix(filename, sourceRoot, opts) ||
+          opts.namespacePrefix ||
+          null;
         const transitiveMatch = isSuperclassTransitivelyKnown(
           filename,
           superClassName,
           knownPaths,
           sourceRoot,
-          opts.namespacePrefix || null
+          effectivePrefix
         );
         if (transitiveMatch) {
           // N2: verify the direct ancestor (the class this file imports) would itself be
@@ -410,7 +416,7 @@ function shouldConvertClass(file, node, opts, classInfo) {
             importSource,
             filename,
             sourceRoot,
-            opts.namespacePrefix || null
+            effectivePrefix
           );
           if (ancestorFile) {
             // Containment check via Path.relative: the ancestor is inside sourceRoot
@@ -421,12 +427,32 @@ function shouldConvertClass(file, node, opts, classInfo) {
             const ancestorInsideSourceRoot =
               ancestorRel === "" ||
               (!ancestorRel.startsWith("..") && !Path.isAbsolute(ancestorRel));
+            // Compute the ancestor's own effective prefix (it may live in a different sourceFolders entry).
+            const ancestorEffectivePrefix = ancestorInsideSourceRoot
+              ? getEffectiveNamespacePrefix(ancestorFile, sourceRoot, opts) ||
+                opts.namespacePrefix ||
+                null
+              : null;
+            const ancestorDirParts = ancestorInsideSourceRoot
+              ? Path.parse(ancestorRel).dir.split(Path.sep).filter(Boolean)
+              : [];
+            // When sourceFolders is active, the leading folder segment is the source-folder key
+            // and must be stripped (getEffectiveNamespacePrefix already incorporated its prefix).
+            const sourceFolders = opts.sourceFolders;
+            const skipLeadingFolder =
+              sourceFolders &&
+              typeof sourceFolders === "object" &&
+              ancestorDirParts.length > 0 &&
+              Object.prototype.hasOwnProperty.call(
+                sourceFolders,
+                ancestorDirParts[0]
+              );
             const ancestorNamespace = ancestorInsideSourceRoot
               ? [
-                  ...(opts.namespacePrefix ? [opts.namespacePrefix] : []),
-                  ...Path.parse(ancestorRel)
-                    .dir.split(Path.sep)
-                    .filter(Boolean),
+                  ...(ancestorEffectivePrefix ? [ancestorEffectivePrefix] : []),
+                  ...(skipLeadingFolder
+                    ? ancestorDirParts.slice(1)
+                    : ancestorDirParts),
                 ].join(".")
               : "";
             // Legacy .controller.(js|ts) files convert even with an empty namespace

@@ -663,6 +663,22 @@ exports[`classes class-convert-options-namedonly.js 1`] = `
 });"
 `;
 
+exports[`classes class-convert-source-folders src controller SourceFolderApp.controller.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  const SourceFolderApp = Controller.extend("my.app.controller.SourceFolderApp", {});
+});"
+`;
+
+exports[`classes class-convert-source-folders-unmatched other controller UnmatchedFolderApp.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  class UnmatchedFolderApp extends Controller {}
+});"
+`;
+
 exports[`classes class-convert-transitive-default-alias-collision MixedModule.js 1`] = `
 "sap.ui.define(["sap/ui/core/mvc/Controller", "./NativePlatform"], function (Controller, __NativePlatform) {
   "use strict";
