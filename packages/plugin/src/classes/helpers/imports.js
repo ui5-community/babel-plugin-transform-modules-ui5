@@ -1,6 +1,6 @@
 import { types as t, parse } from "@babel/core";
 import * as Path from "path";
-import { readFileSync, existsSync } from "fs";
+import { readFileSync } from "fs";
 
 let importDeclarations = {};
 
@@ -23,10 +23,12 @@ let classSuperclassNames = {};
 let ancestryCacheKeys = {};
 
 // PM2: Tracks which files were populated by readAndRecordFile (on-demand disk reads)
-// rather than by saveImports (Babel-opened files). On-demand entries are evicted at the
-// start of every saveImports call for any file, so that a changed ancestor is re-read
-// next time a descendant needs it rather than serving stale cached data.
+// rather than by saveImports (Babel-opened files). On-demand entries are evicted once
+// at the start of the first saveImports call in each rebuild cycle, so that a changed
+// ancestor is re-read next time a descendant needs it rather than serving stale data.
+// onDemandEvictedThisCycle prevents re-evicting the same set on every file in the cycle.
 const onDemandCachedFiles = new Set();
+let onDemandEvictedThisCycle = false;
 
 // N1: Tracks files that have any explicit `export default` declaration. Used to decide
 // whether by-name fallback is safe in isSuperclassTransitivelyKnown for default imports:
@@ -375,7 +377,6 @@ function recordAncestry(filename, programBody) {
 function readAndRecordFile(absPath) {
   if (Object.prototype.hasOwnProperty.call(importDeclarations, absPath))
     return true; // already cached
-  if (!existsSync(absPath)) return false;
   try {
     const code = readFileSync(absPath, "utf8");
     // Don't enable JSX for plain .ts files: Babel's JSX parser treats the legacy
@@ -404,9 +405,8 @@ function readAndRecordFile(absPath) {
     return true;
   } catch (err) {
     if (err.code !== "ENOENT") {
-      // Swallow ENOENT silently: covers both "file never existed" and the rare TOCTOU window
-      // where existsSync returned true but the file was deleted before readFileSync ran
-      // (more frequent in Windows watch mode). Re-surface unexpected errors (permissions, etc.).
+      // Swallow ENOENT silently (file missing or deleted before the read).
+      // Re-surface unexpected errors (permissions, parse failures, etc.).
       console.warn(
         `[babel-plugin-ui5] Could not read ancestor file ${absPath}: ${err.message}`
       );
@@ -417,14 +417,16 @@ function readAndRecordFile(absPath) {
 
 export const saveImports = (file, additionalUI5Classes) => {
   const filename = file.opts.filename;
-  // PM2: evict any on-demand (disk-read) ancestor cache entries before re-populating.
-  // An ancestor loaded via readAndRecordFile is never refreshed unless evicted here.
-  // By clearing all on-demand entries at the start of each saveImports call we ensure
-  // that a changed ancestor is re-read from disk next time a descendant needs it.
+  // PM2: evict all on-demand (disk-read) ancestor cache entries once per rebuild cycle.
+  // Doing it once (guarded by onDemandEvictedThisCycle) rather than on every saveImports
+  // call avoids re-reading every shared ancestor file once per source file per rebuild.
   // clearFileFromCache also removes the entry from onDemandCachedFiles, so a snapshot
   // of the keys is taken first to avoid mutating the Set while iterating it.
-  for (const f of [...onDemandCachedFiles]) {
-    clearFileFromCache(f);
+  if (!onDemandEvictedThisCycle) {
+    onDemandEvictedThisCycle = true;
+    for (const f of [...onDemandCachedFiles]) {
+      clearFileFromCache(f);
+    }
   }
   // Clear ALL stale cache entries for this file before re-populating, so watch-mode
   // rebuilds never carry over data from a previous version of the file.
@@ -455,6 +457,7 @@ export function resetAllCaches() {
   classSuperclassNames = {};
   ancestryCacheKeys = {};
   onDemandCachedFiles.clear();
+  onDemandEvictedThisCycle = false;
   filesWithDefaultExport.clear();
   matchedAdditionalUI5ClassPaths.clear();
 }
@@ -743,12 +746,13 @@ export function isLocalChainConvertible(
       fromFile = ancestorFile;
       continue;
     }
-    // No default sentinel — scan all superclassImportSources keys for this file.
-    const prefix = ancestorFile + "\0";
+    // No default sentinel — use the per-file key index (O(own-keys)) instead of
+    // scanning all superclassImportSources keys (O(total-keys)).
     let nextSrc = null;
-    for (const key of Object.keys(superclassImportSources)) {
-      if (key.startsWith(prefix)) {
-        nextSrc = superclassImportSources[key];
+    for (const key of ancestryCacheKeys[ancestorFile] ?? []) {
+      const src = superclassImportSources[key];
+      if (src !== undefined) {
+        nextSrc = src;
         break;
       }
     }

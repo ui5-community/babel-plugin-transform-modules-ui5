@@ -414,7 +414,7 @@ function shouldConvertClass(file, node, opts, classInfo) {
       .join(", ");
     console.warn(
       `[babel-plugin-ui5] Skipping auto-conversion of class "${node.id?.name}" in "${file.opts.filename}" — ` +
-        `non-UI5 decorator(s) present: ${names}. Add @alias or @namespace to convert explicitly.`
+        `non-UI5 decorator(s) present: ${names}. Add @alias or @namespace to convert it, or @nonUI5 to silence this warning.`
     );
     return null;
   }
