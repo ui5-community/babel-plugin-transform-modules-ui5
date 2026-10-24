@@ -294,7 +294,8 @@ function readAndRecordFile(absPath) {
     // Don't enable JSX for plain .ts files: Babel's JSX parser treats the legacy
     // TypeScript type-assertion syntax `<SomeType>expr` as JSX and fails to parse it.
     // Only enable JSX for .jsx/.tsx files where it is expected.
-    const isTsOnly = /\.ts$/.test(absPath);
+    const isTS = /\.tsx?$/.test(absPath);
+    const isJSX = /\.[jt]sx$/.test(absPath);
     const ast = parse(code, {
       sourceType: "module",
       babelrc: false,
@@ -302,8 +303,8 @@ function readAndRecordFile(absPath) {
       parserOpts: {
         errorRecovery: true,
         plugins: [
-          "typescript",
-          ...(isTsOnly ? [] : ["jsx"]),
+          ...(isTS ? ["typescript"] : []),
+          ...(isJSX ? ["jsx"] : []),
           ["decorators", { legacy: true }],
           "classProperties",
         ],
@@ -314,8 +315,15 @@ function readAndRecordFile(absPath) {
     // preventing a changed ancestor from serving stale cached data indefinitely.
     onDemandCachedFiles.add(absPath);
     return true;
-  } catch {
-    return false; // unparseable ancestor → degrade silently, never throw
+  } catch (err) {
+    if (err.code !== "ENOENT") {
+      // Only swallow "file not found"; re-surface unexpected errors (permissions, etc.)
+      // so they're not silently mistaken for a missing ancestor.
+      console.warn(
+        `[babel-plugin-ui5] Could not read ancestor file ${absPath}: ${err.message}`
+      );
+    }
+    return false; // unparseable or missing ancestor → degrade, never throw
   }
 }
 
@@ -493,6 +501,10 @@ export function resolveImportSourceToFilename(
       const candidate = base + ext;
       if (importDeclarations[candidate]) return candidate;
     }
+    for (const ext of extensions) {
+      const candidate = base + "/index" + ext;
+      if (importDeclarations[candidate]) return candidate;
+    }
   }
   // Nothing cached — try reading candidate files from disk on demand.
   // This makes transitive detection order-independent: a descendant processed before
@@ -506,6 +518,11 @@ export function resolveImportSourceToFilename(
     if (readAndRecordFile(base)) return base;
     for (const ext of extensions) {
       const candidate = base + ext;
+      if (readAndRecordFile(candidate)) return candidate;
+    }
+    // F2: directory index — handles `import Base from "./controllers"` → controllers/index.js
+    for (const ext of extensions) {
+      const candidate = base + "/index" + ext;
       if (readAndRecordFile(candidate)) return candidate;
     }
   }

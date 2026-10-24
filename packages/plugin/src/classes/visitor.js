@@ -96,21 +96,21 @@ export const ClassTransformVisitor = {
           if (
             opts.autoConvertUI5FileTypes !== false &&
             opts.autoConvertControllerClass !== false &&
-            /.*[.]controller[.](js|ts)$/.test(filename)
+            /[.]controller[.](js|ts)$/.test(filename)
           ) {
             classInfo.controller = true;
           } else {
             // Direct superclass imported from a known controller base-class path.
-            const superClassName = node.superClass?.name;
-            const importDecl = superClassName
-              ? getImportDeclaration(filename, superClassName)
+            const directSuperClassName = node.superClass?.name;
+            const importDecl = directSuperClassName
+              ? getImportDeclaration(filename, directSuperClassName)
               : null;
             if (
               importDecl &&
               KNOWN_UI5_CONTROLLER_CLASSES.includes(importDecl.source.value)
             ) {
               classInfo.controller = true;
-            } else if (importDecl && superClassName) {
+            } else if (importDecl && directSuperClassName) {
               // Transitive case: class extends a local base that itself extends a
               // known controller path. Walk the chain using the same infrastructure
               // as shouldConvertClass so controller-specific options activate.
@@ -123,7 +123,7 @@ export const ClassTransformVisitor = {
                 null;
               const transitiveMatch = isSuperclassTransitivelyKnown(
                 filename,
-                superClassName,
+                directSuperClassName,
                 KNOWN_UI5_CONTROLLER_CLASSES,
                 sourceRoot,
                 effectivePrefix
@@ -373,13 +373,13 @@ function shouldConvertClass(file, node, opts, classInfo) {
   {
     const filename = file.opts.filename || "";
     if (
-      /.*[.]controller[.](js|ts)$/.test(filename) &&
+      /[.]controller[.](js|ts)$/.test(filename) &&
       opts.autoConvertControllerClass === false
     ) {
       return false;
     }
     if (
-      /.*[.]view[.](js|ts|jsx|tsx)$/.test(filename) &&
+      /[.]view[.](js|ts|jsx|tsx)$/.test(filename) &&
       opts.autoConvertViewClass === false
     ) {
       return false;
@@ -392,7 +392,7 @@ function shouldConvertClass(file, node, opts, classInfo) {
   if (
     opts.autoConvertUI5FileTypes !== false &&
     opts.autoConvertControllerClass !== false &&
-    /.*[.]controller[.](js|ts)$/.test(file.opts.filename || "")
+    /[.]controller[.](js|ts)$/.test(file.opts.filename || "")
   ) {
     return true;
   }
@@ -524,7 +524,7 @@ function shouldConvertClass(file, node, opts, classInfo) {
             const isControllerFile =
               opts.autoConvertUI5FileTypes !== false &&
               opts.autoConvertControllerClass !== false &&
-              /.*[.]controller[.](js|ts)$/.test(ancestorFile);
+              /[.]controller[.](js|ts)$/.test(ancestorFile);
             if (!ancestorNamespace && !isControllerFile) {
               // Ancestor would remain a native class — do not convert this descendant.
               return false;
@@ -545,7 +545,7 @@ function shouldConvertClass(file, node, opts, classInfo) {
   if (
     opts.autoConvertUI5FileTypes !== false &&
     opts.autoConvertViewClass !== false &&
-    /.*[.]view[.](js|ts|jsx|tsx)$/.test(file.opts.filename || "")
+    /[.]view[.](js|ts|jsx|tsx)$/.test(file.opts.filename || "")
   ) {
     return true;
   }
