@@ -7,7 +7,7 @@ import * as ast from "../../utils/ast";
 
 import { getJsDocClassInfo, getTags } from "./jsdoc";
 import { getDecoratorClassInfo } from "./decorators";
-import { getImportDeclaration, getEffectiveNamespacePrefix } from "./imports";
+import { getImportDeclaration } from "./imports";
 
 /**
  * Converts an ES6 class to a UI5 extend.
