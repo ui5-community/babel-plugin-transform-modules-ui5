@@ -10,6 +10,11 @@ import { join, resolve } from "path";
 import { transformFileSync } from "@babel/core";
 import { get as getOpts, getBabelOpts } from "./options";
 import plugin from "../src";
+import { resetAllCaches } from "../src/classes/helpers/imports";
+
+// Clear all ancestry caches before this test file runs so that stale state from
+// a previous test module (same Jest worker) cannot affect transitive detection results.
+resetAllCaches();
 
 const FIXTURE_DIR_NAME = "fixtures";
 const OUT_DIR_NAME = "__output__";

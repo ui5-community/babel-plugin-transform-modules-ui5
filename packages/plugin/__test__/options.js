@@ -45,6 +45,12 @@ const Options = {
     "class-convert-additional-ui5-classes": {
       additionalUI5Classes: ["my/app/BaseController"],
     },
+    "class-no-convert-controller-opt-out.controller": {
+      autoConvertControllerClass: false,
+    },
+    "class-no-convert-view-opt-out.view": {
+      autoConvertViewClass: false,
+    },
     "class-convert-constructor-move.controller": {
       moveControllerConstructorToOnInit: true,
     },
@@ -164,6 +170,10 @@ const Options = {
     },
     "class-convert-transitive-named-import-alias": {
       autoConvertKnownUI5Classes: true,
+    },
+    "class-convert-transitive-controller-flag": {
+      autoConvertKnownUI5Classes: true,
+      moveControllerConstructorToOnInit: true,
     },
   },
   // Babel-level option overrides keyed by file/dir name.

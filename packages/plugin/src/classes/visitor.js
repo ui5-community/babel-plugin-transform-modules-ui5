@@ -110,6 +110,27 @@ export const ClassTransformVisitor = {
               KNOWN_UI5_CONTROLLER_CLASSES.includes(importDecl.source.value)
             ) {
               classInfo.controller = true;
+            } else if (importDecl && superClassName) {
+              // Transitive case: class extends a local base that itself extends a
+              // known controller path. Walk the chain using the same infrastructure
+              // as shouldConvertClass so controller-specific options activate.
+              const sourceRoot = file.opts.sourceRoot
+                ? Path.resolve(process.cwd(), file.opts.sourceRoot)
+                : process.cwd();
+              const effectivePrefix =
+                getEffectiveNamespacePrefix(filename, sourceRoot, opts) ??
+                opts.namespacePrefix ??
+                null;
+              const transitiveMatch = isSuperclassTransitivelyKnown(
+                filename,
+                superClassName,
+                KNOWN_UI5_CONTROLLER_CLASSES,
+                sourceRoot,
+                effectivePrefix
+              );
+              if (transitiveMatch) {
+                classInfo.controller = true;
+              }
             }
           }
         }
@@ -392,15 +413,13 @@ function shouldConvertClass(file, node, opts, classInfo) {
 
   // Convert classes whose superclass is imported from a known UI5 base-class module.
   // autoConvertKnownUI5Classes defaults to true; opt out by setting it to false.
-  // additionalUI5Classes: extra module paths added on top of the built-in list.
-  if (
-    opts.autoConvertKnownUI5Classes !== false ||
-    opts.additionalUI5Classes?.length
-  ) {
+  // additionalUI5Classes entries are always checked regardless of autoConvertKnownUI5Classes —
+  // the two are independent: one controls the built-in list, the other adds custom paths.
+  const useBuiltInList = opts.autoConvertKnownUI5Classes !== false;
+  const hasAdditionalClasses = !!opts.additionalUI5Classes?.length;
+  if (useBuiltInList || hasAdditionalClasses) {
     const knownPaths = [
-      ...(opts.autoConvertKnownUI5Classes !== false
-        ? KNOWN_UI5_BASE_CLASSES
-        : []),
+      ...(useBuiltInList ? KNOWN_UI5_BASE_CLASSES : []),
       ...(opts.additionalUI5Classes || []),
     ];
     if (knownPaths.length) {

@@ -16,9 +16,10 @@ let superclassImportSources = {};
 let classSuperclassNames = {};
 
 // PM1: Per-file key index for O(1) cache invalidation.
-// Maps filename → array of keys currently stored in superclassImportSources and
+// Maps filename → Set of keys currently stored in superclassImportSources and
 // classSuperclassNames for that file. Allows clearFileFromCache to visit only
 // the relevant keys rather than scanning all entries (which was O(N²) across N files).
+// Using a Set gives O(1) dedup and membership checks vs. the prior Array.includes approach.
 let ancestryCacheKeys = {};
 
 // PM2: Tracks which files were populated by readAndRecordFile (on-demand disk reads)
@@ -228,15 +229,16 @@ function recordAncestry(filename, programBody) {
       superclassImportSources[srcKey] = importSource;
       classSuperclassNames[clsKey] = superName;
       // PM1: track keys for O(1) invalidation
-      ancestryCacheKeys[filename] = ancestryCacheKeys[filename] || [];
-      ancestryCacheKeys[filename].push(srcKey, clsKey);
+      ancestryCacheKeys[filename] = ancestryCacheKeys[filename] || new Set();
+      ancestryCacheKeys[filename].add(srcKey);
+      ancestryCacheKeys[filename].add(clsKey);
       // For inline `export default class Foo extends Bar {}`, record the sentinel
       // immediately. This will be overwritten below if an identifier-style default
       // export names a different class (identifier-style takes precedence).
       if (isDefaultExport) {
         const defKey = filename + "\0default";
         classSuperclassNames[defKey] = superName;
-        ancestryCacheKeys[filename].push(defKey);
+        ancestryCacheKeys[filename].add(defKey);
       }
     }
   }
@@ -272,11 +274,9 @@ function recordAncestry(filename, programBody) {
       const defKey = filename + "\0default";
       // Overwrite any sentinel from an inline export default class above.
       classSuperclassNames[defKey] = superName;
-      // PM1: only push if not already present (idempotent for identifier-style overwrites)
-      if (!ancestryCacheKeys[filename]?.includes(defKey)) {
-        ancestryCacheKeys[filename] = ancestryCacheKeys[filename] || [];
-        ancestryCacheKeys[filename].push(defKey);
-      }
+      // PM1: Set.add is idempotent — no need to guard against duplicates.
+      ancestryCacheKeys[filename] = ancestryCacheKeys[filename] || new Set();
+      ancestryCacheKeys[filename].add(defKey);
     }
   }
 }
@@ -348,6 +348,22 @@ export const saveImports = (file, additionalUI5Classes) => {
 };
 
 /**
+ * Reset all ancestry caches to their initial state.
+ * Intended for programmatic/test callers that run several independent transforms
+ * in a single process and need a completely clean slate between runs.
+ * (The per-file `clearFileFromCache` is sufficient for watch-mode incremental eviction.)
+ */
+export function resetAllCaches() {
+  importDeclarations = {};
+  superclassImportSources = {};
+  classSuperclassNames = {};
+  ancestryCacheKeys = {};
+  onDemandCachedFiles.clear();
+  filesWithDefaultExport.clear();
+  matchedAdditionalUI5ClassPaths.clear();
+}
+
+/**
  * Remove all cache entries associated with `filename`.
  * Call this when a file is renamed or deleted mid-watch to prevent stale ancestry
  * data from persisting for the lifetime of the Babel process.
@@ -355,7 +371,7 @@ export const saveImports = (file, additionalUI5Classes) => {
 export function clearFileFromCache(filename) {
   delete importDeclarations[filename];
   // PM1: use the per-file key index for O(own-keys) cleanup instead of scanning all entries.
-  for (const key of ancestryCacheKeys[filename] ?? []) {
+  for (const key of ancestryCacheKeys[filename] ?? new Set()) {
     delete superclassImportSources[key];
     delete classSuperclassNames[key];
   }
@@ -385,12 +401,11 @@ export function saveSuperclassImportSource(
     const clsKey = filename + "\0" + className;
     superclassImportSources[srcKey] = superclassImportSource;
     classSuperclassNames[clsKey] = superclassLocalName;
-    // PM1: register keys so clearFileFromCache can find them without a full scan
-    ancestryCacheKeys[filename] = ancestryCacheKeys[filename] || [];
-    if (!ancestryCacheKeys[filename].includes(srcKey))
-      ancestryCacheKeys[filename].push(srcKey);
-    if (!ancestryCacheKeys[filename].includes(clsKey))
-      ancestryCacheKeys[filename].push(clsKey);
+    // PM1: register keys so clearFileFromCache can find them without a full scan.
+    // Set.add is idempotent, so no explicit membership check is needed.
+    ancestryCacheKeys[filename] = ancestryCacheKeys[filename] || new Set();
+    ancestryCacheKeys[filename].add(srcKey);
+    ancestryCacheKeys[filename].add(clsKey);
   }
 }
 

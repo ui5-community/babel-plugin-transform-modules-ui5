@@ -708,6 +708,35 @@ exports[`classes class-convert-source-folders-unmatched other controller Unmatch
 });"
 `;
 
+exports[`classes class-convert-transitive-controller-flag BaseController.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  const AppBase = Controller.extend("fixtures.classes.class-convert-transitive-controller-flag.AppBase", {
+    onInit: function _onInit() {}
+  });
+});"
+`;
+
+exports[`classes class-convert-transitive-controller-flag MyController.js 1`] = `
+"sap.ui.define(["./BaseController"], function (__AppBase) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const AppBase = _interopRequireDefault(__AppBase);
+  const MyView = AppBase.extend("fixtures.classes.class-convert-transitive-controller-flag.MyView", {
+    onInit: function onInit() {
+      this.value = 42;
+      if (typeof AppBase.prototype.onInit === 'function') {
+        AppBase.prototype.onInit.apply(this, arguments);
+      }
+    }
+  });
+});"
+`;
+
 exports[`classes class-convert-transitive-default-alias-collision MixedModule.js 1`] = `
 "sap.ui.define(["sap/ui/core/mvc/Controller", "./NativePlatform"], function (Controller, __NativePlatform) {
   "use strict";
@@ -1180,6 +1209,25 @@ exports[`classes class-import-meta.js 1`] = `
     }
   });
   return MyClass;
+});"
+`;
+
+exports[`classes class-no-convert-controller-opt-out.controller.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  class AppPage extends Controller {
+    onInit() {}
+  }
+  return AppPage;
+});"
+`;
+
+exports[`classes class-no-convert-view-opt-out.view.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/JSView"], function (JSView) {
+  "use strict";
+
+  class MyView extends JSView {}
 });"
 `;
 
