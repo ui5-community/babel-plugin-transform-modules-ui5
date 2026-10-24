@@ -76,6 +76,30 @@ const Options = {
       autoConvertKnownUI5Classes: true,
       sourceFolders: { src: "my.app" }, // "other" is not mapped → empty namespace → no auto-convert
     },
+    "DepMappedApp.controller": {
+      autoConvertKnownUI5Classes: true,
+      dependencies: [
+        {
+          sourceRoot: resolve(
+            __dirname,
+            "fixtures/classes/class-convert-dependencies/dep-lib"
+          ),
+          sourceFolders: { src: "my.dep" },
+        },
+      ],
+    },
+    "DepUnmappedApp": {
+      autoConvertKnownUI5Classes: true,
+      dependencies: [
+        {
+          sourceRoot: resolve(
+            __dirname,
+            "fixtures/classes/class-convert-dependencies/dep-lib"
+          ),
+          sourceFolders: { src: "my.dep" },
+        },
+      ],
+    },
     "error-noextend-mixed-exports": {
       noExportExtend: true,
     },
@@ -176,6 +200,23 @@ const Options = {
       sourceRoot: resolve(
         __dirname,
         "fixtures/classes/class-convert-source-folders-unmatched"
+      ),
+    },
+    "DepMappedApp.controller": {
+      // Primary sourceRoot is <fixture-root>/primary — file lives in dep-lib, so it is
+      // outside the primary root. The dependencies option points to dep-lib so the plugin
+      // can derive the namespace "my.dep.controller" from there.
+      sourceRoot: resolve(
+        __dirname,
+        "fixtures/classes/class-convert-dependencies/primary"
+      ),
+    },
+    "DepUnmappedApp": {
+      // Same primary sourceRoot as DepMappedApp.controller, but the dep-lib sub-folder
+      // "other" is not mapped in dep.sourceFolders → empty namespace → no auto-convert.
+      sourceRoot: resolve(
+        __dirname,
+        "fixtures/classes/class-convert-dependencies/primary"
       ),
     },
   },

@@ -488,7 +488,45 @@ function getFileBaseNamespace(path, pluginOpts) {
   const insideSourceRoot =
     filenameRelative === "" ||
     (!filenameRelative.startsWith("..") && !Path.isAbsolute(filenameRelative));
-  if (!insideSourceRoot) return undefined;
+  if (!insideSourceRoot) {
+    const deps = pluginOpts.dependencies;
+    if (Array.isArray(deps)) {
+      for (const dep of deps) {
+        if (!dep.sourceRoot) continue;
+        const depRoot = Path.resolve(dep.sourceRoot);
+        const depRel = Path.relative(depRoot, filename);
+        const depInside =
+          depRel === "" ||
+          (!depRel.startsWith("..") && !Path.isAbsolute(depRel));
+        if (!depInside) continue;
+        const sf = dep.sourceFolders;
+        if (sf && typeof sf === "object") {
+          let { dir } = Path.parse(depRel);
+          const parts = dir.split(Path.sep);
+          const leadingFolder = parts[0];
+          if (
+            leadingFolder &&
+            Object.prototype.hasOwnProperty.call(sf, leadingFolder)
+          ) {
+            const mappedPrefix = sf[leadingFolder];
+            dir = parts.slice(1).join(Path.sep);
+            const namespaceParts = dir.split(Path.sep).filter(Boolean);
+            if (mappedPrefix) namespaceParts.unshift(mappedPrefix);
+            return namespaceParts.join(".");
+          } else if (leadingFolder) {
+            return "";
+          }
+          // File directly at dep root with no sub-folder — fall through to namespacePrefix
+        }
+        // No sourceFolders on this dep — use dep.namespacePrefix if provided
+        const { dir: depDir } = Path.parse(depRel);
+        const depNamespaceParts = depDir.split(Path.sep).filter(Boolean);
+        if (dep.namespacePrefix) depNamespaceParts.unshift(dep.namespacePrefix);
+        return depNamespaceParts.join(".");
+      }
+    }
+    return undefined;
+  }
 
   let { dir } = Path.parse(filenameRelative);
 

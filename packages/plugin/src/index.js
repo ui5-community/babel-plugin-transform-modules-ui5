@@ -46,6 +46,9 @@ module.exports = () => {
 
         // Opts
         this.namespacePrefix = opts.namespacePrefix;
+        this.dependencies = Array.isArray(opts.dependencies)
+          ? opts.dependencies
+          : [];
         this.noImportInteropPrefixes = opts.noImportInteropPrefixes || ["sap/"];
         this.noImportInteropPrefixesRegexp = new RegExp(
           this.noImportInteropPrefixes.map((p) => `(^${p}.*)`).join("|")

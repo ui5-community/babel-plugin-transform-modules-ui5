@@ -479,6 +479,26 @@ With this configuration:
 - `test/integration/opaTest.js` → FQN `my.lib.test.integration.opaTest`
 - A file in a folder **not listed** in `sourceFolders` gets an empty namespace and will **not** be auto-converted.
 
+**For monorepo / npm-workspace setups** where a dependency project's files are transpiled alongside the main project but live outside its `sourceRoot`, use the `dependencies` option. Each entry describes one dependency project with its own `sourceRoot` and optional `sourceFolders`:
+
+```json
+{
+    "plugins": [
+        ["transform-modules-ui5", {
+            "sourceFolders": { "src": "my.app" },
+            "dependencies": [
+                {
+                    "sourceRoot": "../my-lib",
+                    "sourceFolders": { "src": "my.lib" }
+                }
+            ]
+        }]
+    ]
+}
+```
+
+When a file is outside the primary `sourceRoot`, the plugin checks each dependency entry in order. The first entry whose `sourceRoot` contains the file is used to derive the namespace — applying that entry's `sourceFolders` exactly as the primary `sourceFolders` option works. Files that are outside every listed `sourceRoot` remain without a namespace (existing behaviour).
+
 For simpler single-root projects you can still use `namespacePrefix` together with Babel's `sourceRoot`:
 
 ```json
@@ -896,6 +916,7 @@ In general, comments are preserved, but for each class property/method whose pos
 ### Class Conversion
 
 - `sourceFolders` (Default: `{}`). Maps source-folder names to namespace prefixes. When set, the file's leading folder segment (relative to `sourceRoot` / cwd) is looked up in this map. The matched folder is stripped from the namespace path and the mapped value becomes the namespace prefix. Files whose leading folder is **not** in the map get an empty namespace and will not be auto-converted. Use this for library or app projects where sources live under `src/`, `test/`, or `webapp/`. Example: `{ "src": "my.lib", "test": "my.lib.test" }`.
+- `dependencies` (Default: `[]`). Array of `{ sourceRoot, sourceFolders }` entries describing dependency projects whose files may be transpiled alongside the main project but live outside the primary `sourceRoot` (e.g. npm-workspace symlinks). When a file's path is outside the primary `sourceRoot`, the plugin iterates this array and uses the first matching entry to derive the namespace, applying that entry's `sourceFolders` the same way as the top-level option. Example: `[{ "sourceRoot": "../my-lib", "sourceFolders": { "src": "my.lib" } }]`.
 - `namespacePrefix` (Default: '') Prefix to apply to namespace derived from directory. When `sourceFolders` is set, `namespacePrefix` is used as fallback only for files not matched by `sourceFolders`.
 - `autoConvertAllExtendClasses` (Default false). Converts all classes by default, provided they extend from an imported class. Version 6 default behaviour.
 - `autoConvertUI5FileTypes` (Default true). Converts classes in files whose name ends with a recognised UI5 file-type suffix, provided the class extends an imported class and has a resolvable namespace. Covers `.controller.(js|ts)` and `.view.(js|ts|jsx|tsx)` by default.

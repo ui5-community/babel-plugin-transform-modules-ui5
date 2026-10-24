@@ -347,6 +347,22 @@ exports[`classes class-convert-dec-nonui5.js 1`] = `
 });"
 `;
 
+exports[`classes class-convert-dependencies dep-lib other controller DepUnmappedApp.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  class DepUnmappedApp extends Controller {}
+});"
+`;
+
+exports[`classes class-convert-dependencies dep-lib src controller DepMappedApp.controller.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  const DepMappedApp = Controller.extend("my.dep.controller.DepMappedApp", {});
+});"
+`;
+
 exports[`classes class-convert-extend-managed.js 1`] = `
 "sap.ui.define(["sap/ui/core/SAPClass", "./Relative"], function (SAPClass, __Relative) {
   "use strict";
