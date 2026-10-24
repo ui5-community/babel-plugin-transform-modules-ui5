@@ -109,6 +109,49 @@ const Options = {
         },
       ],
     },
+    "PrimaryExtendsDepBase": {
+      autoConvertKnownUI5Classes: true,
+      sourceFolders: { src: "my.app" },
+      dependencies: [
+        {
+          sourceRoot: resolve(
+            __dirname,
+            "fixtures/classes/class-convert-dependencies/dep-lib"
+          ),
+          sourceFolders: { src: "my.dep" },
+        },
+      ],
+    },
+    "PrimaryExtendsDepBaseModulePath": {
+      autoConvertKnownUI5Classes: true,
+      sourceFolders: { src: "my.app" },
+      dependencies: [
+        {
+          sourceRoot: resolve(
+            __dirname,
+            "fixtures/classes/class-convert-dependencies/dep-lib"
+          ),
+          sourceFolders: { src: "my.dep" },
+        },
+      ],
+    },
+    "PrimaryExtendsDepBaseUnmapped": {
+      autoConvertKnownUI5Classes: true,
+      sourceFolders: { src: "my.app" },
+      dependencies: [
+        {
+          sourceRoot: resolve(
+            __dirname,
+            "fixtures/classes/class-convert-dependencies/dep-lib"
+          ),
+          sourceFolders: { src: "my.dep" }, // "other" is not mapped → dep ancestor not found → no auto-convert
+        },
+      ],
+    },
+    "DepBase": {
+      autoConvertKnownUI5Classes: true,
+      sourceFolders: { src: "my.dep" },
+    },
     "error-noextend-mixed-exports": {
       noExportExtend: true,
     },
@@ -227,6 +270,41 @@ const Options = {
     "DepUnmappedApp": {
       // Same primary sourceRoot as DepMappedApp.controller, but the dep-lib sub-folder
       // "other" is not mapped in dep.sourceFolders → empty namespace → no auto-convert.
+      sourceRoot: resolve(
+        __dirname,
+        "fixtures/classes/class-convert-dependencies/primary"
+      ),
+    },
+    "DepBase": {
+      // DepBase.js lives in dep-lib/src/base/. Point sourceRoot at dep-lib so the FQN
+      // resolves to "my.dep.base.DepBase" via dep-level sourceFolders { src: "my.dep" }.
+      sourceRoot: resolve(
+        __dirname,
+        "fixtures/classes/class-convert-dependencies/dep-lib"
+      ),
+    },
+    "PrimaryExtendsDepBase": {
+      // Primary sourceRoot is <fixture-root>/primary; sourceFolders maps "src" → "my.app".
+      // The dep ancestor (DepBase.js) lives in dep-lib, outside the primary root.
+      // This exercises the N2 cross-root ancestor namespace check.
+      sourceRoot: resolve(
+        __dirname,
+        "fixtures/classes/class-convert-dependencies/primary"
+      ),
+    },
+    "PrimaryExtendsDepBaseModulePath": {
+      // Same primary sourceRoot as PrimaryExtendsDepBase but the ancestor is imported
+      // via UI5 module path "my/dep/base/DepBase" rather than a relative path.
+      // Exercises the dep-sourceRoot loop added to resolveImportSourceToFilename.
+      sourceRoot: resolve(
+        __dirname,
+        "fixtures/classes/class-convert-dependencies/primary"
+      ),
+    },
+    "PrimaryExtendsDepBaseUnmapped": {
+      // Dep ancestor path "my/dep/other/DepBaseUnmapped" has "other" as its folder,
+      // which is NOT in dep.sourceFolders { src: "my.dep" } → resolver can't find it
+      // → no transitive match → class stays unconverted.
       sourceRoot: resolve(
         __dirname,
         "fixtures/classes/class-convert-dependencies/primary"

@@ -468,6 +468,9 @@ export function getImportDeclaration(filename, typeName) {
  *    When namespacePrefix is set (e.g. "my.app"), module-path imports are first tried with
  *    the prefix stripped (dots→slashes), so "my/app/BaseController" → "BaseController"
  *    is resolved as sourceRoot + "/BaseController" rather than sourceRoot + "/my/app/BaseController".
+ *  - Module-path imports into dependency sourceRoots (e.g. "my/dep/base/DepBase") — resolved
+ *    by walking each entry in `dependencies`, inverting its sourceFolders map, and trying
+ *    both the raw path and the prefix-stripped path under each dep folder's root.
  *
  * Third-party / SAP module paths like "sap/ui/core/mvc/Controller" are never on disk
  * and will always return null (no key in importDeclarations, existsSync false).
@@ -477,7 +480,8 @@ export function resolveImportSourceToFilename(
   currentFilename,
   sourceRoot,
   namespacePrefix,
-  sourceFolders
+  sourceFolders,
+  dependencies
 ) {
   if (!importSource || !currentFilename) return null;
 
@@ -510,6 +514,38 @@ export function resolveImportSourceToFilename(
           if (importSource.startsWith(prefixPath + "/")) {
             const stripped = importSource.slice(prefixPath.length + 1);
             bases.push(Path.resolve(folderRoot, stripped));
+          }
+        }
+      }
+    }
+    // Walk dependency sourceRoots: a module-path import like "my/dep/base/DepBase" may
+    // refer to a file in a dep project whose folder is mapped to a prefix in dep.sourceFolders.
+    // Invert each dep's sourceFolders map (prefix → folder) to strip the prefix and build
+    // the candidate path under the dep's physical folder.
+    if (Array.isArray(dependencies)) {
+      for (const dep of dependencies) {
+        if (!dep.sourceRoot) continue;
+        const depRoot = Path.resolve(dep.sourceRoot);
+        bases.push(Path.resolve(depRoot, importSource));
+        if (dep.namespacePrefix) {
+          const prefixPath = dep.namespacePrefix.replace(/\./g, "/");
+          if (importSource.startsWith(prefixPath + "/")) {
+            const stripped = importSource.slice(prefixPath.length + 1);
+            bases.push(Path.resolve(depRoot, stripped));
+          }
+        }
+        const depSf = dep.sourceFolders;
+        if (depSf && typeof depSf === "object") {
+          for (const [folder, prefix] of Object.entries(depSf)) {
+            const folderRoot = Path.resolve(depRoot, folder);
+            bases.push(Path.resolve(folderRoot, importSource));
+            if (prefix) {
+              const prefixPath = prefix.replace(/\./g, "/");
+              if (importSource.startsWith(prefixPath + "/")) {
+                const stripped = importSource.slice(prefixPath.length + 1);
+                bases.push(Path.resolve(folderRoot, stripped));
+              }
+            }
           }
         }
       }
@@ -580,7 +616,8 @@ export function isSuperclassTransitivelyKnown(
   sourceRoot,
   namespacePrefix = null,
   sourceFolders = null,
-  _visited = null
+  _visited = null,
+  dependencies = null
 ) {
   if (!filename || !superclassLocalName || !knownPaths?.length) {
     return null;
@@ -605,7 +642,8 @@ export function isSuperclassTransitivelyKnown(
     filename,
     sourceRoot,
     namespacePrefix,
-    sourceFolders
+    sourceFolders,
+    dependencies
   );
   if (!resolvedFile) return null;
 
@@ -669,6 +707,7 @@ export function isSuperclassTransitivelyKnown(
     sourceRoot,
     namespacePrefix,
     sourceFolders,
-    visited
+    visited,
+    dependencies
   );
 }

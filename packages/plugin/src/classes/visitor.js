@@ -127,7 +127,9 @@ export const ClassTransformVisitor = {
                 KNOWN_UI5_CONTROLLER_CLASSES,
                 sourceRoot,
                 effectivePrefix,
-                opts.sourceFolders ?? null
+                opts.sourceFolders ?? null,
+                null,
+                opts.dependencies ?? null
               );
               if (transitiveMatch) {
                 classInfo.controller = true;
@@ -471,7 +473,9 @@ function shouldConvertClass(file, node, opts, classInfo) {
           knownPaths,
           sourceRoot,
           effectivePrefix,
-          opts.sourceFolders ?? null
+          opts.sourceFolders ?? null,
+          null,
+          opts.dependencies ?? null
         );
         if (transitiveMatch) {
           // N2: verify the direct ancestor (the class this file imports) would itself be
@@ -488,7 +492,8 @@ function shouldConvertClass(file, node, opts, classInfo) {
             filename,
             sourceRoot,
             effectivePrefix,
-            opts.sourceFolders ?? null
+            opts.sourceFolders ?? null,
+            opts.dependencies ?? null
           );
           if (ancestorFile) {
             // Containment check via Path.relative: the ancestor is inside sourceRoot
@@ -502,33 +507,69 @@ function shouldConvertClass(file, node, opts, classInfo) {
             // Compute the ancestor's own effective prefix (it may live in a different sourceFolders entry).
             // ?? (not ||) so that an explicit "" mapping in sourceFolders is respected —
             // || would treat "" as falsy and fall through to namespacePrefix.
-            const ancestorEffectivePrefix = ancestorInsideSourceRoot
-              ? (getEffectiveNamespacePrefix(ancestorFile, sourceRoot, opts) ??
+            let ancestorNamespace = "";
+            if (ancestorInsideSourceRoot) {
+              // Compute the ancestor's own effective prefix (it may live in a different
+              // sourceFolders entry). ?? (not ||) so that an explicit "" mapping is respected.
+              const ancestorEffectivePrefix =
+                getEffectiveNamespacePrefix(ancestorFile, sourceRoot, opts) ??
                 opts.namespacePrefix ??
-                null)
-              : null;
-            const ancestorDirParts = ancestorInsideSourceRoot
-              ? Path.parse(ancestorRel).dir.split(Path.sep).filter(Boolean)
-              : [];
-            // When sourceFolders is active, the leading folder segment is the source-folder key
-            // and must be stripped (getEffectiveNamespacePrefix already incorporated its prefix).
-            const sourceFolders = opts.sourceFolders;
-            const skipLeadingFolder =
-              sourceFolders &&
-              typeof sourceFolders === "object" &&
-              ancestorDirParts.length > 0 &&
-              Object.prototype.hasOwnProperty.call(
-                sourceFolders,
-                ancestorDirParts[0]
-              );
-            const ancestorNamespace = ancestorInsideSourceRoot
-              ? [
-                  ...(ancestorEffectivePrefix ? [ancestorEffectivePrefix] : []),
-                  ...(skipLeadingFolder
-                    ? ancestorDirParts.slice(1)
-                    : ancestorDirParts),
-                ].join(".")
-              : "";
+                null;
+              const ancestorDirParts = Path.parse(ancestorRel)
+                .dir.split(Path.sep)
+                .filter(Boolean);
+              // When sourceFolders is active, the leading folder segment is the source-folder
+              // key and must be stripped (getEffectiveNamespacePrefix already incorporated its
+              // prefix).
+              const sf = opts.sourceFolders;
+              const skipLeadingFolder =
+                sf &&
+                typeof sf === "object" &&
+                ancestorDirParts.length > 0 &&
+                Object.prototype.hasOwnProperty.call(sf, ancestorDirParts[0]);
+              ancestorNamespace = [
+                ...(ancestorEffectivePrefix ? [ancestorEffectivePrefix] : []),
+                ...(skipLeadingFolder
+                  ? ancestorDirParts.slice(1)
+                  : ancestorDirParts),
+              ].join(".");
+            } else {
+              // Ancestor is outside the primary sourceRoot — look it up in opts.dependencies.
+              // Each dep entry has its own sourceRoot and optional sourceFolders/namespacePrefix.
+              const deps = Array.isArray(opts.dependencies)
+                ? opts.dependencies
+                : [];
+              for (const dep of deps) {
+                if (!dep.sourceRoot) continue;
+                const depRoot = Path.resolve(dep.sourceRoot);
+                const depRel = Path.relative(depRoot, ancestorFile);
+                const depInside =
+                  depRel === "" ||
+                  (!depRel.startsWith("..") && !Path.isAbsolute(depRel));
+                if (!depInside) continue;
+                // File is inside this dep — compute namespace using dep's own sourceFolders/namespacePrefix.
+                const depEffectivePrefix = getEffectiveNamespacePrefix(
+                  ancestorFile,
+                  depRoot,
+                  dep
+                );
+                if (depEffectivePrefix === null) break; // unmapped folder → no namespace
+                const depDirParts = Path.parse(depRel)
+                  .dir.split(Path.sep)
+                  .filter(Boolean);
+                const depSf = dep.sourceFolders;
+                const depSkipLeading =
+                  depSf &&
+                  typeof depSf === "object" &&
+                  depDirParts.length > 0 &&
+                  Object.prototype.hasOwnProperty.call(depSf, depDirParts[0]);
+                ancestorNamespace = [
+                  ...(depEffectivePrefix ? [depEffectivePrefix] : []),
+                  ...(depSkipLeading ? depDirParts.slice(1) : depDirParts),
+                ].join(".");
+                break;
+              }
+            }
             // Legacy .controller.(js|ts) files convert even with an empty namespace
             // (preserves the same exemption as shouldConvertClass for the controller path).
             const isControllerFile =

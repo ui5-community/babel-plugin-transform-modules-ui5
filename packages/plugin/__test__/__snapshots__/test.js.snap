@@ -368,11 +368,55 @@ exports[`classes class-convert-dependencies dep-lib other controller DepUnmapped
 });"
 `;
 
+exports[`classes class-convert-dependencies dep-lib src base DepBase.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  const DepBase = Controller.extend("my.dep.base.DepBase", {});
+});"
+`;
+
 exports[`classes class-convert-dependencies dep-lib src controller DepMappedApp.controller.js 1`] = `
 "sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
   "use strict";
 
   const DepMappedApp = Controller.extend("my.dep.controller.DepMappedApp", {});
+});"
+`;
+
+exports[`classes class-convert-dependencies primary src app PrimaryExtendsDepBase.js 1`] = `
+"sap.ui.define(["../../../dep-lib/src/base/DepBase"], function (__DepBase) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const DepBase = _interopRequireDefault(__DepBase);
+  const PrimaryExtendsDepBase = DepBase.extend("my.app.app.PrimaryExtendsDepBase", {});
+});"
+`;
+
+exports[`classes class-convert-dependencies primary src app PrimaryExtendsDepBaseModulePath.js 1`] = `
+"sap.ui.define(["my/dep/base/DepBase"], function (__DepBase) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const DepBase = _interopRequireDefault(__DepBase);
+  const PrimaryExtendsDepBaseModulePath = DepBase.extend("my.app.app.PrimaryExtendsDepBaseModulePath", {});
+});"
+`;
+
+exports[`classes class-convert-dependencies primary src app PrimaryExtendsDepBaseUnmapped.js 1`] = `
+"sap.ui.define(["my/dep/other/DepBaseUnmapped"], function (__DepBase) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const DepBase = _interopRequireDefault(__DepBase);
+  class PrimaryExtendsDepBaseUnmapped extends DepBase {}
 });"
 `;
 
