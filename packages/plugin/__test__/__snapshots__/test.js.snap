@@ -755,6 +755,26 @@ exports[`classes class-convert-source-folders src controller SourceFolderApp.con
 });"
 `;
 
+exports[`classes class-convert-source-folders-empty-mapping src controller EmptyPrefixApp.js 1`] = `
+"sap.ui.define(["./EmptyPrefixBase"], function (__EmptyPrefixBase) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const EmptyPrefixBase = _interopRequireDefault(__EmptyPrefixBase);
+  const EmptyPrefixApp = EmptyPrefixBase.extend("controller.EmptyPrefixApp", {});
+});"
+`;
+
+exports[`classes class-convert-source-folders-empty-mapping src controller EmptyPrefixBase.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  const EmptyPrefixBase = Controller.extend("controller.EmptyPrefixBase", {});
+});"
+`;
+
 exports[`classes class-convert-source-folders-unmatched other controller UnmatchedFolderApp.js 1`] = `
 "sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
   "use strict";

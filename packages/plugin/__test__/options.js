@@ -162,6 +162,14 @@ const Options = {
     "import-remove-fileext-suppressed": {
       suppressImportResolutionHints: true,
     },
+    "EmptyPrefixBase": {
+      autoConvertKnownUI5Classes: true,
+      sourceFolders: { src: "" }, // empty-string mapping → "src" stripped, no prefix prepended
+    },
+    "EmptyPrefixApp": {
+      autoConvertKnownUI5Classes: true,
+      sourceFolders: { src: "" },
+    },
   },
   dirs: {
     comments: {
@@ -312,6 +320,26 @@ const Options = {
       sourceRoot: resolve(
         __dirname,
         "fixtures/classes/class-convert-dependencies/primary"
+      ),
+    },
+    "class-convert-source-folders-empty-mapping": {
+      // Point sourceRoot at the fixture root so the file's leading folder is "src"
+      // (matched in sourceFolders: { src: "" }) rather than "fixtures".
+      sourceRoot: resolve(
+        __dirname,
+        "fixtures/classes/class-convert-source-folders-empty-mapping"
+      ),
+    },
+    "EmptyPrefixBase": {
+      sourceRoot: resolve(
+        __dirname,
+        "fixtures/classes/class-convert-source-folders-empty-mapping"
+      ),
+    },
+    "EmptyPrefixApp": {
+      sourceRoot: resolve(
+        __dirname,
+        "fixtures/classes/class-convert-source-folders-empty-mapping"
       ),
     },
   },

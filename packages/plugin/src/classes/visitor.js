@@ -333,6 +333,19 @@ function doesClassExtendFromImport(node, imports) {
   return superClass && imports.some((imported) => imported === superClass.name);
 }
 
+function decoratorName(expr) {
+  if (!expr) return "?";
+  if (t.isIdentifier(expr)) return expr.name;
+  if (t.isCallExpression(expr) || t.isOptionalCallExpression(expr))
+    return decoratorName(expr.callee);
+  if (t.isMemberExpression(expr) || t.isOptionalMemberExpression(expr)) {
+    const obj = decoratorName(expr.object);
+    const prop = t.isIdentifier(expr.property) ? expr.property.name : "?";
+    return `${obj}.${prop}`;
+  }
+  return "?";
+}
+
 // Sentinel objects returned by shouldConvertClass.
 // Using distinct objects (not `true`) lets callers read `isController` without a second walk.
 const CONVERT = { isController: false };
@@ -397,7 +410,7 @@ function shouldConvertClass(file, node, opts, classInfo) {
   // Explicit @alias/@namespace annotations (handled above) still take precedence.
   if (node.decorators?.length) {
     const names = node.decorators
-      .map((d) => "@" + (d.expression.name || d.expression.callee?.name || "?"))
+      .map((d) => "@" + decoratorName(d.expression))
       .join(", ");
     console.warn(
       `[babel-plugin-ui5] Skipping auto-conversion of class "${node.id?.name}" in "${file.opts.filename}" — ` +

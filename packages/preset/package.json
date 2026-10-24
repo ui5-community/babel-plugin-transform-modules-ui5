@@ -12,7 +12,7 @@
     "directory": "packages/preset"
   },
   "dependencies": {
-    "babel-plugin-transform-modules-ui5": "^7.10.0"
+    "babel-plugin-transform-modules-ui5": "file:../plugin"
   },
   "devDependencies": {
     "prettier": "3.9.0"
