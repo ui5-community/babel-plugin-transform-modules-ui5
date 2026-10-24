@@ -143,6 +143,26 @@ The main advantage of this syntax is with TypeScript projects, where the TypeScr
 
 Also note that while the ES dynamic import specification requires a relative path, `sap.ui.require` works with absolute paths using a module prefix.
 
+#### `import.meta` rewriting
+
+The plugin rewrites two `import.meta` member accesses to their UI5 equivalents (adding the corresponding built-in module as a hidden `sap.ui.define` dependency):
+
+- `import.meta.url` → `module.url` (adds the built-in `module` dependency to the `sap.ui.define` call)
+- `import.meta.resolve(path)` → `require.toUrl(path)` (adds the built-in `require` dependency)
+
+```js
+// Input
+const url = import.meta.url;
+const path = import.meta.resolve("./assets/icon.png");
+
+// Output (inside the sap.ui.define factory)
+const url = module.url;
+const path = require.toUrl("./assets/icon.png");
+```
+
+`import.meta` accesses of any other form are left unchanged.
+Files that carry `/* @ui5-no-wrap */` skip this transform (and all module transforms) entirely.
+
 #### Export
 
 The plugin also supports (most of) the ES modules export syntax.
@@ -547,6 +567,19 @@ If the default file-based namespace does not work for you (perhaps the app name 
 
 The simplest way to override the names is to use JSDoc. This approach will also work well with classes output from TypeScript if you configure TypeScript to generate ES6 or higher, and don't enable `removeComments``.
 
+The recognized class-info JSDoc tags are (all matching is **case-insensitive**, so `@nonui5` and `@nonUI5` are equivalent):
+
+| Tag | Kind | Effect |
+|---|---|---|
+| `@alias my.app.ClassName` | value | Full FQN replacement — highest precedence (overrides `@name`, `@namespace`, and the file path). |
+| `@name my.app.ClassName` | value | Full FQN replacement — overrides `@namespace` and the file path. |
+| `@namespace my.app` | value | Overrides the file-path-derived namespace; class name is still appended. |
+| `@nonUI5` | flag | Opts this class out of UI5 conversion entirely. |
+| `@controller` | flag | Marks this class as a controller (used with `moveControllerPropsToOnInit`). |
+| `@keepConstructor` | flag | Prevents the constructor from being moved to `onInit` when `moveControllerConstructorToOnInit` is enabled. |
+
+You can set the `@name`/`@alias` directly or just the `@namespace` and have the name derived from the ES class name.
+
 ###### `@alias` — recommended for named extend-classes
 
 Use **`@alias`** with the fully-qualified class name. `@alias` is the [officially recommended](https://github.com/SAP/openui5) JSDoc property used by UI5 source code itself to declare the module name.
@@ -604,7 +637,7 @@ const AController = SAPController.extend("my.app.AController", {
 
 ##### Decorators
 
-Alternatively, you can use decorators to override the namespace or name used. Pass the value as a string literal argument to the decorator function.
+Alternatively, you can use decorators to override the namespace or name used. The decorators `@alias`, `@name`, `@namespace`, and `@nonUI5` work the same as their JSDoc counterparts, but instead of a space you pass the string literal to the decorator function. Note that `@controller` and `@keepConstructor` are **JSDoc-only** and have no decorator equivalent.
 
 NOTE that using a variable is currently not supported.
 
@@ -922,6 +955,7 @@ In general, comments are preserved, but for each class property/method whose pos
 ### Imports
 
 - `noImportInteropPrefixes` (Default `['sap/']`) A list of import path prefixes which never need an import inter-opt.
+- `libs` (Default `['.*']`) A list of regular-expression patterns (as strings). Only import sources matching at least one pattern are converted into `sap.ui.define` dependencies; non-matching imports are stripped from the dependency list and placed before the define wrapper. The default `'.*'` matches every import, preserving existing behaviour.
 - `modulesMap` (Default {}) Mapping for an import's path. Accepts object or function.
 - `suppressImportResolutionHints` (Default false) When a dependency's `.js` file extension is stripped because the import resolves to a local file, a hint is logged to the console. Set this to `true` to silence those hints (e.g. to keep build output clean).
 
@@ -950,7 +984,7 @@ In general, comments are preserved, but for each class property/method whose pos
 - `additionalUI5Classes` (Default: []). Additional module paths to treat as known UI5 base classes, supplementing the built-in list used by `autoConvertKnownUI5Classes`. Useful for project-specific base classes (e.g. `"my/app/BaseController"`). Works independently of `autoConvertKnownUI5Classes` — you can supply additional paths without enabling the built-in list. Transitive resolution applies here too.
 - `neverConvertClass` (Default: false) Never convert classes to SAPClass.extend() syntax.
 - `moveControllerPropsToOnInit` (Default: false) Moves class props in a controller to the onInit method instead of constructor.
-- `moveControllerConstructorToOnInit` (Default: false) Moves existing constructor code in a controller to the onInit method. Enabling will auto-enable `moveControllerPropsToOnInit`.
+- `moveControllerConstructorToOnInit` (Default: false) Moves existing constructor code in a controller to the onInit method. Enabling will auto-enable `moveControllerPropsToOnInit`. Use the `@keepConstructor` JSDoc tag on a specific class to opt that class out of the move.
 - `addControllerStaticPropsToExtend` (Default: false) Moves static props of a controller to the extends call. Useful for formatters.
 - `onlyMoveClassPropsUsingThis` (Default: false) Set to use old behavior where only instance class props referencing `this` would be moved to the constructor or onInit. New default is to always move instance props.
 - `overridesToOverride` (Default: false) Changes the name of the static overrides to override when being added to ControllerExtension.extend() allowing to use the new overrides keyword with older UI5 versions
