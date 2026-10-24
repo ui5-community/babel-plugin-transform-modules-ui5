@@ -39,6 +39,10 @@ const Options = {
     "class-convert-known-ui5-classes": {
       autoConvertKnownUI5Classes: true,
     },
+    "class-convert-known-ui5-classes-named-import": {
+      autoConvertKnownUI5Classes: true,
+      namespacePrefix: "my.app",
+    },
     "class-convert-known-ui5-classes-disabled": {
       autoConvertKnownUI5Classes: false,
     },

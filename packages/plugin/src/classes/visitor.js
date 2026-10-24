@@ -7,9 +7,9 @@ import {
   getImportDeclaration,
   saveSuperclassImportSource,
   isSuperclassTransitivelyKnown,
-  resolveImportSourceToFilename,
   recordAdditionalUI5ClassMatch,
   getEffectiveNamespacePrefix,
+  isLocalChainConvertible,
 } from "./helpers/imports";
 
 /**
@@ -86,7 +86,8 @@ export const ClassTransformVisitor = {
         return classInfo[name] === undefined;
       });
 
-      if (shouldConvertClass(file, node, opts, classInfo)) {
+      const convertInfo = shouldConvertClass(file, node, opts, classInfo);
+      if (convertInfo) {
         // Auto-set the controller flag when the filename suffix or superclass
         // import identifies this as a UI5 controller, so that controller-specific
         // options (moveControllerPropsToOnInit, etc.) activate even when the class
@@ -99,6 +100,9 @@ export const ClassTransformVisitor = {
             /[.]controller[.](js|ts)$/.test(filename)
           ) {
             classInfo.controller = true;
+          } else if (convertInfo.isController) {
+            // shouldConvertClass already walked the chain and found a controller ancestor.
+            classInfo.controller = true;
           } else {
             // Direct superclass imported from a known controller base-class path.
             const directSuperClassName = node.superClass?.name;
@@ -110,31 +114,6 @@ export const ClassTransformVisitor = {
               KNOWN_UI5_CONTROLLER_CLASSES.includes(importDecl.source.value)
             ) {
               classInfo.controller = true;
-            } else if (importDecl && directSuperClassName) {
-              // Transitive case: class extends a local base that itself extends a
-              // known controller path. Walk the chain using the same infrastructure
-              // as shouldConvertClass so controller-specific options activate.
-              const sourceRoot = file.opts.sourceRoot
-                ? Path.resolve(process.cwd(), file.opts.sourceRoot)
-                : process.cwd();
-              const effectivePrefix =
-                getEffectiveNamespacePrefix(filename, sourceRoot, opts) ??
-                opts.namespacePrefix ??
-                null;
-              const transitiveMatch = isSuperclassTransitivelyKnown(
-                filename,
-                directSuperClassName,
-                KNOWN_UI5_CONTROLLER_CLASSES,
-                sourceRoot,
-                {
-                  namespacePrefix: effectivePrefix,
-                  sourceFolders: opts.sourceFolders ?? null,
-                  dependencies: opts.dependencies ?? null,
-                }
-              );
-              if (transitiveMatch) {
-                classInfo.controller = true;
-              }
             }
           }
         }
@@ -354,12 +333,17 @@ function doesClassExtendFromImport(node, imports) {
   return superClass && imports.some((imported) => imported === superClass.name);
 }
 
+// Sentinel objects returned by shouldConvertClass.
+// Using distinct objects (not `true`) lets callers read `isController` without a second walk.
+const CONVERT = { isController: false };
+const CONVERT_CONTROLLER = { isController: true };
+
 function shouldConvertClass(file, node, opts, classInfo) {
   if (classInfo.nonUI5) {
-    return false;
+    return null;
   }
   if (opts.autoConvertAllExtendClasses == true) {
-    return true;
+    return CONVERT;
   }
   if (
     classInfo.name ||
@@ -367,7 +351,7 @@ function shouldConvertClass(file, node, opts, classInfo) {
     classInfo.controller ||
     classInfo.namespace
   ) {
-    return true;
+    return CONVERT;
   }
 
   // Filename-suffix opt-outs are authoritative overrides — honor them regardless of
@@ -380,13 +364,13 @@ function shouldConvertClass(file, node, opts, classInfo) {
       /[.]controller[.](js|ts)$/.test(filename) &&
       opts.autoConvertControllerClass === false
     ) {
-      return false;
+      return null;
     }
     if (
       /[.]view[.](js|ts|jsx|tsx)$/.test(filename) &&
       opts.autoConvertViewClass === false
     ) {
-      return false;
+      return null;
     }
   }
 
@@ -398,14 +382,14 @@ function shouldConvertClass(file, node, opts, classInfo) {
     opts.autoConvertControllerClass !== false &&
     /[.]controller[.](js|ts)$/.test(file.opts.filename || "")
   ) {
-    return true;
+    return CONVERT_CONTROLLER;
   }
 
   // For all auto-conversion paths below, require a non-empty namespace so the
   // generated FQN is not a bare class name. fileNamespace is derived from the
   // file path relative to sourceRoot (+ namespacePrefix if set).
   if (!classInfo.fileNamespace) {
-    return false;
+    return null;
   }
 
   // Don't auto-convert when unknown (non-UI5) decorators remain on the class —
@@ -419,7 +403,7 @@ function shouldConvertClass(file, node, opts, classInfo) {
       `[babel-plugin-ui5] Skipping auto-conversion of class "${node.id?.name}" in "${file.opts.filename}" — ` +
         `non-UI5 decorator(s) present: ${names}. Add @alias or @namespace to convert explicitly.`
     );
-    return false;
+    return null;
   }
 
   // Convert classes whose superclass is imported from a known UI5 base-class module.
@@ -454,7 +438,9 @@ function shouldConvertClass(file, node, opts, classInfo) {
           if (opts.additionalUI5Classes?.includes(importSource)) {
             recordAdditionalUI5ClassMatch(importSource);
           }
-          return true;
+          return KNOWN_UI5_CONTROLLER_CLASSES.includes(importSource)
+            ? CONVERT_CONTROLLER
+            : CONVERT;
         }
         // Transitive hit — walk the superclass chain through already-processed local files.
         // isSuperclassTransitivelyKnown returns the matched importSource string (or null).
@@ -480,115 +466,35 @@ function shouldConvertClass(file, node, opts, classInfo) {
           }
         );
         if (transitiveMatch) {
-          // N2: verify the direct ancestor (the class this file imports) would itself be
-          // convertible — specifically that it has either a non-empty namespace or is a
-          // legacy controller file (which converts even at the root without a namespace,
-          // matching the shouldConvertClass exemption). An ancestor with an empty namespace
-          // that is NOT a controller file remains a native ES class, so calling .extend()
-          // on it at runtime would throw.
+          // N2: walk every intermediate local ancestor in the chain and verify that each
+          // one has a resolvable namespace (or is a legacy .controller.(js|ts) file that
+          // converts without a namespace). An ancestor with an empty namespace that is NOT
+          // a controller file remains a native ES class at runtime, so calling .extend()
+          // on it would throw.
           //
-          // Reuse importDecl/importSource from above: importDeclarations[filename] is not
-          // mutated between there and here, so a re-fetch would return the same declaration.
-          const ancestorFile = resolveImportSourceToFilename(
-            importSource,
-            filename,
-            sourceRoot,
-            effectivePrefix,
-            opts.sourceFolders ?? null,
-            opts.dependencies ?? null
-          );
-          if (ancestorFile) {
-            // Containment check via Path.relative: the ancestor is inside sourceRoot
-            // only when the relative path doesn't escape upward ("..") and isn't absolute
-            // (absolute happens on Windows across drives). A plain startsWith(sourceRoot)
-            // would wrongly match a sibling dir like "<sourceRoot>-legacy/".
-            const ancestorRel = Path.relative(sourceRoot, ancestorFile);
-            const ancestorInsideSourceRoot =
-              ancestorRel === "" ||
-              (!ancestorRel.startsWith("..") && !Path.isAbsolute(ancestorRel));
-            // Compute the ancestor's own effective prefix (it may live in a different sourceFolders entry).
-            // ?? (not ||) so that an explicit "" mapping in sourceFolders is respected —
-            // || would treat "" as falsy and fall through to namespacePrefix.
-            let ancestorNamespace = "";
-            if (ancestorInsideSourceRoot) {
-              // Compute the ancestor's own effective prefix (it may live in a different
-              // sourceFolders entry). ?? (not ||) so that an explicit "" mapping is respected.
-              const ancestorEffectivePrefix =
-                getEffectiveNamespacePrefix(ancestorFile, sourceRoot, opts) ??
-                opts.namespacePrefix ??
-                null;
-              const ancestorDirParts = Path.parse(ancestorRel)
-                .dir.split(Path.sep)
-                .filter(Boolean);
-              // When sourceFolders is active, the leading folder segment is the source-folder
-              // key and must be stripped (getEffectiveNamespacePrefix already incorporated its
-              // prefix).
-              const sf = opts.sourceFolders;
-              const skipLeadingFolder =
-                sf &&
-                typeof sf === "object" &&
-                ancestorDirParts.length > 0 &&
-                Object.prototype.hasOwnProperty.call(sf, ancestorDirParts[0]);
-              ancestorNamespace = [
-                ...(ancestorEffectivePrefix ? [ancestorEffectivePrefix] : []),
-                ...(skipLeadingFolder
-                  ? ancestorDirParts.slice(1)
-                  : ancestorDirParts),
-              ].join(".");
-            } else {
-              // Ancestor is outside the primary sourceRoot — look it up in opts.dependencies.
-              // Each dep entry has its own sourceRoot and optional sourceFolders/namespacePrefix.
-              const deps = Array.isArray(opts.dependencies)
-                ? opts.dependencies
-                : [];
-              for (const dep of deps) {
-                if (!dep.sourceRoot) continue;
-                const depRoot = Path.resolve(dep.sourceRoot);
-                const depRel = Path.relative(depRoot, ancestorFile);
-                const depInside =
-                  depRel === "" ||
-                  (!depRel.startsWith("..") && !Path.isAbsolute(depRel));
-                if (!depInside) continue;
-                // File is inside this dep — compute namespace using dep's own sourceFolders/namespacePrefix.
-                const depEffectivePrefix = getEffectiveNamespacePrefix(
-                  ancestorFile,
-                  depRoot,
-                  dep
-                );
-                if (depEffectivePrefix === null) break; // unmapped folder → no namespace
-                const depDirParts = Path.parse(depRel)
-                  .dir.split(Path.sep)
-                  .filter(Boolean);
-                const depSf = dep.sourceFolders;
-                const depSkipLeading =
-                  depSf &&
-                  typeof depSf === "object" &&
-                  depDirParts.length > 0 &&
-                  Object.prototype.hasOwnProperty.call(depSf, depDirParts[0]);
-                ancestorNamespace = [
-                  ...(depEffectivePrefix ? [depEffectivePrefix] : []),
-                  ...(depSkipLeading ? depDirParts.slice(1) : depDirParts),
-                ].join(".");
-                break;
-              }
-            }
-            // Legacy .controller.(js|ts) files convert even with an empty namespace
-            // (preserves the same exemption as shouldConvertClass for the controller path).
-            const isControllerFile =
-              opts.autoConvertUI5FileTypes !== false &&
-              opts.autoConvertControllerClass !== false &&
-              /[.]controller[.](js|ts)$/.test(ancestorFile);
-            if (!ancestorNamespace && !isControllerFile) {
-              // Ancestor would remain a native class — do not convert this descendant.
-              return false;
-            }
+          // isLocalChainConvertible checks the *full* chain, not only the direct ancestor:
+          // a chain MyCtrl→LocalA(has NS)→LocalMid(empty NS)→SAP Controller is rejected
+          // because LocalMid would not be converted to .extend().
+          if (
+            !isLocalChainConvertible(
+              importSource,
+              filename,
+              sourceRoot,
+              effectivePrefix,
+              knownPaths,
+              opts
+            )
+          ) {
+            return null;
           }
           // F4: mark only the path that was actually matched, not every additionalUI5Classes
           // entry — to avoid suppressing valid "never matched" warnings for typo paths.
           if (opts.additionalUI5Classes?.includes(transitiveMatch)) {
             recordAdditionalUI5ClassMatch(transitiveMatch);
           }
-          return true;
+          return KNOWN_UI5_CONTROLLER_CLASSES.includes(transitiveMatch)
+            ? CONVERT_CONTROLLER
+            : CONVERT;
         }
       }
     }
@@ -600,7 +506,7 @@ function shouldConvertClass(file, node, opts, classInfo) {
     opts.autoConvertViewClass !== false &&
     /[.]view[.](js|ts|jsx|tsx)$/.test(file.opts.filename || "")
   ) {
-    return true;
+    return CONVERT;
   }
-  return false;
+  return null;
 }

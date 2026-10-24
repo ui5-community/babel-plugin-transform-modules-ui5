@@ -582,6 +582,17 @@ exports[`classes class-convert-known-ui5-classes-disabled.js 1`] = `
 });"
 `;
 
+exports[`classes class-convert-known-ui5-classes-named-import.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/ControllerExtension", "sap/ui/base/ManagedObject"], function (sap_ui_core_mvc_ControllerExtension, sap_ui_base_ManagedObject) {
+  "use strict";
+
+  const ControllerExtension = sap_ui_core_mvc_ControllerExtension["ControllerExtension"];
+  const MO = sap_ui_base_ManagedObject["ManagedObject"];
+  const MyExtension = ControllerExtension.extend("my.app.fixtures.classes.MyExtension", {});
+  const MyModel = MO.extend("my.app.fixtures.classes.MyModel", {});
+});"
+`;
+
 exports[`classes class-convert-known-ui5-classes-no-namespace MyController.js 1`] = `
 "sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
   "use strict";

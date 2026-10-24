@@ -7,7 +7,7 @@ import * as ast from "../../utils/ast";
 
 import { getJsDocClassInfo, getTags } from "./jsdoc";
 import { getDecoratorClassInfo } from "./decorators";
-import { getImportDeclaration } from "./imports";
+import { getImportDeclaration, deriveNamespaceForFile } from "./imports";
 
 /**
  * Converts an ES6 class to a UI5 extend.
@@ -480,84 +480,7 @@ function getFileBaseNamespace(path, pluginOpts) {
   const sourceRoot = opts.sourceRoot
     ? Path.resolve(process.cwd(), opts.sourceRoot)
     : process.cwd();
-  // Containment check via Path.relative rather than startsWith(sourceRoot): a plain
-  // prefix match would wrongly treat a sibling dir like "<sourceRoot>-legacy/" as inside
-  // sourceRoot. The ancestor is inside only when the relative path doesn't escape upward
-  // ("..") and isn't absolute (absolute happens on Windows across drives).
-  const filenameRelative = Path.relative(sourceRoot, filename);
-  const insideSourceRoot =
-    filenameRelative === "" ||
-    (!filenameRelative.startsWith("..") && !Path.isAbsolute(filenameRelative));
-  if (!insideSourceRoot) {
-    const deps = pluginOpts.dependencies;
-    if (Array.isArray(deps)) {
-      for (const dep of deps) {
-        if (!dep.sourceRoot) continue;
-        const depRoot = Path.resolve(dep.sourceRoot);
-        const depRel = Path.relative(depRoot, filename);
-        const depInside =
-          depRel === "" ||
-          (!depRel.startsWith("..") && !Path.isAbsolute(depRel));
-        if (!depInside) continue;
-        const sf = dep.sourceFolders;
-        if (sf && typeof sf === "object") {
-          let { dir } = Path.parse(depRel);
-          const parts = dir.split(Path.sep);
-          const leadingFolder = parts[0];
-          if (
-            leadingFolder &&
-            Object.prototype.hasOwnProperty.call(sf, leadingFolder)
-          ) {
-            const mappedPrefix = sf[leadingFolder];
-            dir = parts.slice(1).join(Path.sep);
-            const namespaceParts = dir.split(Path.sep).filter(Boolean);
-            if (mappedPrefix) namespaceParts.unshift(mappedPrefix);
-            return namespaceParts.join(".");
-          } else if (leadingFolder) {
-            return "";
-          }
-          // File directly at dep root with no sub-folder — fall through to namespacePrefix
-        }
-        // No sourceFolders on this dep — use dep.namespacePrefix if provided
-        const { dir: depDir } = Path.parse(depRel);
-        const depNamespaceParts = depDir.split(Path.sep).filter(Boolean);
-        if (dep.namespacePrefix) depNamespaceParts.unshift(dep.namespacePrefix);
-        return depNamespaceParts.join(".");
-      }
-    }
-    return undefined;
-  }
-
-  let { dir } = Path.parse(filenameRelative);
-
-  // sourceFolders: { "src": "my.lib", "test": "my.lib.test" }
-  // Strip the leading source-folder segment and use its mapped prefix instead of namespacePrefix.
-  // Files whose leading folder is present but unmapped return "" (no namespace → disables auto-convert).
-  const sourceFolders = pluginOpts.sourceFolders;
-  if (sourceFolders && typeof sourceFolders === "object") {
-    const parts = dir.split(Path.sep);
-    const leadingFolder = parts[0];
-    if (
-      leadingFolder &&
-      Object.prototype.hasOwnProperty.call(sourceFolders, leadingFolder)
-    ) {
-      const mappedPrefix = sourceFolders[leadingFolder];
-      dir = parts.slice(1).join(Path.sep);
-      const namespaceParts = dir.split(Path.sep).filter(Boolean);
-      if (mappedPrefix) namespaceParts.unshift(mappedPrefix);
-      return namespaceParts.join(".");
-    } else if (leadingFolder) {
-      // Leading folder exists but is not mapped → no namespace
-      return "";
-    }
-    // File is directly at sourceRoot root with no sub-folder — fall through to normal logic
-  }
-
-  const namespaceParts = dir.split(Path.sep).filter(Boolean);
-  if (pluginOpts.namespacePrefix) {
-    namespaceParts.unshift(pluginOpts.namespacePrefix);
-  }
-  return namespaceParts.join(".");
+  return deriveNamespaceForFile(filename, sourceRoot, pluginOpts);
 }
 
 const getQualifiedName = (node) => {

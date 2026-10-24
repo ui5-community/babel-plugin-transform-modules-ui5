@@ -49,6 +49,89 @@ let filesWithDefaultExport = new Set();
 const matchedAdditionalUI5ClassPaths = new Set();
 
 /**
+ * Derive the full namespace string for `filename` given `sourceRoot` and plugin options.
+ *
+ * This is the pure, path-only version of the namespace computation — it does NOT append
+ * the class name. Returns "" when the file has no namespace (e.g. unmapped sourceFolders
+ * entry), and `undefined` when the file is outside both sourceRoot and all dependencies.
+ *
+ * Used by:
+ *  - getFileBaseNamespace (classes.js) — production path via Babel path object
+ *  - N2 ancestor-namespace check (visitor.js) — operates on resolved absolute paths
+ *
+ * @param {string} filename   Absolute path of the file.
+ * @param {string} sourceRoot Absolute source-root path.
+ * @param {object} opts       Plugin options (sourceFolders, namespacePrefix, dependencies).
+ * @returns {string|undefined}  Namespace string (may be ""), or undefined when outside all roots.
+ */
+export function deriveNamespaceForFile(filename, sourceRoot, opts) {
+  const filenameRelative = Path.relative(sourceRoot, filename);
+  const insideSourceRoot =
+    filenameRelative === "" ||
+    (!filenameRelative.startsWith("..") && !Path.isAbsolute(filenameRelative));
+
+  if (!insideSourceRoot) {
+    const deps =
+      opts && Array.isArray(opts.dependencies) ? opts.dependencies : [];
+    for (const dep of deps) {
+      if (!dep.sourceRoot) continue;
+      const depRoot = Path.resolve(dep.sourceRoot);
+      const depRel = Path.relative(depRoot, filename);
+      const depInside =
+        depRel === "" || (!depRel.startsWith("..") && !Path.isAbsolute(depRel));
+      if (!depInside) continue;
+      const sf = dep.sourceFolders;
+      if (sf && typeof sf === "object") {
+        const parts = Path.parse(depRel).dir.split(Path.sep);
+        const leadingFolder = parts[0];
+        if (
+          leadingFolder &&
+          Object.prototype.hasOwnProperty.call(sf, leadingFolder)
+        ) {
+          const mappedPrefix = sf[leadingFolder];
+          const namespaceParts = parts.slice(1).filter(Boolean);
+          if (mappedPrefix) namespaceParts.unshift(mappedPrefix);
+          return namespaceParts.join(".");
+        } else if (leadingFolder) {
+          return "";
+        }
+        // File directly at dep root with no sub-folder — fall through to namespacePrefix
+      }
+      const depDirParts = Path.parse(depRel)
+        .dir.split(Path.sep)
+        .filter(Boolean);
+      if (dep.namespacePrefix) depDirParts.unshift(dep.namespacePrefix);
+      return depDirParts.join(".");
+    }
+    return undefined;
+  }
+
+  const sourceFolders = opts && opts.sourceFolders;
+  const parts = Path.parse(filenameRelative).dir.split(Path.sep);
+  const leadingFolder = parts[0];
+
+  if (sourceFolders && typeof sourceFolders === "object") {
+    if (
+      leadingFolder &&
+      Object.prototype.hasOwnProperty.call(sourceFolders, leadingFolder)
+    ) {
+      const mappedPrefix = sourceFolders[leadingFolder];
+      const namespaceParts = parts.slice(1).filter(Boolean);
+      if (mappedPrefix) namespaceParts.unshift(mappedPrefix);
+      return namespaceParts.join(".");
+    } else if (leadingFolder) {
+      return "";
+    }
+    // File directly at sourceRoot with no sub-folder — fall through to namespacePrefix
+  }
+
+  const namespaceParts = parts.filter(Boolean);
+  if (opts && opts.namespacePrefix)
+    namespaceParts.unshift(opts.namespacePrefix);
+  return namespaceParts.join(".");
+}
+
+/**
  * Resolve the effective namespace prefix for a given file path, respecting `sourceFolders`.
  *
  * When `opts.sourceFolders` (a `{ folderName: "prefix" }` map) is set:
@@ -321,8 +404,9 @@ function readAndRecordFile(absPath) {
     return true;
   } catch (err) {
     if (err.code !== "ENOENT") {
-      // Only swallow "file not found"; re-surface unexpected errors (permissions, etc.)
-      // so they're not silently mistaken for a missing ancestor.
+      // Swallow ENOENT silently: covers both "file never existed" and the rare TOCTOU window
+      // where existsSync returned true but the file was deleted before readFileSync ran
+      // (more frequent in Windows watch mode). Re-surface unexpected errors (permissions, etc.).
       console.warn(
         `[babel-plugin-ui5] Could not read ancestor file ${absPath}: ${err.message}`
       );
@@ -586,6 +670,93 @@ export function resolveImportSourceToFilename(
     }
   }
   return null;
+}
+
+/**
+ * Walk every intermediate local ancestor in the superclass chain and return false if any
+ * would not itself be convertible to .extend() — i.e. has an empty namespace and is not
+ * a .controller.(js|ts) file. Stops when a known SAP/UI5 path is reached.
+ *
+ * Fixes N2 for chains of depth > 1: a chain
+ *   MyCtrl → LocalA (has namespace) → LocalMid (empty namespace) → SAP Controller
+ * is rejected because LocalMid would remain a native ES class at runtime.
+ *
+ * @param {string}   startImportSource  Import source of the direct ancestor.
+ * @param {string}   currentFile        Absolute path of the file being converted.
+ * @param {string}   sourceRoot         Resolved absolute source root.
+ * @param {string|null} namespacePrefix Effective namespace prefix for currentFile.
+ * @param {string[]} knownPaths         SAP/UI5 known module paths (stop condition).
+ * @param {object}   opts               Full plugin options.
+ * @returns {boolean}  true if all intermediate locals are convertible, false otherwise.
+ */
+export function isLocalChainConvertible(
+  startImportSource,
+  currentFile,
+  sourceRoot,
+  namespacePrefix,
+  knownPaths,
+  opts
+) {
+  let importSource = startImportSource;
+  let fromFile = currentFile;
+  const visited = new Set();
+
+  while (true) {
+    if (knownPaths.includes(importSource)) return true;
+
+    const ancestorFile = resolveImportSourceToFilename(
+      importSource,
+      fromFile,
+      sourceRoot,
+      namespacePrefix,
+      opts.sourceFolders ?? null,
+      opts.dependencies ?? null
+    );
+    if (!ancestorFile) return true; // can't resolve → allow
+
+    const cycleKey = ancestorFile + "\0" + importSource;
+    if (visited.has(cycleKey)) return true;
+    visited.add(cycleKey);
+
+    const ancestorNamespace = deriveNamespaceForFile(
+      ancestorFile,
+      sourceRoot,
+      opts
+    );
+    const isControllerFile =
+      opts.autoConvertUI5FileTypes !== false &&
+      opts.autoConvertControllerClass !== false &&
+      /[.]controller[.](js|ts)$/.test(ancestorFile);
+
+    if (!ancestorNamespace && !isControllerFile) {
+      return false;
+    }
+
+    // Find what this ancestor's exported class extends by looking in the cache.
+    // Try "\0default" sentinel first; fall back to any superclassImportSources entry for
+    // this file (there will typically be exactly one class per file in the chain).
+    const defSuperName = classSuperclassNames[ancestorFile + "\0default"];
+    if (defSuperName) {
+      const nextSrc =
+        superclassImportSources[ancestorFile + "\0" + defSuperName];
+      if (!nextSrc) return true;
+      importSource = nextSrc;
+      fromFile = ancestorFile;
+      continue;
+    }
+    // No default sentinel — scan all superclassImportSources keys for this file.
+    const prefix = ancestorFile + "\0";
+    let nextSrc = null;
+    for (const key of Object.keys(superclassImportSources)) {
+      if (key.startsWith(prefix)) {
+        nextSrc = superclassImportSources[key];
+        break;
+      }
+    }
+    if (!nextSrc) return true;
+    importSource = nextSrc;
+    fromFile = ancestorFile;
+  }
 }
 
 /**
