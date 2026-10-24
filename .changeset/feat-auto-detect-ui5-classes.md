@@ -24,3 +24,9 @@ feat: auto-detect UI5 extend-classes by filename suffix and known base-class mod
 ## Breaking changes
 
 None. All new features are opt-in or preserve existing behavior.
+
+**Internal API note:** `getImportDeclaration` (in `src/classes/helpers/imports.js`) now matches
+`import { Foo as Bar }` by the _local_ binding name (`Bar`) rather than the _imported_ name (`Foo`).
+This is the correct semantics — callers always pass the name as it appears at the use site — but if
+you maintain a fork or plugin that calls this helper directly by the imported name, update those call
+sites to pass the local name instead.

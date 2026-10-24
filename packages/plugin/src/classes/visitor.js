@@ -426,11 +426,11 @@ function shouldConvertClass(file, node, opts, classInfo) {
   const useBuiltInList = opts.autoConvertKnownUI5Classes !== false;
   const hasAdditionalClasses = !!opts.additionalUI5Classes?.length;
   if (useBuiltInList || hasAdditionalClasses) {
-    const knownPaths = [
+    const knownPaths = new Set([
       ...(useBuiltInList ? KNOWN_UI5_BASE_CLASSES : []),
       ...(opts.additionalUI5Classes || []),
-    ];
-    if (knownPaths.length) {
+    ]);
+    if (knownPaths.size) {
       const superClassName = node.superClass?.name;
       const className = node.id?.name;
       const filename = file.opts.filename;
@@ -447,7 +447,7 @@ function shouldConvertClass(file, node, opts, classInfo) {
           importSource
         );
         // Direct hit — immediate superclass is a known UI5 base class
-        if (knownPaths.includes(importSource)) {
+        if (knownPaths.has(importSource)) {
           if (opts.additionalUI5Classes?.includes(importSource)) {
             recordAdditionalUI5ClassMatch(importSource);
           }

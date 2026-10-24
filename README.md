@@ -502,6 +502,8 @@ Use `additionalUI5Classes` to register project-specific base-class module paths 
 
 A warning is printed at the end of the build for any path that was configured but never matched by an import, helping you catch typos.
 
+> **Note:** The "never matched" warning fires once at Node.js process exit. It will appear in a normal one-shot build (`babel src/` or `webpack --mode production`) but **not** in watch mode (`babel --watch`, `webpack --watch`, `vite dev`, etc.), because long-lived watch processes never reach process exit during normal development.
+
 #### Configuring Name or Namespace
 
 The plugin provides a few ways to set the class name or namespace used in the `SAPClass.extend(...)` call.

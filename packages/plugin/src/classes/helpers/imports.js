@@ -437,8 +437,9 @@ export const saveImports = (file, additionalUI5Classes) => {
   // autoConvertControllerClass:false don't suppress valid match recording and produce
   // false "never matched" warnings.
   if (additionalUI5Classes?.length) {
+    const additionalSet = new Set(additionalUI5Classes);
     for (const decl of importDeclarations[filename] ?? []) {
-      if (additionalUI5Classes.includes(decl.source.value)) {
+      if (additionalSet.has(decl.source.value)) {
         recordAdditionalUI5ClassMatch(decl.source.value);
       }
     }
@@ -565,10 +566,7 @@ export function getImportDeclaration(filename, typeName) {
 export function resolveImportSourceToFilename(
   importSource,
   currentFilename,
-  sourceRoot,
-  namespacePrefix,
-  sourceFolders,
-  dependencies
+  { sourceRoot, namespacePrefix, sourceFolders, dependencies } = {}
 ) {
   if (!importSource || !currentFilename) return null;
 
@@ -656,7 +654,7 @@ export function resolveImportSourceToFilename(
   // This makes transitive detection order-independent: a descendant processed before
   // its ancestor can still discover the ancestor's superclass chain via a disk read.
   // Bare module specifiers (e.g. "sap/ui/core/mvc/Controller") never reach here because
-  // isSuperclassTransitivelyKnown checks knownPaths.includes(importSource) first,
+  // isSuperclassTransitivelyKnown checks knownPaths.has(importSource) first,
   // before resolveImportSourceToFilename is ever called.
   for (const base of bases) {
     // F1: try the exact path first — handles explicit-extension imports like "./Base.js"
@@ -688,7 +686,7 @@ export function resolveImportSourceToFilename(
  * @param {string}   currentFile        Absolute path of the file being converted.
  * @param {string}   sourceRoot         Resolved absolute source root.
  * @param {string|null} namespacePrefix Effective namespace prefix for currentFile.
- * @param {string[]} knownPaths         SAP/UI5 known module paths (stop condition).
+ * @param {Set<string>} knownPaths         SAP/UI5 known module paths (stop condition).
  * @param {object}   opts               Full plugin options.
  * @returns {boolean}  true if all intermediate locals are convertible, false otherwise.
  */
@@ -705,16 +703,14 @@ export function isLocalChainConvertible(
   const visited = new Set();
 
   while (true) {
-    if (knownPaths.includes(importSource)) return true;
+    if (knownPaths.has(importSource)) return true;
 
-    const ancestorFile = resolveImportSourceToFilename(
-      importSource,
-      fromFile,
+    const ancestorFile = resolveImportSourceToFilename(importSource, fromFile, {
       sourceRoot,
       namespacePrefix,
-      opts.sourceFolders ?? null,
-      opts.dependencies ?? null
-    );
+      sourceFolders: opts.sourceFolders ?? null,
+      dependencies: opts.dependencies ?? null,
+    });
     if (!ancestorFile) return true; // can't resolve → allow
 
     if (visited.has(ancestorFile)) return true;
@@ -785,7 +781,7 @@ export function isLocalChainConvertible(
  *
  * @param {string}   filename            Absolute path of the file being checked.
  * @param {string}   superclassLocalName Local binding name of the superclass in `filename`.
- * @param {string[]} knownPaths          Module paths that count as "known UI5 base classes".
+ * @param {Set<string>} knownPaths          Module paths that count as "known UI5 base classes".
  * @param {string}   sourceRoot          Resolved absolute source root for the project.
  * @param {object}   opts                Plugin options subset: { namespacePrefix, sourceFolders, dependencies }.
  * @param {Set}      [_visited]          Internal cycle-detection set; callers omit this.
@@ -803,7 +799,7 @@ export function isSuperclassTransitivelyKnown(
     sourceFolders = null,
     dependencies = null,
   } = opts;
-  if (!filename || !superclassLocalName || !knownPaths?.length) {
+  if (!filename || !superclassLocalName || !knownPaths?.size) {
     return null;
   }
 
@@ -818,17 +814,15 @@ export function isSuperclassTransitivelyKnown(
   const importSource = importDecl.source.value;
 
   // Direct hit — immediate superclass is in the known list; return the matched path
-  if (knownPaths.includes(importSource)) return importSource;
+  if (knownPaths.has(importSource)) return importSource;
 
   // Try to resolve to a local file processed earlier in this Babel run
-  const resolvedFile = resolveImportSourceToFilename(
-    importSource,
-    filename,
+  const resolvedFile = resolveImportSourceToFilename(importSource, filename, {
     sourceRoot,
     namespacePrefix,
     sourceFolders,
-    dependencies
-  );
+    dependencies,
+  });
   if (!resolvedFile) return null;
 
   // Look up what that file's class itself extends (stored by saveSuperclassImportSource).
@@ -882,7 +876,7 @@ export function isSuperclassTransitivelyKnown(
   if (!ancestorSuperImportSource) return null;
 
   // One-hop hit: ancestor's superclass is directly known; return the matched path
-  if (knownPaths.includes(ancestorSuperImportSource))
+  if (knownPaths.has(ancestorSuperImportSource))
     return ancestorSuperImportSource;
   return isSuperclassTransitivelyKnown(
     resolvedFile,
