@@ -55,6 +55,19 @@ const Options = {
     "class-no-convert-view-opt-out.view": {
       autoConvertViewClass: false,
     },
+    "LocalMid": {
+      // Middle ancestor in the N2 rejection chain — lives in "other/" which is not mapped
+      // in sourceFolders, so it gets no namespace and should NOT be converted.
+      autoConvertKnownUI5Classes: true,
+      sourceFolders: { src: "my.app" },
+    },
+    "MyApp": {
+      // Top of the N2 rejection chain — "src/" is mapped, giving it a namespace, but its
+      // intermediate ancestor LocalMid has no namespace, so isLocalChainConvertible returns
+      // false and MyApp must also NOT be converted.
+      autoConvertKnownUI5Classes: true,
+      sourceFolders: { src: "my.app" },
+    },
     "class-convert-constructor-move.controller": {
       moveControllerConstructorToOnInit: true,
     },
@@ -220,6 +233,15 @@ const Options = {
     "class-convert-transitive-no-super-default-collision": {
       autoConvertKnownUI5Classes: true,
     },
+    "class-convert-transitive-no-super-default-mid": {
+      // namespacePrefix gives ZChild and GrandChild a non-empty namespace so the namespace
+      // guard passes and isLocalChainConvertible is exercised. MixedMid has an explicit
+      // default export (AppBase, no superclass) plus a sibling UI5 Helper — the
+      // filesWithDefaultExport guard must block the key-scan fallback so neither ZChild nor
+      // GrandChild is converted.
+      autoConvertKnownUI5Classes: true,
+      namespacePrefix: "my.app",
+    },
     "class-convert-transitive-named-export-default": {
       autoConvertKnownUI5Classes: true,
     },
@@ -320,6 +342,28 @@ const Options = {
       sourceRoot: resolve(
         __dirname,
         "fixtures/classes/class-convert-dependencies/primary"
+      ),
+    },
+    "class-convert-transitive-no-ns-mid": {
+      // Point sourceRoot at the fixture root so "src" and "other" are the leading folders.
+      // "src" is mapped in sourceFolders → namespace "my.app.*"; "other" is not mapped → no namespace.
+      // MyApp.js (in src/) must NOT be converted: isLocalChainConvertible rejects the chain because
+      // LocalMid (in other/) has no namespace and is not a .controller.js file.
+      sourceRoot: resolve(
+        __dirname,
+        "fixtures/classes/class-convert-transitive-no-ns-mid"
+      ),
+    },
+    "LocalMid": {
+      sourceRoot: resolve(
+        __dirname,
+        "fixtures/classes/class-convert-transitive-no-ns-mid"
+      ),
+    },
+    "MyApp": {
+      sourceRoot: resolve(
+        __dirname,
+        "fixtures/classes/class-convert-transitive-no-ns-mid"
       ),
     },
     "class-convert-source-folders-empty-mapping": {

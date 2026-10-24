@@ -731,8 +731,12 @@ export function isLocalChainConvertible(
     }
 
     // Find what this ancestor's exported class extends by looking in the cache.
-    // Try "\0default" sentinel first; fall back to any superclassImportSources entry for
-    // this file (there will typically be exactly one class per file in the chain).
+    // Try "\0default" sentinel first. If the file has an explicit default export but no
+    // sentinel, the default-exported class has no UI5 superclass — stop here (return true:
+    // we cannot verify further, but the namespace check above already passed for this hop).
+    // Only fall back to the key scan when the file has NO explicit default export at all
+    // (bare class / module-interop), to avoid picking a sibling class's ancestry chain.
+    // This mirrors the filesWithDefaultExport guard in isSuperclassTransitivelyKnown.
     const defSuperName = classSuperclassNames[ancestorFile + "\0default"];
     if (defSuperName) {
       const nextSrc =
@@ -742,8 +746,8 @@ export function isLocalChainConvertible(
       fromFile = ancestorFile;
       continue;
     }
-    // No default sentinel — use the per-file key index (O(own-keys)) instead of
-    // scanning all superclassImportSources keys (O(total-keys)).
+    if (filesWithDefaultExport.has(ancestorFile)) return true;
+    // No explicit default export — key-scan fallback is safe (interop / bare class declaration).
     let nextSrc = null;
     for (const key of ancestryCacheKeys[ancestorFile] ?? []) {
       const src = superclassImportSources[key];

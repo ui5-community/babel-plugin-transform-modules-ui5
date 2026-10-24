@@ -990,6 +990,28 @@ exports[`classes class-convert-transitive-named-import-alias MyController.js 1`]
 });"
 `;
 
+exports[`classes class-convert-transitive-no-ns-mid other LocalMid.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  class LocalMid extends Controller {}
+  return LocalMid;
+});"
+`;
+
+exports[`classes class-convert-transitive-no-ns-mid src MyApp.js 1`] = `
+"sap.ui.define(["../other/LocalMid"], function (__LocalMid) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const LocalMid = _interopRequireDefault(__LocalMid);
+  class MyApp extends LocalMid {}
+  return MyApp;
+});"
+`;
+
 exports[`classes class-convert-transitive-no-super-default-collision MixedModule.js 1`] = `
 "sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
   "use strict";
@@ -1060,6 +1082,42 @@ exports[`classes class-convert-transitive-no-super-default-collision ZChildSpeci
   const Helper = _interopRequireDefault(__Helper);
   class ZChildSpecifier extends Helper {}
   return ZChildSpecifier;
+});"
+`;
+
+exports[`classes class-convert-transitive-no-super-default-mid GrandChild.js 1`] = `
+"sap.ui.define(["./ZChild"], function (__ZChild) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const ZChild = _interopRequireDefault(__ZChild);
+  class GrandChild extends ZChild {}
+  return GrandChild;
+});"
+`;
+
+exports[`classes class-convert-transitive-no-super-default-mid MixedMid.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  const Helper = Controller.extend("my.app.fixtures.classes.class-convert-transitive-no-super-default-mid.Helper", {});
+  class AppBase {}
+  return AppBase;
+});"
+`;
+
+exports[`classes class-convert-transitive-no-super-default-mid ZChild.js 1`] = `
+"sap.ui.define(["./MixedMid"], function (__Helper) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const Helper = _interopRequireDefault(__Helper);
+  class ZChild extends Helper {}
+  return ZChild;
 });"
 `;
 
