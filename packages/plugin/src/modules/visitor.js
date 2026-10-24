@@ -240,7 +240,7 @@ export const ModuleTransformVisitor = {
    * The reason we don't export in place is to handle the situation
    * where a let or var can be defined, and the latest one should be exported.
    */
-  ExportNamedDeclaration(path, { filename }) {
+  ExportNamedDeclaration(path, { filename, opts }) {
     const { node } = path;
     const { specifiers, declaration, source } = node;
 
@@ -252,7 +252,7 @@ export const ModuleTransformVisitor = {
       const src = resolveSource(source.value, filename);
       const name = cleanImportSource(src);
       const tmpName = tempModuleName(name);
-      addImport(this.imports, { src, name, tmpName }, filename);
+      addImport(this.imports, { src, name, tmpName }, filename, false, opts);
       fromSource = tmpName + ".";
     }
 
@@ -342,13 +342,13 @@ export const ModuleTransformVisitor = {
     }
   },
 
-  ExportAllDeclaration(path, { filename }) {
+  ExportAllDeclaration(path, { filename, opts }) {
     if (this.noWrap) return;
     const src = resolveSource(path.node.source.value, filename);
     const name = cleanImportSource(src);
     const tmpName = tempModuleName(name);
 
-    addImport(this.imports, { src, name, tmpName }, filename);
+    addImport(this.imports, { src, name, tmpName }, filename, false, opts);
 
     this.exportAllHelper = true;
 
