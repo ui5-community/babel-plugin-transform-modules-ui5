@@ -36,7 +36,7 @@ module.exports = () => {
 
         if (opts.onlyConvertNamedClass == false) {
           throw new Error(
-            "ERROR: onlyConvertNamedClass=false is no longer supported. Use autoConvertAllExtendClassesByDefault=true"
+            "ERROR: onlyConvertNamedClass=false is no longer supported. Use autoConvertAllExtendClasses=true"
           );
         }
         // TODO: enable this in a later version
