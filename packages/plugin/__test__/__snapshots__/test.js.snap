@@ -188,6 +188,19 @@ exports[`classes class-convert-controller-basic.controller.js 1`] = `
 });"
 `;
 
+exports[`classes class-convert-controller-detect-by-filename.controller.js 1`] = `
+"sap.ui.define(["sap/ui/core/Controller"], function (SAPController) {
+  "use strict";
+
+  const AppPage = SAPController.extend("fixtures.classes.AppPage", {
+    onInit: function _onInit() {
+      this.ref = this.byId("ref");
+    }
+  });
+  return AppPage;
+});"
+`;
+
 exports[`classes class-convert-controller-extend-static-assign.js 1`] = `
 "sap.ui.define(["sap/SAPController"], function (SAPController) {
   "use strict";

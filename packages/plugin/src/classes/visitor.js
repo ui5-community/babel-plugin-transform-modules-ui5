@@ -33,6 +33,17 @@ const KNOWN_UI5_BASE_CLASSES = [
   "sap/ui/core/mvc/ControllerExtension",
 ];
 
+/**
+ * Subset of KNOWN_UI5_BASE_CLASSES that are UI5 controller types.
+ * Used to auto-set classInfo.controller when no explicit @controller tag is present,
+ * so that controller-specific options (moveControllerPropsToOnInit, etc.) activate
+ * for classes that extend a controller base class directly.
+ */
+const KNOWN_UI5_CONTROLLER_CLASSES = [
+  "sap/ui/core/mvc/Controller",
+  "sap/ui/core/mvc/ControllerExtension",
+];
+
 const CONSTRUCTOR = "constructor";
 
 export const ClassTransformVisitor = {
@@ -76,6 +87,33 @@ export const ClassTransformVisitor = {
       });
 
       if (shouldConvertClass(file, node, opts, classInfo)) {
+        // Auto-set the controller flag when the filename suffix or superclass
+        // import identifies this as a UI5 controller, so that controller-specific
+        // options (moveControllerPropsToOnInit, etc.) activate even when the class
+        // name does not contain "Controller" and no explicit @controller tag is set.
+        if (!classInfo.controller) {
+          const filename = file.opts.filename || "";
+          if (
+            opts.autoConvertUI5FileTypes !== false &&
+            opts.autoConvertControllerClass !== false &&
+            /.*[.]controller[.](js|ts)$/.test(filename)
+          ) {
+            classInfo.controller = true;
+          } else {
+            // Direct superclass imported from a known controller base-class path.
+            const superClassName = node.superClass?.name;
+            const importDecl = superClassName
+              ? getImportDeclaration(filename, superClassName)
+              : null;
+            if (
+              importDecl &&
+              KNOWN_UI5_CONTROLLER_CLASSES.includes(importDecl.source.value)
+            ) {
+              classInfo.controller = true;
+            }
+          }
+        }
+
         // Save super class name for converting super calls
         this.superClassName = classInfo.superClassName;
         // store the classinfo

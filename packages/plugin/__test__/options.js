@@ -51,6 +51,9 @@ const Options = {
     "class-convert-constructor-keep-annot.controller": {
       moveControllerConstructorToOnInit: true,
     },
+    "class-convert-controller-detect-by-filename.controller": {
+      moveControllerPropsToOnInit: true,
+    },
     "import-modules-map": {
       modulesMap: {
         ["@babel/polyfill"]: "./vendor/browser-polyfill",

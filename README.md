@@ -723,7 +723,7 @@ const Controller = SAPController.extend("...", {
 
 The default class property behaviour of babel is to move the property into the constructor. This plugin has a `moveControllerPropsToOnInit` option that moves them to the `onInit` function rather than the `constructor`. This is useful since the `onInit` method is called after the view's controls have been created (but not yet rendered).
 
-When that property is enabled, any class with 'Controller' in the name or namespace, or having the JSDoc `@controller` will be treated as a controller.
+When that property is enabled, any class treated as a controller will use `onInit` instead of `constructor` for class-property initialisation. A class is treated as a controller when any of the following is true: its **name contains "Controller"**, it has the **`@controller`** JSDoc tag, its **filename ends with `.controller.(js|ts)`**, or its **direct superclass is imported from `sap/ui/core/mvc/Controller` or `sap/ui/core/mvc/ControllerExtension`**.
 
 This is mostly beneficial for TypeScript projects that want easy access to controls without always casting them. In typescript, the `byId(..)` method of a controller returns a `Control` instance. Rather than continually casting that to the controller type such as `sap.m.Input`, it can be useful to use a class property.
 
