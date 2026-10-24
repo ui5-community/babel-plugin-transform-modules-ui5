@@ -960,10 +960,6 @@ In general, comments are preserved, but for each class property/method whose pos
 
 > **Note:** The plugin also makes use of Babel's standard `sourceRoot` option for file-path-based namespace computation (see [File based namespace](#file-based-namespace-default) above).
 
-## Other Similar Plugins
-
-[sergiirocks babel-plugin-transform-ui5](https://github.com/sergiirocks/babel-plugin-transform-ui5) is a great choice if you use webpack. It allows you to configure which import paths to convert to sap.ui.define syntax and leaves the rest as ES2015 import statements, which allows webpack to load them in. Otherwise this plugin handles more edge cases with named exports, class conversion, and typescript output support.
-
 ## Example
 
 [openui5-master-detail-app-ts](https://github.com/r-murphy/openui5-masterdetail-app-ts), which is a fork of SAP's openui5-master-detail-app converted to TypeScript.
