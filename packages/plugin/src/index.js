@@ -123,6 +123,8 @@ module.exports = () => {
 
 module.exports.resetPluginState = function resetPluginState() {
   allConfiguredUI5ClassPaths = null;
-  exitHandlerRegistered = false;
+  // Do NOT reset exitHandlerRegistered: the process.on('exit') handler is registered
+  // once for the lifetime of the process. Re-registering it after resetPluginState()
+  // would cause duplicate warnings (both handlers fire at exit).
   resetAllCaches();
 };

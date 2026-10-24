@@ -107,7 +107,10 @@ export function getEffectiveNamespacePrefix(filename, sourceRoot, opts) {
           }
           // File directly at dep root — fall through to namespacePrefix
         }
-        // No sourceFolders on this dep — use dep.namespacePrefix if provided
+        // No sourceFolders on this dep — use dep.namespacePrefix if provided.
+        // If neither sourceFolders nor namespacePrefix is set on this dep entry,
+        // null is returned and auto-conversion is suppressed for files in this dep.
+        // Set dep.namespacePrefix to enable conversion for flat (non-folder-mapped) deps.
         return dep.namespacePrefix != null ? dep.namespacePrefix : null;
       }
     }
