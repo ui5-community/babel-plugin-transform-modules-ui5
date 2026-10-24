@@ -287,7 +287,8 @@ function recordAncestry(filename, programBody) {
  * Degrades silently on missing or unparseable files — never throws.
  */
 function readAndRecordFile(absPath) {
-  if (importDeclarations[absPath]) return true; // already cached
+  if (Object.prototype.hasOwnProperty.call(importDeclarations, absPath))
+    return true; // already cached
   if (!existsSync(absPath)) return false;
   try {
     const code = readFileSync(absPath, "utf8");
@@ -472,7 +473,8 @@ export function resolveImportSourceToFilename(
   importSource,
   currentFilename,
   sourceRoot,
-  namespacePrefix
+  namespacePrefix,
+  sourceFolders
 ) {
   if (!importSource || !currentFilename) return null;
 
@@ -493,17 +495,35 @@ export function resolveImportSourceToFilename(
         bases.push(Path.resolve(sourceRoot, stripped));
       }
     }
+    // When sourceFolders is configured (e.g. { "src": "my.app" }), each folder maps
+    // module paths through its own prefix. Try both the raw path and the prefix-stripped
+    // path under each folder's root so transitive resolution works without namespacePrefix.
+    if (sourceFolders && typeof sourceFolders === "object") {
+      for (const [folder, prefix] of Object.entries(sourceFolders)) {
+        const folderRoot = Path.resolve(sourceRoot, folder);
+        bases.push(Path.resolve(folderRoot, importSource));
+        if (prefix) {
+          const prefixPath = prefix.replace(/\./g, "/");
+          if (importSource.startsWith(prefixPath + "/")) {
+            const stripped = importSource.slice(prefixPath.length + 1);
+            bases.push(Path.resolve(folderRoot, stripped));
+          }
+        }
+      }
+    }
   }
 
+  const has = (p) =>
+    Object.prototype.hasOwnProperty.call(importDeclarations, p);
   for (const base of bases) {
-    if (importDeclarations[base]) return base;
+    if (has(base)) return base;
     for (const ext of extensions) {
       const candidate = base + ext;
-      if (importDeclarations[candidate]) return candidate;
+      if (has(candidate)) return candidate;
     }
     for (const ext of extensions) {
       const candidate = base + "/index" + ext;
-      if (importDeclarations[candidate]) return candidate;
+      if (has(candidate)) return candidate;
     }
   }
   // Nothing cached — try reading candidate files from disk on demand.
@@ -556,6 +576,7 @@ export function isSuperclassTransitivelyKnown(
   knownPaths,
   sourceRoot,
   namespacePrefix = null,
+  sourceFolders = null,
   _visited = null
 ) {
   if (!filename || !superclassLocalName || !knownPaths?.length) {
@@ -580,7 +601,8 @@ export function isSuperclassTransitivelyKnown(
     importSource,
     filename,
     sourceRoot,
-    namespacePrefix
+    namespacePrefix,
+    sourceFolders
   );
   if (!resolvedFile) return null;
 
@@ -643,6 +665,7 @@ export function isSuperclassTransitivelyKnown(
     knownPaths,
     sourceRoot,
     namespacePrefix,
+    sourceFolders,
     visited
   );
 }

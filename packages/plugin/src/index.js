@@ -1,6 +1,9 @@
 import { ClassTransformVisitor } from "./classes/visitor";
 import { ClassPre } from "./classes/pre";
-import { getUnmatchedAdditionalUI5Classes } from "./classes/helpers/imports";
+import {
+  getUnmatchedAdditionalUI5Classes,
+  resetAllCaches,
+} from "./classes/helpers/imports";
 import { ModuleTransformVisitor } from "./modules/visitor";
 
 import { wrap } from "./modules/helpers/wrapper";
@@ -116,4 +119,10 @@ module.exports = () => {
     },
     visitor: UI5Visitor,
   };
+};
+
+module.exports.resetPluginState = function resetPluginState() {
+  allConfiguredUI5ClassPaths = null;
+  exitHandlerRegistered = false;
+  resetAllCaches();
 };

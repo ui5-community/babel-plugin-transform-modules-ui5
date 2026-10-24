@@ -126,7 +126,8 @@ export const ClassTransformVisitor = {
                 directSuperClassName,
                 KNOWN_UI5_CONTROLLER_CLASSES,
                 sourceRoot,
-                effectivePrefix
+                effectivePrefix,
+                opts.sourceFolders ?? null
               );
               if (transitiveMatch) {
                 classInfo.controller = true;
@@ -408,6 +409,13 @@ function shouldConvertClass(file, node, opts, classInfo) {
   // those decorators may transform the class in ways incompatible with .extend().
   // Explicit @alias/@namespace annotations (handled above) still take precedence.
   if (node.decorators?.length) {
+    const names = node.decorators
+      .map((d) => "@" + (d.expression.name || d.expression.callee?.name || "?"))
+      .join(", ");
+    console.warn(
+      `[babel-plugin-ui5] Skipping auto-conversion of class "${node.id?.name}" in "${file.opts.filename}" — ` +
+        `non-UI5 decorator(s) present: ${names}. Add @alias or @namespace to convert explicitly.`
+    );
     return false;
   }
 
@@ -462,7 +470,8 @@ function shouldConvertClass(file, node, opts, classInfo) {
           superClassName,
           knownPaths,
           sourceRoot,
-          effectivePrefix
+          effectivePrefix,
+          opts.sourceFolders ?? null
         );
         if (transitiveMatch) {
           // N2: verify the direct ancestor (the class this file imports) would itself be
@@ -478,7 +487,8 @@ function shouldConvertClass(file, node, opts, classInfo) {
             importSource,
             filename,
             sourceRoot,
-            effectivePrefix
+            effectivePrefix,
+            opts.sourceFolders ?? null
           );
           if (ancestorFile) {
             // Containment check via Path.relative: the ancestor is inside sourceRoot
