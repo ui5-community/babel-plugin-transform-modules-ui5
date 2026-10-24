@@ -606,19 +606,29 @@ export function resolveImportSourceToFilename(
  *   BaseController.js extends Controller     → import "sap/ui/core/mvc/Controller" ✓ known
  *
  * Called with:
- *   isSuperclassTransitivelyKnown("MyController.js", "BaseController", knownPaths, sourceRoot, namespacePrefix)
+ *   isSuperclassTransitivelyKnown("MyController.js", "BaseController", knownPaths, sourceRoot, opts)
  * → returns true
+ *
+ * @param {string}   filename            Absolute path of the file being checked.
+ * @param {string}   superclassLocalName Local binding name of the superclass in `filename`.
+ * @param {string[]} knownPaths          Module paths that count as "known UI5 base classes".
+ * @param {string}   sourceRoot          Resolved absolute source root for the project.
+ * @param {object}   opts                Plugin options subset: { namespacePrefix, sourceFolders, dependencies }.
+ * @param {Set}      [_visited]          Internal cycle-detection set; callers omit this.
  */
 export function isSuperclassTransitivelyKnown(
   filename,
   superclassLocalName,
   knownPaths,
   sourceRoot,
-  namespacePrefix = null,
-  sourceFolders = null,
-  _visited = null,
-  dependencies = null
+  opts = {},
+  _visited = null
 ) {
+  const {
+    namespacePrefix = null,
+    sourceFolders = null,
+    dependencies = null,
+  } = opts;
   if (!filename || !superclassLocalName || !knownPaths?.length) {
     return null;
   }
@@ -705,9 +715,7 @@ export function isSuperclassTransitivelyKnown(
     ancestorSuperLocalName,
     knownPaths,
     sourceRoot,
-    namespacePrefix,
-    sourceFolders,
-    visited,
-    dependencies
+    opts,
+    visited
   );
 }

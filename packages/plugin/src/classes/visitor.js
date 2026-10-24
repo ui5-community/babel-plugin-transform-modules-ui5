@@ -126,10 +126,11 @@ export const ClassTransformVisitor = {
                 directSuperClassName,
                 KNOWN_UI5_CONTROLLER_CLASSES,
                 sourceRoot,
-                effectivePrefix,
-                opts.sourceFolders ?? null,
-                null,
-                opts.dependencies ?? null
+                {
+                  namespacePrefix: effectivePrefix,
+                  sourceFolders: opts.sourceFolders ?? null,
+                  dependencies: opts.dependencies ?? null,
+                }
               );
               if (transitiveMatch) {
                 classInfo.controller = true;
@@ -472,10 +473,11 @@ function shouldConvertClass(file, node, opts, classInfo) {
           superClassName,
           knownPaths,
           sourceRoot,
-          effectivePrefix,
-          opts.sourceFolders ?? null,
-          null,
-          opts.dependencies ?? null
+          {
+            namespacePrefix: effectivePrefix,
+            sourceFolders: opts.sourceFolders ?? null,
+            dependencies: opts.dependencies ?? null,
+          }
         );
         if (transitiveMatch) {
           // N2: verify the direct ancestor (the class this file imports) would itself be
