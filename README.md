@@ -69,8 +69,6 @@ There are 2 main features of the plugin, and you can use both or one without the
 1. Converting ES modules (`import`/`export`) into `sap.ui.define(...)` or `sap.ui.require(...)`.
 2. Converting ES classes into `Control.extend(...)` syntax.
 
-**NOTE:** The class transform might be split into its own plugin in the future.
-
 This only transforms the UI5 relevant things. It does not transform everything to ES5 (for example it does not transform const/let to var). This makes it easier to use `@babel/preset-env` to transform things correctly.
 
 A more detailed feature list includes:
@@ -444,14 +442,44 @@ Here `sap/m/Button` becomes a `sap.ui.define` dependency and `./transformed-modu
 
 ### Converting ES classes into Control.extend(..) syntax
 
-By default, the plugin converts ES classes to `Control.extend(..)` syntax if the class extends from a class which has been imported.
-So a class without a parent will not be converted to .extend() syntax.
+The plugin converts ES classes to `Control.extend(..)` syntax when it determines a class should be a UI5 managed object. Detection is automatic for the common cases — no annotation is required in a well-configured project.
 
-There are a few options or some metadata you can use to control this.
+#### Automatic conversion
+
+A class is automatically converted when **any** of the following conditions is true:
+
+1. **Known UI5 base class** (`autoConvertKnownUI5Classes`, on by default) — the class's superclass is imported from a known UI5 module path such as `sap/ui/core/mvc/Controller`, `sap/ui/core/Control`, `sap/ui/base/ManagedObject`, etc. The full built-in list is in `src/classes/visitor.js`. _Transitive inheritance_ is also resolved: if `MyController extends BaseController` and `BaseController extends Controller`, `MyController` is auto-converted regardless of the order in which Babel processes the files (ancestor files that have not been processed yet are read from disk on demand).
+
+2. **Filename suffix** (`autoConvertUI5FileTypes`, on by default) — the file's name ends with a recognised UI5 suffix:
+   - `.controller.(js|ts)` — converted even without a namespace (preserves legacy behaviour).
+   - `.view.(js|ts|jsx|tsx)` — converted when a namespace can be resolved.
+
+3. **Explicit annotation** — the class carries a `@name`, `@alias`, or `@namespace` JSDoc tag or decorator (see below).
+
+All automatic paths except `.controller.*` require a **resolvable namespace** so the generated FQN is never a bare class name. Configure `namespacePrefix`, `sourceFolders`, or the file-path-based default to supply one (see [File based namespace](#file-based-namespace-default) below).
+
+To prevent a specific class from being converted, add the `@nonui5` JSDoc tag or decorator to it.
+
+#### Additional base-class paths
+
+Use `additionalUI5Classes` to register project-specific base-class module paths that should trigger auto-conversion:
+
+```json
+{
+    "plugins": [
+        ["transform-modules-ui5", {
+            "additionalUI5Classes": ["my/app/BaseController"]
+        }]
+    ]
+}
+```
+
+A warning is printed at the end of the build for any path that was configured but never matched by an import, helping you catch typos.
 
 #### Configuring Name or Namespace
 
 The plugin provides a few ways to set the class name or namespace used in the `SAPClass.extend(...)` call.
+When none of the overrides below are used, the name comes from the ES class name and the namespace from the file path (see [File based namespace](#file-based-namespace-default) below).
 
 ##### File based namespace (default)
 
@@ -588,10 +616,6 @@ class AController extends SAPController {
 ```
 
 > :information_source: Use `@name('my.app.AController')` when the class has no local name (anonymous class expression). Use `@namespace('my.app')` to supply only the namespace prefix and have the class name derived automatically.
-
-### Don't convert class
-
-If you have a class which extends from an import that you don't want to convert to .extend(..) syntax, you can add the `@nonui5` (case insensitive) jsdoc or decorator to it. Also see Options below for overriding the default behaviour.
 
 ### Class Properties
 
@@ -842,7 +866,7 @@ class MyController extends Controller {
 
 Since class properties are an early ES proposal, TypeScript's compiler (like babel's class properties transform) moves static properties outside the class definition, and moves instance properties inside the constructor (even if TypeScript is configured to output ESNext).
 
-To support this, the plugin will also search for static properties outside the class definition. It does not currently search in the constructor (but will in the future) so be sure to define renderer and metadata as static props if TypeScript is used.
+To support this, the plugin will also search for static properties outside the class definition. It does not search for them in the constructor, so be sure to define renderer and metadata as static props if TypeScript is used.
 
 ```ts
 /** TypeScript **/
@@ -869,7 +893,7 @@ const MyControl = SAPClass.extend('MyControl', {
 });
 ```
 
-**CAUTION** The plugin does not currently search for 'metadata' or 'renderer' properties inside the constructor. So don't apply Babel's class property transform plugin before this one if you have metadata/renderer as instance properties (static properties are safe).
+**CAUTION** The plugin does not search for `metadata` or `renderer` properties inside the constructor. So don't apply Babel's class property transform plugin before this one if you have metadata/renderer as instance properties (static properties are safe).
 
 ### Comments
 
@@ -936,11 +960,9 @@ In general, comments are preserved, but for each class property/method whose pos
 
 > **Note:** The plugin also makes use of Babel's standard `sourceRoot` option for file-path-based namespace computation (see [File based namespace](#file-based-namespace-default) above).
 
-TODO: more options and better description.
-
 ## Other Similar Plugins
 
-[sergiirocks babel-plugin-transform-ui5](https://github.com/sergiirocks/babel-plugin-transform-ui5) is a great choice if you use webpack. It allows you to configure which import paths to convert to sap.ui.define syntax and leaves the rest as ES2015 import statements, which allows webpack to load them in. This plugin will have that functionality soon. Otherwise this plugin handles more edge cases with named exports, class conversion, and typescript output support.
+[sergiirocks babel-plugin-transform-ui5](https://github.com/sergiirocks/babel-plugin-transform-ui5) is a great choice if you use webpack. It allows you to configure which import paths to convert to sap.ui.define syntax and leaves the rest as ES2015 import statements, which allows webpack to load them in. Otherwise this plugin handles more edge cases with named exports, class conversion, and typescript output support.
 
 ## Example
 
@@ -963,14 +985,6 @@ Some preload plugins:
 ## Credits
 
 - Thanks to MagicCube for the upstream initial work and to [Ryan Murphy](https://github.com/r-murphy) for continuing development and handing over the project to the UI5 community.
-
-## TODO
-
-- libs support, like sergiirocks'
-- See if we can export a live binding (getter?)
-- Configuration options
-  - Export interop control
-  - Others..
 
 ## Contribute
 
