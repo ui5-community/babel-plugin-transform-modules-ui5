@@ -42,6 +42,9 @@ export const ClassTransformVisitor = {
   ImportDefaultSpecifier(path) {
     this.importNames.push(path.node.local.name);
   },
+  ImportSpecifier(path) {
+    this.importNames.push(path.node.local.name);
+  },
   /**
    * ClassDeclaration visitor.
    * Use both enter() and exit() to track when the visitor is inside a UI5 class,
@@ -391,9 +394,11 @@ function shouldConvertClass(file, node, opts, classInfo) {
           ? Path.resolve(process.cwd(), file.opts.sourceRoot)
           : process.cwd();
         // Use the effective namespace prefix for the current file (respects sourceFolders).
+        // ?? (not ||) so that an explicit "" mapping in sourceFolders is respected —
+        // || would treat "" as falsy and fall through to namespacePrefix.
         const effectivePrefix =
-          getEffectiveNamespacePrefix(filename, sourceRoot, opts) ||
-          opts.namespacePrefix ||
+          getEffectiveNamespacePrefix(filename, sourceRoot, opts) ??
+          opts.namespacePrefix ??
           null;
         const transitiveMatch = isSuperclassTransitivelyKnown(
           filename,
@@ -428,10 +433,12 @@ function shouldConvertClass(file, node, opts, classInfo) {
               ancestorRel === "" ||
               (!ancestorRel.startsWith("..") && !Path.isAbsolute(ancestorRel));
             // Compute the ancestor's own effective prefix (it may live in a different sourceFolders entry).
+            // ?? (not ||) so that an explicit "" mapping in sourceFolders is respected —
+            // || would treat "" as falsy and fall through to namespacePrefix.
             const ancestorEffectivePrefix = ancestorInsideSourceRoot
-              ? getEffectiveNamespacePrefix(ancestorFile, sourceRoot, opts) ||
-                opts.namespacePrefix ||
-                null
+              ? (getEffectiveNamespacePrefix(ancestorFile, sourceRoot, opts) ??
+                opts.namespacePrefix ??
+                null)
               : null;
             const ancestorDirParts = ancestorInsideSourceRoot
               ? Path.parse(ancestorRel).dir.split(Path.sep).filter(Boolean)

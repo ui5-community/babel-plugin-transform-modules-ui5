@@ -840,6 +840,23 @@ exports[`classes class-convert-transitive-named-export-default MyControllerSpeci
 });"
 `;
 
+exports[`classes class-convert-transitive-named-import-alias BaseController.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  const BaseController = Controller.extend("fixtures.classes.class-convert-transitive-named-import-alias.BaseController", {});
+});"
+`;
+
+exports[`classes class-convert-transitive-named-import-alias MyController.js 1`] = `
+"sap.ui.define(["./BaseController"], function (___BaseController) {
+  "use strict";
+
+  const Base = ___BaseController["BaseController"];
+  const MyController = Base.extend("fixtures.classes.class-convert-transitive-named-import-alias.MyController", {});
+});"
+`;
+
 exports[`classes class-convert-transitive-no-super-default-collision MixedModule.js 1`] = `
 "sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
   "use strict";
