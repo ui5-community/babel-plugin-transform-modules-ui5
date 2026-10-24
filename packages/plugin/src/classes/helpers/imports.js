@@ -714,9 +714,8 @@ export function isLocalChainConvertible(
     );
     if (!ancestorFile) return true; // can't resolve → allow
 
-    const cycleKey = ancestorFile + "\0" + importSource;
-    if (visited.has(cycleKey)) return true;
-    visited.add(cycleKey);
+    if (visited.has(ancestorFile)) return true;
+    visited.add(ancestorFile);
 
     const ancestorNamespace = deriveNamespaceForFile(
       ancestorFile,
