@@ -8,7 +8,7 @@ import {
 } from "fs-extra";
 import { join, resolve } from "path";
 import { transformFileSync } from "@babel/core";
-import { get as getOpts } from "./options";
+import { get as getOpts, getBabelOpts } from "./options";
 import plugin from "../src";
 
 const FIXTURE_DIR_NAME = "fixtures";
@@ -20,13 +20,19 @@ function processDirectory(dir) {
   const items = readdirSync(dir);
   // Process Files first
   items
-    .filter((item) => item.endsWith(".js") || item.endsWith(".ts"))
+    .filter(
+      (item) =>
+        item.endsWith(".js") ||
+        item.endsWith(".ts") ||
+        item.endsWith(".jsx") ||
+        item.endsWith(".tsx")
+    )
     .forEach((filename) => {
       test(filename, () => {
         const filePath = join(dir, filename);
         let outputPath = filePath
           .replace(FIXTURE_DIR_NAME, OUT_DIR_NAME)
-          .replace(/.ts$/, ".js");
+          .replace(/\.(ts|jsx|tsx)$/, ".js");
 
         try {
           const opts = getOpts(filePath);
@@ -39,8 +45,12 @@ function processDirectory(dir) {
             ["@babel/plugin-syntax-class-properties", { useBuiltIns: true }],
           ];
 
-          if (filePath.endsWith(".ts")) {
+          if (filePath.endsWith(".ts") || filePath.endsWith(".tsx")) {
             presets.push(["@babel/preset-typescript"]);
+          }
+
+          if (filePath.endsWith(".jsx")) {
+            plugins.push("@babel/plugin-syntax-jsx");
           }
 
           if (filePath.includes("flow")) {
@@ -74,6 +84,7 @@ function processDirectory(dir) {
             plugins,
             presets,
             sourceRoot: __dirname,
+            ...getBabelOpts(filePath),
             comments:
               filePath.includes("comments") || filename.includes("copyright") || filename.includes("controller-extension-usage"),
             babelrc: false,

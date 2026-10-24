@@ -31,6 +31,12 @@ export function collapseNamedExports(
   if (!namedExports.length || opts.noExportExtend) {
     return {
       filteredExports: namedExports,
+      // Always include conflictingExports so the consumer (wrapper.js) can call
+      // getPropNames() on it. When noExportExtend leaves non-collapsible named
+      // exports in filteredExports, the consumer throws the "Unsafe mixing" error
+      // and reads conflictingExports — a missing key here produced a garbled
+      // "Cannot read properties of undefined (reading 'map')" instead.
+      conflictingExports: namedExports,
       newDefaultExportIdentifier: null,
     };
   }
@@ -136,8 +142,12 @@ function areSame(defaultExportProperty, matchingNamedExport) {
     }
   } else if (t.isLiteral(defaultExportValue)) {
     // i.e. { a: 1 } or { a: '1' }
-    // See if the original declaration for the matching export was for the same literal
+    // See if the original declaration for the matching export was for the same literal.
+    // Guard `declaration` the same way the identifier branch above does: specifier
+    // exports (`export { a }`) carry no `declaration`, so reading declaration.init
+    // would throw.
     if (
+      declaration &&
       t.isLiteral(declaration.init) &&
       declaration.init.value === defaultExportValue.value
     ) {

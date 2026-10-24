@@ -11,7 +11,7 @@ const resolveSource = (src, filename) => {
   src = src.replace(/\\/g, "/");
   const dir = dirname(filename);
   const absoluteSrc = join(dir, src);
-  if (existsSync(absoluteSrc) && statSync(absoluteSrc).isDirectory) {
+  if (existsSync(absoluteSrc) && statSync(absoluteSrc).isDirectory()) {
     if (
       existsSync(join(absoluteSrc, "index.js")) ||
       existsSync(join(absoluteSrc, "index.jsx")) ||
@@ -29,7 +29,7 @@ const cleanImportSource = (src) =>
   src.replace(/(\/)|(-)|(@)/g, "_").replace(/\./g, "");
 const tempModuleName = (name) => `__${name}`;
 const hasGlobalExportFlag = (node) => hasJsdocGlobalExportFlag(node);
-const addImport = (imports, imp, filename, first) => {
+const addImport = (imports, imp, filename, first, opts = {}) => {
   const existingImport = imports.find((i) => i.src === imp.src);
   if (!existingImport) {
     // if a module path ends with the file extension ".js" and it can be resolved to
@@ -54,11 +54,16 @@ const addImport = (imports, imp, filename, first) => {
         } else {
           modulePath = require.resolve(absModuleSrc);
         }
-        // detect removal of file extension and log a hint
-        if (modulePath.endsWith(imp.src.split("/").pop())) {
-          console.log(
-            `\x1b[33mHint:\x1b[0m Removed file extension for dependency "\x1b[34m${imp.src}\x1b[0m" found in \x1b[90m${filename}\x1b[0m`
-          );
+        // detect removal of file extension and log a hint.
+        // Guard on modulePath: for a relative import whose file doesn't exist it
+        // stays undefined (no extension matched) — don't slice, and don't rely on a
+        // thrown TypeError for that control flow.
+        if (modulePath && modulePath.endsWith(imp.src.split("/").pop())) {
+          if (!opts.suppressImportResolutionHints) {
+            console.log(
+              `\x1b[33mHint:\x1b[0m Removed file extension for dependency "\x1b[34m${imp.src}\x1b[0m" found in \x1b[90m${filename}\x1b[0m`
+            );
+          }
           imp.src = imp.src.slice(0, -3);
         }
       } catch (ex) {
@@ -66,6 +71,7 @@ const addImport = (imports, imp, filename, first) => {
         // can't be resolved with the given file extension, e.g.
         // myns/module.js must be provided as myns/module
         // myns/module.js.js must be provided as myns/module.js
+        void ex;
       }
     }
     imports[first ? "unshift" : "push"](imp);
@@ -225,7 +231,7 @@ export const ModuleTransformVisitor = {
     imp.deconstructors = imp.deconstructors.concat(deconstructors);
 
     if (!existingImport) {
-      addImport(this.imports, imp, filename);
+      addImport(this.imports, imp, filename, false, opts);
     }
   },
 
@@ -234,7 +240,7 @@ export const ModuleTransformVisitor = {
    * The reason we don't export in place is to handle the situation
    * where a let or var can be defined, and the latest one should be exported.
    */
-  ExportNamedDeclaration(path, { filename }) {
+  ExportNamedDeclaration(path, { filename, opts }) {
     const { node } = path;
     const { specifiers, declaration, source } = node;
 
@@ -246,7 +252,7 @@ export const ModuleTransformVisitor = {
       const src = resolveSource(source.value, filename);
       const name = cleanImportSource(src);
       const tmpName = tempModuleName(name);
-      addImport(this.imports, { src, name, tmpName }, filename);
+      addImport(this.imports, { src, name, tmpName }, filename, false, opts);
       fromSource = tmpName + ".";
     }
 
@@ -336,13 +342,13 @@ export const ModuleTransformVisitor = {
     }
   },
 
-  ExportAllDeclaration(path, { filename }) {
+  ExportAllDeclaration(path, { filename, opts }) {
     if (this.noWrap) return;
     const src = resolveSource(path.node.source.value, filename);
     const name = cleanImportSource(src);
     const tmpName = tempModuleName(name);
 
-    addImport(this.imports, { src, name, tmpName }, filename);
+    addImport(this.imports, { src, name, tmpName }, filename, false, opts);
 
     this.exportAllHelper = true;
 
