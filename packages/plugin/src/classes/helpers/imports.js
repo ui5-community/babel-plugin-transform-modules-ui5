@@ -78,6 +78,38 @@ export function getEffectiveNamespacePrefix(filename, sourceRoot, opts) {
     return sourceFolders[leadingFolder]; // "" or a namespace string
   }
   if (leadingFolder) {
+    // Present but not mapped in primary sourceFolders — check dependencies
+    const deps = opts && opts.dependencies;
+    if (Array.isArray(deps)) {
+      for (const dep of deps) {
+        if (!dep.sourceRoot) continue;
+        const depRoot = Path.resolve(dep.sourceRoot);
+        const depRel = Path.relative(depRoot, filename);
+        const depInside =
+          depRel === "" ||
+          (!depRel.startsWith("..") && !Path.isAbsolute(depRel));
+        if (!depInside) continue;
+        const sf = dep.sourceFolders;
+        if (sf && typeof sf === "object") {
+          const { dir: depDir } = Path.parse(depRel);
+          const depParts = depDir.split(Path.sep);
+          const depLeading = depParts[0];
+          if (
+            depLeading &&
+            Object.prototype.hasOwnProperty.call(sf, depLeading)
+          ) {
+            return sf[depLeading];
+          }
+          if (depLeading) {
+            // File is inside this dep root but its leading folder is not mapped → no namespace
+            return null;
+          }
+          // File directly at dep root — fall through to namespacePrefix
+        }
+        // No sourceFolders on this dep — use dep.namespacePrefix if provided
+        return dep.namespacePrefix != null ? dep.namespacePrefix : null;
+      }
+    }
     // Present but not mapped → caller should treat as empty namespace
     return null;
   }
