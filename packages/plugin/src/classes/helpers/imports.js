@@ -384,9 +384,11 @@ export function getImportDeclaration(filename, typeName) {
           return true;
         } else if (
           t.isImportSpecifier(specifier) &&
-          specifier.imported.name === typeNameParts[typeNameParts.length - 1]
+          specifier.local.name === typeNameParts[typeNameParts.length - 1]
         ) {
-          // If the import is named, then the last part of the typeName should match the imported name
+          // Match on the local binding name (what the code actually uses).
+          // For `import { Foo as Bar }`, local.name is "Bar" and imported.name is "Foo";
+          // callers always pass the name as it appears in the source (the local name).
           return true;
         }
       }
@@ -551,9 +553,16 @@ export function isSuperclassTransitivelyKnown(
         : classSuperclassNames[resolvedFile + "\0" + superclassLocalName];
     }
   } else {
-    // Named import: the local binding name equals the class name in the ancestor file.
+    // Named import: the class name in the ancestor file is the *imported* name, not the
+    // local alias. For `import { Foo as Bar }`, the cache key was stored as "Foo" but
+    // superclassLocalName is "Bar". Extract the imported name from the specifier.
+    const namedSpecifier = importDecl.specifiers.find(
+      (s) => t.isImportSpecifier(s) && s.local.name === superclassLocalName
+    );
+    const ancestorClassName =
+      namedSpecifier?.imported?.name ?? superclassLocalName;
     ancestorSuperLocalName =
-      classSuperclassNames[resolvedFile + "\0" + superclassLocalName];
+      classSuperclassNames[resolvedFile + "\0" + ancestorClassName];
   }
   if (!ancestorSuperLocalName) return null;
 
