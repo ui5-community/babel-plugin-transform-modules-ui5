@@ -106,6 +106,7 @@ module.exports = () => {
       if (!exitHandlerRegistered) {
         exitHandlerRegistered = true;
         process.on("exit", () => {
+          if (!allConfiguredUI5ClassPaths) return;
           const unmatched = getUnmatchedAdditionalUI5Classes([
             ...allConfiguredUI5ClassPaths,
           ]);
