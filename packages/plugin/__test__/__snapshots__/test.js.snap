@@ -1356,6 +1356,17 @@ exports[`classes class-no-convert-controller-opt-out.controller.js 1`] = `
 });"
 `;
 
+exports[`classes class-no-convert-file-types-opt-out.controller.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  class AppPage extends Controller {
+    onInit() {}
+  }
+  return AppPage;
+});"
+`;
+
 exports[`classes class-no-convert-view-opt-out.view.js 1`] = `
 "sap.ui.define(["sap/ui/core/mvc/JSView"], function (JSView) {
   "use strict";

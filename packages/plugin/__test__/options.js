@@ -55,6 +55,9 @@ const Options = {
     "class-no-convert-view-opt-out.view": {
       autoConvertViewClass: false,
     },
+    "class-no-convert-file-types-opt-out.controller": {
+      autoConvertUI5FileTypes: false,
+    },
     "LocalMid": {
       // Middle ancestor in the N2 rejection chain — lives in "other/" which is not mapped
       // in sourceFolders, so it gets no namespace and should NOT be converted.

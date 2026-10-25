@@ -373,17 +373,21 @@ function shouldConvertClass(file, node, opts, classInfo) {
   // known-class branch or any other detection path.
   {
     const filename = file.opts.filename || "";
-    if (
-      /[.]controller[.](js|ts)$/.test(filename) &&
-      opts.autoConvertControllerClass === false
-    ) {
-      return null;
+    if (/[.]controller[.](js|ts)$/.test(filename)) {
+      if (
+        opts.autoConvertUI5FileTypes === false ||
+        opts.autoConvertControllerClass === false
+      ) {
+        return null;
+      }
     }
-    if (
-      /[.]view[.](js|ts|jsx|tsx)$/.test(filename) &&
-      opts.autoConvertViewClass === false
-    ) {
-      return null;
+    if (/[.]view[.](js|ts|jsx|tsx)$/.test(filename)) {
+      if (
+        opts.autoConvertUI5FileTypes === false ||
+        opts.autoConvertViewClass === false
+      ) {
+        return null;
+      }
     }
   }
 
@@ -463,10 +467,15 @@ function shouldConvertClass(file, node, opts, classInfo) {
         // Use the effective namespace prefix for the current file (respects sourceFolders).
         // ?? (not ||) so that an explicit "" mapping in sourceFolders is respected —
         // || would treat "" as falsy and fall through to namespacePrefix.
-        const effectivePrefix =
-          getEffectiveNamespacePrefix(filename, sourceRoot, opts) ??
-          opts.namespacePrefix ??
-          null;
+        // ?? (not ||) so that an explicit "" mapping in sourceFolders is respected —
+        // || would treat "" as falsy and fall through to namespacePrefix.
+        // getEffectiveNamespacePrefix already returns namespacePrefix as a fallback when
+        // sourceFolders is absent, so no extra ?? namespacePrefix chaining is needed here.
+        const effectivePrefix = getEffectiveNamespacePrefix(
+          filename,
+          sourceRoot,
+          opts
+        );
         const transitiveMatch = isSuperclassTransitivelyKnown(
           filename,
           superClassName,
