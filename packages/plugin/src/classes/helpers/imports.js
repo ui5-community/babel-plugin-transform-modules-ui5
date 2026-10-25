@@ -27,6 +27,7 @@ let ancestryCacheKeys = {};
 // at the start of the first saveImports call in each rebuild cycle, so that a changed
 // ancestor is re-read next time a descendant needs it rather than serving stale data.
 // onDemandEvictedThisCycle prevents re-evicting the same set on every file in the cycle.
+// It must be reset to false after each file (in post()) so the next watch cycle re-evicts.
 const onDemandCachedFiles = new Set();
 let onDemandEvictedThisCycle = false;
 
@@ -461,6 +462,15 @@ export function resetAllCaches() {
   onDemandEvictedThisCycle = false;
   filesWithDefaultExport.clear();
   matchedAdditionalUI5ClassPaths.clear();
+}
+
+/**
+ * Reset the per-cycle eviction flag after each file's post() hook.
+ * This allows the next watch cycle's first saveImports call to re-evict on-demand
+ * ancestor files that may have changed between builds.
+ */
+export function resetOnDemandEvictionCycle() {
+  onDemandEvictedThisCycle = false;
 }
 
 /**

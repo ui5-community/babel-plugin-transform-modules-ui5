@@ -3,6 +3,7 @@ import { ClassPre } from "./classes/pre";
 import {
   getUnmatchedAdditionalUI5Classes,
   resetAllCaches,
+  resetOnDemandEvictionCycle,
 } from "./classes/helpers/imports";
 import { ModuleTransformVisitor } from "./modules/visitor";
 
@@ -94,6 +95,9 @@ module.exports = () => {
   return {
     pre: ClassPre,
     post() {
+      // PM2: reset the per-cycle eviction flag so that the next watch cycle's first
+      // saveImports call re-evicts on-demand ancestor files that may have changed.
+      resetOnDemandEvictionCycle();
       // F5: use this.opts (plugin options), not the Babel file opts passed as argument.
       // F6: defer the warning to process exit so it fires once after all files are done,
       //     avoiding false positives when a valid path is only imported in a later file.
