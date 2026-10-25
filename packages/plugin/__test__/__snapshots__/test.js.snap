@@ -2184,6 +2184,15 @@ exports[`imports import-remove-fileext-suppressed.js 1`] = `
 });"
 `;
 
+exports[`imports import-string-literal-name.js 1`] = `
+"sap.ui.define(["some/module"], function (__some_module) {
+  "use strict";
+
+  const localName = __some_module["some-export"];
+  localName();
+});"
+`;
+
 exports[`libs libs-other-imports.js 1`] = `
 "import _ from "lodash";
 sap.ui.define(["sap/SAPClass"], function (SAPClass) {
