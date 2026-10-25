@@ -35,7 +35,7 @@ jobs:
           node-version: 24.x
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --ignore-scripts
 
       # Fails the PR if no changeset describes the change.
       # Add one with `npm run changeset` (or `npm run changeset:empty` for PRs
