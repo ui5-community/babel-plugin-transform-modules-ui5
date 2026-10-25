@@ -27,6 +27,7 @@ export function convertClassToUI5Extend(
   }
 
   const CONTROLLER_EXTENSION_TAG = "transformControllerExtension";
+  const KEEP_IN_CONSTRUCTOR_TAG = "movePropsToConstructor";
   const staticMembers = [];
 
   const classNameIdentifier = node.id;
@@ -49,6 +50,7 @@ export function convertClassToUI5Extend(
 
   const extendProps = [];
   const boundProps = [];
+  const constructorBoundProps = []; // props that must stay in constructor even when moveControllerPropsToOnInit is true
 
   const CONSTRUCTOR = "constructor";
   const propsByName = {};
@@ -267,12 +269,28 @@ export function convertClassToUI5Extend(
             continue; // don't push to props yet
           }
         }
+        // When moveControllerPropsToOnInit is active, a per-property @movePropsToConstructor
+        // annotation (JSDoc block comment or decorator) opts that specific property out of the
+        // onInit move and keeps it in the constructor instead.
+        const keepInConstructor =
+          moveControllerPropsToOnInit &&
+          (member.leadingComments?.some((comment) =>
+            comment.value.includes("@" + KEEP_IN_CONSTRUCTOR_TAG)
+          ) ||
+            member.decorators?.some(
+              (decorator) =>
+                decorator.expression?.name === KEEP_IN_CONSTRUCTOR_TAG
+            ));
         if (
           alwaysMoveInstanceProps ||
           t.isArrowFunctionExpression(member.value) ||
           ast.isThisExpressionUsed(member.value)
         ) {
-          boundProps.push(member);
+          if (keepInConstructor) {
+            constructorBoundProps.push(member);
+          } else {
+            boundProps.push(member);
+          }
         } else {
           extendProps.push(buildObjectProperty(member));
         }
@@ -348,6 +366,11 @@ export function convertClassToUI5Extend(
     boundProps.length ||
     (moveControllerPropsToOnInit && constructor && !keepConstructor);
 
+  // See if we need to create a constructor separately for constructorBoundProps
+  // (only relevant when moveControllerPropsToOnInit is on and some props opted out).
+  const needsConstructorForOverrides =
+    moveControllerPropsToOnInit && constructorBoundProps.length;
+
   // See if we need to create a new 'constructor' or 'onInit' method, depending which one we'll bind to.
   if (needsBindingMethod && !bindMethod) {
     const bindToId = t.identifier(bindToMethodName);
@@ -412,6 +435,51 @@ export function convertClassToUI5Extend(
       const upToSuper = bindMethod.body.body.slice(0, superIndex + 1);
       const afterSuper = bindMethod.body.body.slice(superIndex + 1);
       bindMethod.body.body = [...upToSuper, ...mappedProps, ...afterSuper];
+    }
+  }
+
+  if (needsConstructorForOverrides) {
+    // Some props were annotated @movePropsToConstructor — inject them into the
+    // constructor even though moveControllerPropsToOnInit is active.
+    let constructorMethod = constructor;
+    if (!constructorMethod) {
+      // No explicit constructor: create an inheriting one and register it.
+      const constructorDeclaration = th.buildInheritingConstructor({
+        SUPER: t.identifier(superClassName),
+      });
+      constructorMethod = ast.convertFunctionDeclarationToExpression(
+        constructorDeclaration
+      );
+      extendProps.unshift(
+        t.objectProperty(t.identifier(CONSTRUCTOR), constructorMethod)
+      );
+    } else if (!keepConstructor) {
+      // Constructor exists but was merged into onInit — we need to keep it in
+      // extend() as well so the constructor-bound props have somewhere to live.
+      extendProps.unshift(
+        t.objectProperty(t.identifier(CONSTRUCTOR), constructorMethod)
+      );
+    }
+
+    const mappedOverrideProps = constructorBoundProps.map((member) =>
+      buildThisMemberAssignmentStatement(member)
+    );
+
+    const superIndex = constructorMethod.body.body.findIndex(
+      (node) =>
+        ast.isSuperCallExpression(node.expression) ||
+        ast.isSuperPrototypeCallOf(node.expression, superClassName, CONSTRUCTOR)
+    );
+    if (superIndex === -1) {
+      constructorMethod.body.body.unshift(...mappedOverrideProps);
+    } else {
+      const upToSuper = constructorMethod.body.body.slice(0, superIndex + 1);
+      const afterSuper = constructorMethod.body.body.slice(superIndex + 1);
+      constructorMethod.body.body = [
+        ...upToSuper,
+        ...mappedOverrideProps,
+        ...afterSuper,
+      ];
     }
   }
 
