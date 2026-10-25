@@ -258,6 +258,27 @@ exports[`classes class-convert-controller-extension-static-prop-compatibility.co
 });"
 `;
 
+exports[`classes class-convert-controller-keep-prop-in-constructor.controller.js 1`] = `
+"sap.ui.define(["sap/ui/core/Controller"], function (Controller) {
+  "use strict";
+
+  const MyController = Controller.extend("test.fixtures.classes.MyController", {
+    constructor: function constructor() {
+      Controller.prototype.constructor.apply(this, arguments);
+      this.formatter = {
+        formatValue: v => v
+      };
+    },
+    onInit: function _onInit() {
+      this.prop = 1;
+      this.handler = () => true;
+      this.title = "hello";
+    }
+  });
+  return MyController;
+});"
+`;
+
 exports[`classes class-convert-controller-multi.controller.js 1`] = `
 "sap.ui.define(["sap/ui/core/Controller", "other"], function (SAPController, __Other) {
   "use strict";

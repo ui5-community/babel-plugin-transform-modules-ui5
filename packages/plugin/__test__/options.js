@@ -80,6 +80,9 @@ const Options = {
     "class-convert-controller-detect-by-filename.controller": {
       moveControllerPropsToOnInit: true,
     },
+    "class-convert-controller-keep-prop-in-constructor.controller": {
+      moveControllerPropsToOnInit: true,
+    },
     "import-modules-map": {
       modulesMap: {
         ["@babel/polyfill"]: "./vendor/browser-polyfill",
