@@ -6,6 +6,7 @@ import {
   resetOnDemandEvictionCycle,
 } from "./classes/helpers/imports";
 import { ModuleTransformVisitor } from "./modules/visitor";
+import { escapeRegExp } from "./utils/ast";
 
 import { wrap } from "./modules/helpers/wrapper";
 
@@ -55,7 +56,9 @@ module.exports = () => {
           : [];
         this.noImportInteropPrefixes = opts.noImportInteropPrefixes || ["sap/"];
         this.noImportInteropPrefixesRegexp = new RegExp(
-          this.noImportInteropPrefixes.map((p) => `(^${p}.*)`).join("|")
+          this.noImportInteropPrefixes
+            .map((p) => `(^${escapeRegExp(p)}.*)`)
+            .join("|")
         );
 
         // Properties for Module Transform

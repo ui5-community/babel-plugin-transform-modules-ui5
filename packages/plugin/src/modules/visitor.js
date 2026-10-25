@@ -200,7 +200,11 @@ export const ModuleTransformVisitor = {
           th.buildNamedImportDestructor({
             MODULE: t.identifier(imp.tmpName),
             LOCAL: specifier.local,
-            IMPORTED: t.stringLiteral(specifier.imported.name),
+            IMPORTED: t.stringLiteral(
+              t.isStringLiteral(specifier.imported)
+                ? specifier.imported.value
+                : specifier.imported.name
+            ),
           })
         );
       } else {
