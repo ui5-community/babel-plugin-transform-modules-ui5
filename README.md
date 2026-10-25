@@ -2,7 +2,13 @@
 
 A community-driven Babel transformer plugin for SAPUI5/OpenUI5.
 
-It allows you to develop SAPUI5 applications by using the latest [ECMAScript](http://babeljs.io/docs/learn-es2015/), including classes and modules, or even TypeScript.
+It allows you to develop SAPUI5 applications using the latest [ECMAScript](http://babeljs.io/docs/learn-es2015/), including classes and modules, or TypeScript.
+
+### Used by the UI5 ecosystem
+
+Most UI5 TypeScript projects consume this plugin indirectly through [**ui5-tooling-transpile**](https://github.com/ui5-community/ui5-ecosystem-showcase/tree/main/packages/ui5-tooling-transpile) — a `@ui5/cli` middleware and build task that bundles `babel-preset-transform-ui5` and provides a zero-configuration Babel setup for standard UI5 projects. If you use `@ui5/cli`, installing `ui5-tooling-transpile` is the recommended way to use this plugin without writing a Babel config manually.
+
+The official [Easy UI5](https://github.com/ui5-community/generator-easy-ui5) TypeScript project generators — [**ts-app**](https://github.com/ui5-community/generator-ui5-ts-app) and [**ts-library**](https://github.com/ui5-community/generator-ui5-ts-library) — both scaffold projects that use `ui5-tooling-transpile`, so any project generated from those templates relies on this plugin out of the box.
 
 ## Install
 
@@ -42,9 +48,9 @@ Or if you want to supply plugin options, use the array syntax.
 }
 ```
 
-At the time of writing the babel version is 7.3, which does not natively support class property syntax. To use that syntax also add the plugin `@babel/plugin-syntax-class-properties`.
+Class property syntax (`static metadata = {}`) is supported natively by recent Babel versions. If you are on an older Babel 7 setup, add `@babel/plugin-proposal-class-properties` (Babel < 7.12) or rely on `@babel/preset-env` (Babel ≥ 7.12, where it is included automatically).
 
-It is also recommended to use [@babel/preset-env](https://babeljs.io/docs/en/next/babel-preset-env.html) to control which ES version the final code is transformed to.
+It is also recommended to use [@babel/preset-env](https://babeljs.io/docs/babel-preset-env) to control which ES version the final code is transformed to.
 
 The order of presets is important and `@babel/preset-env` should be higher in the array than this one. Babel applies them in reverse order for legacy reasons, so this preset will be applied first.
 
@@ -68,8 +74,6 @@ There are 2 main features of the plugin, and you can use both or one without the
 
 1. Converting ES modules (`import`/`export`) into `sap.ui.define(...)` or `sap.ui.require(...)`.
 2. Converting ES classes into `Control.extend(...)` syntax.
-
-**NOTE:** The class transform might be split into its own plugin in the future.
 
 This only transforms the UI5 relevant things. It does not transform everything to ES5 (for example it does not transform const/let to var). This makes it easier to use `@babel/preset-env` to transform things correctly.
 
@@ -144,6 +148,26 @@ For JavaScript projects, this syntax doesn't provide much advantage over a small
 The main advantage of this syntax is with TypeScript projects, where the TypeScript compiler will know the type of the imported module, so there is no need to define a separate interface for it.
 
 Also note that while the ES dynamic import specification requires a relative path, `sap.ui.require` works with absolute paths using a module prefix.
+
+#### `import.meta` rewriting
+
+The plugin rewrites two `import.meta` member accesses to their UI5 equivalents (adding the corresponding built-in module as a hidden `sap.ui.define` dependency):
+
+- `import.meta.url` → `module.url` (adds the built-in `module` dependency to the `sap.ui.define` call)
+- `import.meta.resolve(path)` → `require.toUrl(path)` (adds the built-in `require` dependency)
+
+```js
+// Input
+const url = import.meta.url;
+const path = import.meta.resolve("./assets/icon.png");
+
+// Output (inside the sap.ui.define factory)
+const url = module.url;
+const path = require.toUrl("./assets/icon.png");
+```
+
+`import.meta` accesses of any other form are left unchanged.
+Files that carry `/* @ui5-no-wrap */` skip this transform (and all module transforms) entirely.
 
 #### Export
 
@@ -365,7 +389,7 @@ will be converted to:
 "use strict";
 
 QUnit.config.autostart = false;
-"sap.ui.require([], function () {
+sap.ui.require([], function () {
   function __ui5_require_async(path) { /* ... */ }
   void Promise.all([__ui5_require_async("unit/controller/App.qunit")]).then(() => {
     QUnit.start();
@@ -444,14 +468,46 @@ Here `sap/m/Button` becomes a `sap.ui.define` dependency and `./transformed-modu
 
 ### Converting ES classes into Control.extend(..) syntax
 
-By default, the plugin converts ES classes to `Control.extend(..)` syntax if the class extends from a class which has been imported.
-So a class without a parent will not be converted to .extend() syntax.
+The plugin converts ES classes to `Control.extend(..)` syntax when it determines a class should be a UI5 managed object. Detection is automatic for the common cases — no annotation is required in a well-configured project.
 
-There are a few options or some metadata you can use to control this.
+#### Automatic conversion
+
+A class is automatically converted when **any** of the following conditions is true:
+
+1. **Known UI5 base class** (`autoConvertKnownUI5Classes`, on by default) — the class's superclass is imported from a known UI5 module path such as `sap/ui/core/mvc/Controller`, `sap/ui/core/Control`, `sap/ui/base/ManagedObject`, etc. The full built-in list is in `src/classes/visitor.js`. _Transitive inheritance_ is also resolved: if `MyController extends BaseController` and `BaseController extends Controller`, `MyController` is auto-converted regardless of the order in which Babel processes the files (ancestor files that have not been processed yet are read from disk on demand).
+
+2. **Filename suffix** (`autoConvertUI5FileTypes`, on by default) — the file's name ends with a recognised UI5 suffix:
+   - `.controller.(js|ts)` — converted even without a namespace (preserves legacy behaviour).
+   - `.view.(js|ts|jsx|tsx)` — converted when a namespace can be resolved.
+
+3. **Explicit annotation** — the class carries a `@name`, `@alias`, or `@namespace` JSDoc tag or decorator (see below).
+
+All automatic paths except `.controller.*` require a **resolvable namespace** so the generated FQN is never a bare class name. Configure `namespacePrefix`, `sourceFolders`, or the file-path-based default to supply one (see [File based namespace](#file-based-namespace-default) below).
+
+To prevent a specific class from being converted, add the `@nonui5` JSDoc tag or decorator to it.
+
+#### Additional base-class paths
+
+Use `additionalUI5Classes` to register project-specific base-class module paths that should trigger auto-conversion:
+
+```json
+{
+    "plugins": [
+        ["transform-modules-ui5", {
+            "additionalUI5Classes": ["my/app/BaseController"]
+        }]
+    ]
+}
+```
+
+A warning is printed at the end of the build for any path that was configured but never matched by an import, helping you catch typos.
+
+> **Note:** The "never matched" warning fires once at Node.js process exit. It will appear in a normal one-shot build (`babel src/` or `webpack --mode production`) but **not** in watch mode (`babel --watch`, `webpack --watch`, `vite dev`, etc.), because long-lived watch processes never reach process exit during normal development.
 
 #### Configuring Name or Namespace
 
 The plugin provides a few ways to set the class name or namespace used in the `SAPClass.extend(...)` call.
+When none of the overrides below are used, the name comes from the ES class name and the namespace from the file path (see [File based namespace](#file-based-namespace-default) below).
 
 ##### File based namespace (default)
 
@@ -459,13 +515,51 @@ The default behaviour if no JSDoc or Decorator overrides are given is to use the
 
 This is based on the relative path from either the babelrc `sourceRoot` property or the current working directory.
 
-The plugin also supports supplying a namespace prefix in this mode, in case the desired namespace root is not a directory in the filesystem.
+**For library and app projects with a dedicated source folder** (e.g. `src/`, `test/`, `webapp/`), use the `sourceFolders` option to map each folder to its namespace prefix. The folder name is stripped from the namespace and replaced by the mapped prefix:
 
-In order to pass the namespace prefix, pass it as a plugin option, and not a top-level babel option. Passing plugin options requires the array format for the plugin itself (within the outer plugins array).
-
-```js
+```json
 {
-    "sourceRoot" "src/",
+    "plugins": [
+        ["transform-modules-ui5", {
+            "sourceFolders": {
+                "src": "my.lib",
+                "test": "my.lib.test"
+            }
+        }]
+    ]
+}
+```
+
+With this configuration:
+- `src/control/MyButton.js` → FQN `my.lib.control.MyButton`
+- `test/integration/opaTest.js` → FQN `my.lib.test.integration.opaTest`
+- A file in a folder **not listed** in `sourceFolders` gets an empty namespace and will **not** be auto-converted.
+
+**For monorepo / npm-workspace setups** where a dependency project's files are transpiled alongside the main project but live outside its `sourceRoot`, use the `dependencies` option. Each entry describes one dependency project with its own `sourceRoot` and optional `sourceFolders`:
+
+```json
+{
+    "plugins": [
+        ["transform-modules-ui5", {
+            "sourceFolders": { "src": "my.app" },
+            "dependencies": [
+                {
+                    "sourceRoot": "../my-lib",
+                    "sourceFolders": { "src": "my.lib" }
+                }
+            ]
+        }]
+    ]
+}
+```
+
+When a file is outside the primary `sourceRoot`, the plugin checks each dependency entry in order. The first entry whose `sourceRoot` contains the file is used to derive the namespace — applying that entry's `sourceFolders` exactly as the primary `sourceFolders` option works. Files that are outside every listed `sourceRoot` remain without a namespace (existing behaviour).
+
+For simpler single-root projects you can still use `namespacePrefix` together with Babel's `sourceRoot`:
+
+```json
+{
+    "sourceRoot": "src/",
     "plugins": [
         ["transform-modules-ui5", {
             "namespacePrefix": "my.app"
@@ -480,6 +574,19 @@ If the default file-based namespace does not work for you (perhaps the app name 
 ##### JSDoc
 
 The simplest way to override the names is to use JSDoc. This approach will also work well with classes output from TypeScript if you configure TypeScript to generate ES6 or higher, and don't enable `removeComments``.
+
+The recognized class-info JSDoc tags are (all matching is **case-insensitive**, so `@nonui5` and `@nonUI5` are equivalent):
+
+| Tag | Kind | Effect |
+|---|---|---|
+| `@alias my.app.ClassName` | value | Full FQN replacement — highest precedence (overrides `@name`, `@namespace`, and the file path). |
+| `@name my.app.ClassName` | value | Full FQN replacement — overrides `@namespace` and the file path. |
+| `@namespace my.app` | value | Overrides the file-path-derived namespace; class name is still appended. |
+| `@nonUI5` | flag | Opts this class out of UI5 conversion entirely. |
+| `@controller` | flag | Marks this class as a controller (used with `moveControllerPropsToOnInit`). |
+| `@keepConstructor` | flag | Prevents the constructor from being moved to `onInit` when `moveControllerConstructorToOnInit` is enabled. |
+
+You can set the `@name`/`@alias` directly or just the `@namespace` and have the name derived from the ES class name.
 
 ###### `@alias` — recommended for named extend-classes
 
@@ -538,7 +645,7 @@ const AController = SAPController.extend("my.app.AController", {
 
 ##### Decorators
 
-Alternatively, you can use decorators to override the namespace or name used. Pass the value as a string literal argument to the decorator function.
+Alternatively, you can use decorators to override the namespace or name used. The decorators `@alias`, `@name`, `@namespace`, and `@nonUI5` work the same as their JSDoc counterparts, but instead of a space you pass the string literal to the decorator function. Note that `@controller` and `@keepConstructor` are **JSDoc-only** and have no decorator equivalent.
 
 NOTE that using a variable is currently not supported.
 
@@ -550,10 +657,6 @@ class AController extends SAPController {
 ```
 
 > :information_source: Use `@name('my.app.AController')` when the class has no local name (anonymous class expression). Use `@namespace('my.app')` to supply only the namespace prefix and have the class name derived automatically.
-
-### Don't convert class
-
-If you have a class which extends from an import that you don't want to convert to .extend(..) syntax, you can add the `@nonui5` (case insensitive) jsdoc or decorator to it. Also see Options below for overriding the default behaviour.
 
 ### Class Properties
 
@@ -628,7 +731,7 @@ const Controller = SAPController.extend("...", {
 
 The default class property behaviour of babel is to move the property into the constructor. This plugin has a `moveControllerPropsToOnInit` option that moves them to the `onInit` function rather than the `constructor`. This is useful since the `onInit` method is called after the view's controls have been created (but not yet rendered).
 
-When that property is enabled, any class with 'Controller' in the name or namespace, or having the JSDoc `@controller` will be treated as a controller.
+When that property is enabled, any class treated as a controller will use `onInit` instead of `constructor` for class-property initialisation. A class is treated as a controller when any of the following is true: its **name contains "Controller"**, it has the **`@controller`** JSDoc tag, its **filename ends with `.controller.(js|ts)`**, or its **direct superclass is imported from `sap/ui/core/mvc/Controller` or `sap/ui/core/mvc/ControllerExtension`**.
 
 This is mostly beneficial for TypeScript projects that want easy access to controls without always casting them. In typescript, the `byId(..)` method of a controller returns a `Control` instance. Rather than continually casting that to the controller type such as `sap.m.Input`, it can be useful to use a class property.
 
@@ -804,7 +907,7 @@ class MyController extends Controller {
 
 Since class properties are an early ES proposal, TypeScript's compiler (like babel's class properties transform) moves static properties outside the class definition, and moves instance properties inside the constructor (even if TypeScript is configured to output ESNext).
 
-To support this, the plugin will also search for static properties outside the class definition. It does not currently search in the constructor (but will in the future) so be sure to define renderer and metadata as static props if TypeScript is used.
+To support this, the plugin will also search for static properties outside the class definition. It does not search for them in the constructor, so be sure to define renderer and metadata as static props if TypeScript is used.
 
 ```ts
 /** TypeScript **/
@@ -831,7 +934,7 @@ const MyControl = SAPClass.extend('MyControl', {
 });
 ```
 
-**CAUTION** The plugin does not currently search for 'metadata' or 'renderer' properties inside the constructor. So don't apply Babel's class property transform plugin before this one if you have metadata/renderer as instance properties (static properties are safe).
+**CAUTION** The plugin does not search for `metadata` or `renderer` properties inside the constructor. So don't apply Babel's class property transform plugin before this one if you have metadata/renderer as instance properties (static properties are safe).
 
 ### Comments
 
@@ -859,74 +962,61 @@ In general, comments are preserved, but for each class property/method whose pos
 
 ### Imports
 
-- `noImportInteropPrefixes` (Default `['sap/']`) A list of import path prefixes which never need an import inter-opt.
-- `modulesMap` (Default {}) Mapping for an import's path. Accepts object or function.
+| Option | Default | Description |
+|---|---|---|
+| `noImportInteropPrefixes` | `['sap/']` | A list of import path prefixes which never need an import interop. |
+| `libs` | `['.*']` | A list of regular-expression patterns (as strings). Only import sources matching at least one pattern are converted into `sap.ui.define` dependencies; non-matching imports are stripped from the dependency list and placed before the define wrapper. The default `'.*'` matches every import, preserving existing behaviour. |
+| `modulesMap` | `{}` | Mapping for an import's path. Accepts an object or a function. |
+| `suppressImportResolutionHints` | `false` | When a dependency's `.js` file extension is stripped because the import resolves to a local file, a hint is logged to the console. Set to `true` to silence those hints (e.g. to keep build output clean). |
 
 ### Exports
 
-- `allowUnsafeMixedExports` (Default: false) No errors for unsafe mixed exports (mix of named and default export where named cannot be collapsed\*)
-- `noExportCollapse` (Default: false) Skip collapsing\* named exports to the default export.
-- `noExportExtend` (Default: false) Skips assigning named exports to the default export.
-- `exportAllGlobal` (Default: false) Adds the export flag to all sap.ui.define files.
+| Option | Default | Description |
+|---|---|---|
+| `allowUnsafeMixedExports` | `false` | No errors for unsafe mixed exports (mix of named and default export where named cannot be collapsed\*). |
+| `noExportCollapse` | `false` | Skip collapsing\* named exports to the default export. |
+| `noExportExtend` | `false` | Skip assigning named exports to the default export. |
+| `exportAllGlobal` | `false` | Adds the export flag to all `sap.ui.define` files. |
 
 ### Wrapping
 
-- `noWrapBeforeImport` (Default: false) Does not wrap code before the first import (if there are imports).
-- `noWrapQUnitConfigAutostart` (Default: true) Does not wrap the `QUnit.config.autostart` in the `sap.ui.require` or `sap.ui.define` block.
+| Option | Default | Description |
+|---|---|---|
+| `noWrapBeforeImport` | `false` | Does not wrap code before the first import (if there are imports). |
+| `noWrapQUnitConfigAutostart` | `true` | Does not wrap `QUnit.config.autostart` inside the `sap.ui.require` or `sap.ui.define` block. |
+| `neverUseStrict` | `false` | Disables the addition of the `"use strict";` directive to the program or `sap.ui.define` callback function. |
 
 ### Class Conversion
 
-- `namespacePrefix` (Default: '') Prefix to apply to namespace derived from directory.
-- `autoConvertAllExtendClasses` (Default false). Converts all classes by default, provided they extend from an imported class. Version 6 default behaviour.
-- `autoConvertControllerClass` (Default true). Converts the classes in a `.controller.js` (or .ts) file by default, if it extends from an imported class. 
-  Use `@nonui5` if there are multiple classes in a controller file which extend from an import.
-- `neverConvertClass` (Default: false) Never convert classes to SAPClass.extend() syntax.
-- `moveControllerPropsToOnInit` (Default: false) Moves class props in a controller to the onInit method instead of constructor.
-- `moveControllerConstructorToOnInit` (Default: false) Moves existing constructor code in a controller to the onInit method. Enabling will auto-enable `moveControllerPropsToOnInit`.
-- `addControllerStaticPropsToExtend` (Default: false) Moves static props of a controller to the extends call. Useful for formatters.
-- `onlyMoveClassPropsUsingThis` (Default: false) Set to use old behavior where only instance class props referencing `this` would be moved to the constructor or onInit. New default is to always move instance props.
-- `overridesToOverride` (Default: false) Changes the name of the static overrides to override when being added to ControllerExtension.extend() allowing to use the new overrides keyword with older UI5 versions
-- `neverUseStrict` (Default: false) Disables the addition of the `"use strict";` directive to the program or `sap.ui.define` callback function.
+| Option | Default | Description |
+|---|---|---|
+| `sourceFolders` | `{}` | Maps source-folder names to namespace prefixes. The file's leading folder segment (relative to `sourceRoot` / cwd) is looked up in this map; the folder is stripped from the namespace path and the mapped value becomes the prefix. Files whose leading folder is **not** in the map get an empty namespace and will not be auto-converted. Example: `{ "src": "my.lib", "test": "my.lib.test" }`. |
+| `dependencies` | `[]` | Array of `{ sourceRoot, sourceFolders?, namespacePrefix? }` entries describing dependency projects whose files live outside the primary `sourceRoot` (e.g. npm-workspace symlinks). The plugin iterates this array for out-of-root files and derives the namespace from the first matching entry. `sourceFolders` works exactly like the top-level option. When `sourceFolders` is absent, `namespacePrefix` is used as a flat prefix for all files in that dep — if neither is set, files in that dep get no namespace and will not be auto-converted. Example: `[{ "sourceRoot": "../my-lib", "sourceFolders": { "src": "my.lib" } }]`. |
+| `namespacePrefix` | `''` | Prefix prepended to the namespace derived from the file path. When `sourceFolders` is set, this is used only as a fallback for files not matched by `sourceFolders`. |
+| `autoConvertAllExtendClasses` | `false` | Converts all classes that extend an imported class. Version 6 default behaviour. |
+| `autoConvertUI5FileTypes` | `true` | Converts classes in files whose name ends with a recognised UI5 file-type suffix (`.controller.(js\|ts)`, `.view.(js\|ts\|jsx\|tsx)`), provided the class extends an imported class and has a resolvable namespace. |
+| `autoConvertControllerClass` | `true` | Set to `false` to suppress auto-conversion for `.controller.*` files even when `autoConvertUI5FileTypes` is enabled. |
+| `autoConvertViewClass` | `true` | Set to `false` to suppress auto-conversion for `.view.*` files even when `autoConvertUI5FileTypes` is enabled. |
+| `autoConvertKnownUI5Classes` | `true` | Converts classes that extend a UI5 base class from a known module path (e.g. `sap/ui/core/mvc/Controller`, `sap/ui/core/Control`, `sap/ui/base/ManagedObject` — see the full list in `src/classes/visitor.js`), without requiring an explicit `@alias` or `@namespace`, provided the class has a resolvable namespace. Transitive inheritance is resolved across files. |
+| `additionalUI5Classes` | `[]` | Extra module paths treated as known UI5 base classes, on top of the built-in list. Works independently of `autoConvertKnownUI5Classes`. Transitive resolution applies. Example: `["my/app/BaseController"]`. |
+| `neverConvertClass` | `false` | Never convert classes to `.extend()` syntax. |
+| `moveControllerPropsToOnInit` | `false` | Moves class properties in a controller to `onInit` instead of `constructor`. |
+| `moveControllerConstructorToOnInit` | `false` | Moves existing constructor code in a controller to `onInit`. Enabling this also enables `moveControllerPropsToOnInit`. Use the `@keepConstructor` JSDoc tag on a specific class to opt out. |
+| `addControllerStaticPropsToExtend` | `false` | Moves static props of a controller into the `.extend()` call. Useful for formatters. |
+| `onlyMoveClassPropsUsingThis` | `false` | Old behaviour: only move instance class props that reference `this`. New default moves all instance props. |
+| `overridesToOverride` | `false` | Renames the static `overrides` property to `override` inside `ControllerExtension.extend()`, enabling the `overrides` keyword with older UI5 versions. |
 
 \* 'collapsing' named exports is a combination of simply ignoring them if their definition is the same as a property on the default export, and also assigning them to the default export.
 
-\*\* This plugin also makes use of babel's standard `sourceRoot` option.
-
-TODO: more options and better description.
-
-## Other Similar Plugins
-
-[sergiirocks babel-plugin-transform-ui5](https://github.com/sergiirocks/babel-plugin-transform-ui5) is a great choice if you use webpack. It allows you to configure which import paths to convert to sap.ui.define syntax and leaves the rest as ES2015 import statements, which allows webpack to load them in. This plugin will have that functionality soon. Otherwise this plugin handles more edge cases with named exports, class conversion, and typescript output support.
+> **Note:** The plugin also makes use of Babel's standard `sourceRoot` option for file-path-based namespace computation (see [File based namespace](#file-based-namespace-default) above).
 
 ## Example
 
 [openui5-master-detail-app-ts](https://github.com/r-murphy/openui5-masterdetail-app-ts), which is a fork of SAP's openui5-master-detail-app converted to TypeScript.
 
-## Building with Webpack
-
-Take a look at [ui5-loader](https://github.com/MagicCube/ui5-loader) (we have not tried this).
-
-## Modularization / Preload
-
-UI5 supports Modularization through a mechanism called `preload`, which can compile many JavaScript and xml files into just one preload file.
-
-Some preload plugins:
-
-- Module/CLI: [openui5-preload](https://github.com/r-murphy/openui5-preload) (also created by Ryan Murphy)
-- Gulp: [gulp-ui5-lib](https://github.com/MagicCube/gulp-ui5-lib) (MagicCube)
-- Grunt: [grunt-openui5](https://github.com/SAP/grunt-openui5) (Official SAP)
-
 ## Credits
 
 - Thanks to MagicCube for the upstream initial work and to [Ryan Murphy](https://github.com/r-murphy) for continuing development and handing over the project to the UI5 community.
-
-## TODO
-
-- libs support, like sergiirocks'
-- See if we can export a live binding (getter?)
-- Configuration options
-  - Export interop control
-  - Others..
 
 ## Contribute
 
@@ -947,4 +1037,4 @@ This installs all dependencies (including lifecycle scripts needed by some packa
 
 ## License
 
-MIT © 2019-2024 Ryan Murphy, UI5 community and contributors
+MIT © 2019-2026 Ryan Murphy, UI5 community and contributors

@@ -7,7 +7,7 @@ import * as ast from "../../utils/ast";
 
 import { getJsDocClassInfo, getTags } from "./jsdoc";
 import { getDecoratorClassInfo } from "./decorators";
-import { getImportDeclaration } from "./imports";
+import { getImportDeclaration, deriveNamespaceForFile } from "./imports";
 
 /**
  * Converts an ES6 class to a UI5 extend.
@@ -480,17 +480,7 @@ function getFileBaseNamespace(path, pluginOpts) {
   const sourceRoot = opts.sourceRoot
     ? Path.resolve(process.cwd(), opts.sourceRoot)
     : process.cwd();
-  if (filename.startsWith(sourceRoot)) {
-    const filenameRelative = Path.relative(sourceRoot, filename);
-    const { dir } = Path.parse(filenameRelative);
-    const namespaceParts = dir.split(Path.sep);
-    if (pluginOpts.namespacePrefix) {
-      namespaceParts.unshift(pluginOpts.namespacePrefix);
-    }
-    return namespaceParts.join(".");
-  } else {
-    return undefined;
-  }
+  return deriveNamespaceForFile(filename, sourceRoot, pluginOpts);
 }
 
 const getQualifiedName = (node) => {

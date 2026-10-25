@@ -26,6 +26,18 @@ exports[`classes class-computed-prop.js 1`] = `
 });"
 `;
 
+exports[`classes class-convert-additional-ui5-classes.js 1`] = `
+"sap.ui.define(["my/app/BaseController"], function (__BaseController) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const BaseController = _interopRequireDefault(__BaseController);
+  const MyController = BaseController.extend("fixtures.classes.MyController", {});
+});"
+`;
+
 exports[`classes class-convert-all.js 1`] = `
 "sap.ui.define(["sap/class"], function (SAPClass) {
   "use strict";
@@ -173,6 +185,19 @@ exports[`classes class-convert-controller-basic.controller.js 1`] = `
   "use strict";
 
   const MyController = SAPController.extend("fixtures.classes.MyController", {});
+});"
+`;
+
+exports[`classes class-convert-controller-detect-by-filename.controller.js 1`] = `
+"sap.ui.define(["sap/ui/core/Controller"], function (SAPController) {
+  "use strict";
+
+  const AppPage = SAPController.extend("fixtures.classes.AppPage", {
+    onInit: function _onInit() {
+      this.ref = this.byId("ref");
+    }
+  });
+  return AppPage;
 });"
 `;
 
@@ -335,6 +360,66 @@ exports[`classes class-convert-dec-nonui5.js 1`] = `
 });"
 `;
 
+exports[`classes class-convert-dependencies dep-lib other controller DepUnmappedApp.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  class DepUnmappedApp extends Controller {}
+});"
+`;
+
+exports[`classes class-convert-dependencies dep-lib src base DepBase.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  const DepBase = Controller.extend("my.dep.base.DepBase", {});
+});"
+`;
+
+exports[`classes class-convert-dependencies dep-lib src controller DepMappedApp.controller.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  const DepMappedApp = Controller.extend("my.dep.controller.DepMappedApp", {});
+});"
+`;
+
+exports[`classes class-convert-dependencies primary src app PrimaryExtendsDepBase.js 1`] = `
+"sap.ui.define(["../../../dep-lib/src/base/DepBase"], function (__DepBase) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const DepBase = _interopRequireDefault(__DepBase);
+  const PrimaryExtendsDepBase = DepBase.extend("my.app.app.PrimaryExtendsDepBase", {});
+});"
+`;
+
+exports[`classes class-convert-dependencies primary src app PrimaryExtendsDepBaseModulePath.js 1`] = `
+"sap.ui.define(["my/dep/base/DepBase"], function (__DepBase) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const DepBase = _interopRequireDefault(__DepBase);
+  const PrimaryExtendsDepBaseModulePath = DepBase.extend("my.app.app.PrimaryExtendsDepBaseModulePath", {});
+});"
+`;
+
+exports[`classes class-convert-dependencies primary src app PrimaryExtendsDepBaseUnmapped.js 1`] = `
+"sap.ui.define(["my/dep/other/DepBaseUnmapped"], function (__DepBase) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const DepBase = _interopRequireDefault(__DepBase);
+  class PrimaryExtendsDepBaseUnmapped extends DepBase {}
+});"
+`;
+
 exports[`classes class-convert-extend-managed.js 1`] = `
 "sap.ui.define(["sap/ui/core/SAPClass", "./Relative"], function (SAPClass, __Relative) {
   "use strict";
@@ -475,6 +560,44 @@ exports[`classes class-convert-jsdoc-nonui5.js 1`] = `
 
   class MyClass extends SAPClass {}
   return MyClass;
+});"
+`;
+
+exports[`classes class-convert-known-ui5-classes.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller", "sap/ui/base/ManagedObject", "sap/ui/core/Control"], function (Controller, ManagedObject, Control) {
+  "use strict";
+
+  const MyController = Controller.extend("fixtures.classes.MyController", {});
+  const MyModel = ManagedObject.extend("fixtures.classes.MyModel", {});
+  const MyControl = Control.extend("fixtures.classes.MyControl", {});
+});"
+`;
+
+exports[`classes class-convert-known-ui5-classes-disabled.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller", "sap/ui/core/Control"], function (Controller, Control) {
+  "use strict";
+
+  class MyController extends Controller {}
+  class MyControl extends Control {}
+});"
+`;
+
+exports[`classes class-convert-known-ui5-classes-named-import.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/ControllerExtension", "sap/ui/base/ManagedObject"], function (sap_ui_core_mvc_ControllerExtension, sap_ui_base_ManagedObject) {
+  "use strict";
+
+  const ControllerExtension = sap_ui_core_mvc_ControllerExtension["ControllerExtension"];
+  const MO = sap_ui_base_ManagedObject["ManagedObject"];
+  const MyExtension = ControllerExtension.extend("my.app.fixtures.classes.MyExtension", {});
+  const MyModel = MO.extend("my.app.fixtures.classes.MyModel", {});
+});"
+`;
+
+exports[`classes class-convert-known-ui5-classes-no-namespace MyController.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  class MyController extends Controller {}
 });"
 `;
 
@@ -624,6 +747,538 @@ exports[`classes class-convert-options-namedonly.js 1`] = `
 });"
 `;
 
+exports[`classes class-convert-source-folders src controller SourceFolderApp.controller.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  const SourceFolderApp = Controller.extend("my.app.controller.SourceFolderApp", {});
+});"
+`;
+
+exports[`classes class-convert-source-folders-empty-mapping src controller EmptyPrefixApp.js 1`] = `
+"sap.ui.define(["./EmptyPrefixBase"], function (__EmptyPrefixBase) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const EmptyPrefixBase = _interopRequireDefault(__EmptyPrefixBase);
+  const EmptyPrefixApp = EmptyPrefixBase.extend("controller.EmptyPrefixApp", {});
+});"
+`;
+
+exports[`classes class-convert-source-folders-empty-mapping src controller EmptyPrefixBase.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  const EmptyPrefixBase = Controller.extend("controller.EmptyPrefixBase", {});
+});"
+`;
+
+exports[`classes class-convert-source-folders-unmatched other controller UnmatchedFolderApp.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  class UnmatchedFolderApp extends Controller {}
+});"
+`;
+
+exports[`classes class-convert-transitive-controller-flag BaseController.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  const AppBase = Controller.extend("fixtures.classes.class-convert-transitive-controller-flag.AppBase", {
+    onInit: function _onInit() {}
+  });
+});"
+`;
+
+exports[`classes class-convert-transitive-controller-flag MyController.js 1`] = `
+"sap.ui.define(["./BaseController"], function (__AppBase) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const AppBase = _interopRequireDefault(__AppBase);
+  const MyView = AppBase.extend("fixtures.classes.class-convert-transitive-controller-flag.MyView", {
+    onInit: function onInit() {
+      this.value = 42;
+      if (typeof AppBase.prototype.onInit === 'function') {
+        AppBase.prototype.onInit.apply(this, arguments);
+      }
+    }
+  });
+});"
+`;
+
+exports[`classes class-convert-transitive-default-alias-collision MixedModule.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller", "./NativePlatform"], function (Controller, __NativePlatform) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const NativePlatform = _interopRequireDefault(__NativePlatform);
+  const Helper = Controller.extend("fixtures.classes.class-convert-transitive-default-alias-collision.Helper", {});
+  class AppBase extends NativePlatform {}
+  return AppBase;
+});"
+`;
+
+exports[`classes class-convert-transitive-default-alias-collision NativePlatform.js 1`] = `
+"sap.ui.define([], function () {
+  "use strict";
+
+  class NativePlatform {}
+  return NativePlatform;
+});"
+`;
+
+exports[`classes class-convert-transitive-default-alias-collision ZChild.js 1`] = `
+"sap.ui.define(["./MixedModule"], function (__Helper) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const Helper = _interopRequireDefault(__Helper);
+  class ZChild extends Helper {}
+  return ZChild;
+});"
+`;
+
+exports[`classes class-convert-transitive-default-export-nonui5 NativeBase.js 1`] = `
+"sap.ui.define([], function () {
+  "use strict";
+
+  class NativeBase {}
+  return NativeBase;
+});"
+`;
+
+exports[`classes class-convert-transitive-default-export-nonui5 UIBase.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller", "./NativeBase"], function (Controller, __NativeBase) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const NativeBase = _interopRequireDefault(__NativeBase);
+  const Helper = Controller.extend("fixtures.classes.class-convert-transitive-default-export-nonui5.Helper", {});
+  class UIBase extends NativeBase {}
+  return UIBase;
+});"
+`;
+
+exports[`classes class-convert-transitive-default-export-nonui5 ZChild.js 1`] = `
+"sap.ui.define(["./UIBase"], function (__UIBase) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const UIBase = _interopRequireDefault(__UIBase);
+  class ZChild extends UIBase {}
+  return ZChild;
+});"
+`;
+
+exports[`classes class-convert-transitive-explicit-ext BaseController.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  const BaseController = Controller.extend("fixtures.classes.class-convert-transitive-explicit-ext.BaseController", {});
+});"
+`;
+
+exports[`classes class-convert-transitive-explicit-ext MyController.js 1`] = `
+"sap.ui.define(["./BaseController"], function (__BaseController) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const BaseController = _interopRequireDefault(__BaseController);
+  const MyController = BaseController.extend("fixtures.classes.class-convert-transitive-explicit-ext.MyController", {});
+});"
+`;
+
+exports[`classes class-convert-transitive-identifier-default-export ActualBase.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  const ActualBase = Controller.extend("fixtures.classes.class-convert-transitive-identifier-default-export.ActualBase", {});
+  return ActualBase;
+});"
+`;
+
+exports[`classes class-convert-transitive-identifier-default-export MyController.js 1`] = `
+"sap.ui.define(["./ActualBase"], function (__Base) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const Base = _interopRequireDefault(__Base);
+  const MyController = Base.extend("fixtures.classes.class-convert-transitive-identifier-default-export.MyController", {});
+});"
+`;
+
+exports[`classes class-convert-transitive-named-export-default BaseController.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  const Base = Controller.extend("fixtures.classes.class-convert-transitive-named-export-default.Base", {});
+  return Base;
+});"
+`;
+
+exports[`classes class-convert-transitive-named-export-default BaseControllerSpecifier.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  const UIBase = Controller.extend("fixtures.classes.class-convert-transitive-named-export-default.UIBase", {});
+  var __exports = {
+    __esModule: true
+  };
+  __exports.default = UIBase;
+  return __exports;
+});"
+`;
+
+exports[`classes class-convert-transitive-named-export-default MyController.js 1`] = `
+"sap.ui.define(["./BaseController"], function (__Base) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const Base = _interopRequireDefault(__Base);
+  const MyController = Base.extend("fixtures.classes.class-convert-transitive-named-export-default.MyController", {});
+  return MyController;
+});"
+`;
+
+exports[`classes class-convert-transitive-named-export-default MyControllerSpecifier.js 1`] = `
+"sap.ui.define(["./BaseControllerSpecifier"], function (__Base) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const Base = _interopRequireDefault(__Base);
+  const MyControllerSpecifier = Base.extend("fixtures.classes.class-convert-transitive-named-export-default.MyControllerSpecifier", {});
+  return MyControllerSpecifier;
+});"
+`;
+
+exports[`classes class-convert-transitive-named-import-alias BaseController.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  const BaseController = Controller.extend("fixtures.classes.class-convert-transitive-named-import-alias.BaseController", {});
+});"
+`;
+
+exports[`classes class-convert-transitive-named-import-alias MyController.js 1`] = `
+"sap.ui.define(["./BaseController"], function (___BaseController) {
+  "use strict";
+
+  const Base = ___BaseController["BaseController"];
+  const MyController = Base.extend("fixtures.classes.class-convert-transitive-named-import-alias.MyController", {});
+});"
+`;
+
+exports[`classes class-convert-transitive-no-ns-mid other LocalMid.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  class LocalMid extends Controller {}
+  return LocalMid;
+});"
+`;
+
+exports[`classes class-convert-transitive-no-ns-mid src MyApp.js 1`] = `
+"sap.ui.define(["../other/LocalMid"], function (__LocalMid) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const LocalMid = _interopRequireDefault(__LocalMid);
+  class MyApp extends LocalMid {}
+  return MyApp;
+});"
+`;
+
+exports[`classes class-convert-transitive-no-super-default-collision MixedModule.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  const Helper = Controller.extend("fixtures.classes.class-convert-transitive-no-super-default-collision.Helper", {});
+  class AppBase {}
+  return AppBase;
+});"
+`;
+
+exports[`classes class-convert-transitive-no-super-default-collision MixedModuleFunction.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  const Helper = Controller.extend("fixtures.classes.class-convert-transitive-no-super-default-collision.Helper", {});
+  function NativeBase() {}
+  return NativeBase;
+});"
+`;
+
+exports[`classes class-convert-transitive-no-super-default-collision MixedModuleSpecifier.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  const Helper = Controller.extend("fixtures.classes.class-convert-transitive-no-super-default-collision.Helper", {});
+  class AppBase {}
+  var __exports = {
+    __esModule: true
+  };
+  __exports.default = AppBase;
+  return __exports;
+});"
+`;
+
+exports[`classes class-convert-transitive-no-super-default-collision ZChild.js 1`] = `
+"sap.ui.define(["./MixedModule"], function (__Helper) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const Helper = _interopRequireDefault(__Helper);
+  class ZChild extends Helper {}
+  return ZChild;
+});"
+`;
+
+exports[`classes class-convert-transitive-no-super-default-collision ZChildFunction.js 1`] = `
+"sap.ui.define(["./MixedModuleFunction"], function (__Helper) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const Helper = _interopRequireDefault(__Helper);
+  class ZChildFunction extends Helper {}
+  return ZChildFunction;
+});"
+`;
+
+exports[`classes class-convert-transitive-no-super-default-collision ZChildSpecifier.js 1`] = `
+"sap.ui.define(["./MixedModuleSpecifier"], function (__Helper) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const Helper = _interopRequireDefault(__Helper);
+  class ZChildSpecifier extends Helper {}
+  return ZChildSpecifier;
+});"
+`;
+
+exports[`classes class-convert-transitive-no-super-default-mid GrandChild.js 1`] = `
+"sap.ui.define(["./ZChild"], function (__ZChild) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const ZChild = _interopRequireDefault(__ZChild);
+  class GrandChild extends ZChild {}
+  return GrandChild;
+});"
+`;
+
+exports[`classes class-convert-transitive-no-super-default-mid MixedMid.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  const Helper = Controller.extend("my.app.fixtures.classes.class-convert-transitive-no-super-default-mid.Helper", {});
+  class AppBase {}
+  return AppBase;
+});"
+`;
+
+exports[`classes class-convert-transitive-no-super-default-mid ZChild.js 1`] = `
+"sap.ui.define(["./MixedMid"], function (__Helper) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const Helper = _interopRequireDefault(__Helper);
+  class ZChild extends Helper {}
+  return ZChild;
+});"
+`;
+
+exports[`classes class-convert-transitive-renamed-import ActualBase.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  const ActualBase = Controller.extend("fixtures.classes.class-convert-transitive-renamed-import.ActualBase", {});
+  return ActualBase;
+});"
+`;
+
+exports[`classes class-convert-transitive-renamed-import MyController.js 1`] = `
+"sap.ui.define(["./ActualBase"], function (__Base) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const Base = _interopRequireDefault(__Base);
+  const MyController = Base.extend("fixtures.classes.class-convert-transitive-renamed-import.MyController", {});
+});"
+`;
+
+exports[`classes class-convert-transitive-reverse-order AChild.js 1`] = `
+"sap.ui.define(["./ZBase"], function (__ZBase) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const ZBase = _interopRequireDefault(__ZBase);
+  const AChild = ZBase.extend("fixtures.classes.class-convert-transitive-reverse-order.AChild", {});
+  return AChild;
+});"
+`;
+
+exports[`classes class-convert-transitive-reverse-order ZBase.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  const ZBase = Controller.extend("fixtures.classes.class-convert-transitive-reverse-order.ZBase", {});
+  return ZBase;
+});"
+`;
+
+exports[`classes class-convert-transitive-sibling-sourceroot app SiblingSourcerootApp.js 1`] = `
+"sap.ui.define(["../../class-convert-transitive-sibling-sourceroot-legacy/Base"], function (__Base) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const Base = _interopRequireDefault(__Base);
+  class SiblingSourcerootApp extends Base {}
+  return SiblingSourcerootApp;
+});"
+`;
+
+exports[`classes class-convert-transitive-sibling-sourceroot-legacy Base.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  const Base = Controller.extend("fixtures.classes.class-convert-transitive-sibling-sourceroot-legacy.Base", {});
+  return Base;
+});"
+`;
+
+exports[`classes class-convert-transitive-ts-ancestor BaseController.ts 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  const BaseController = Controller.extend("fixtures.classes.class-convert-transitive-ts-ancestor.BaseController", {
+    init: function _init() {
+      const input = "test";
+      const value = input;
+      return value;
+    }
+  });
+  return BaseController;
+});"
+`;
+
+exports[`classes class-convert-transitive-ts-ancestor MyController.js 1`] = `
+"sap.ui.define(["./BaseController"], function (__BaseController) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const BaseController = _interopRequireDefault(__BaseController);
+  const MyController = BaseController.extend("fixtures.classes.class-convert-transitive-ts-ancestor.MyController", {});
+});"
+`;
+
+exports[`classes class-convert-transitive-ui5-classes BaseController.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  const BaseController = Controller.extend("fixtures.classes.class-convert-transitive-ui5-classes.BaseController", {});
+});"
+`;
+
+exports[`classes class-convert-transitive-ui5-classes MyController.js 1`] = `
+"sap.ui.define(["./BaseController"], function (__BaseController) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const BaseController = _interopRequireDefault(__BaseController);
+  const MyController = BaseController.extend("fixtures.classes.class-convert-transitive-ui5-classes.MyController", {});
+});"
+`;
+
+exports[`classes class-convert-view-basic.view.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/JSView"], function (SAPView) {
+  "use strict";
+
+  const MyView = SAPView.extend("fixtures.classes.MyView", {});
+});"
+`;
+
+exports[`classes class-convert-view-basic.view.jsx 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/JSView", "sap/m/Button"], function (JSView, Button) {
+  "use strict";
+
+  const MyView = JSView.extend("fixtures.classes.MyView", {
+    getControllerName: function _getControllerName() {
+      return "fixtures.classes.MyView";
+    },
+    createContent: function _createContent(oController) {
+      return <Button text="Press me" press={oController.onPress} />;
+    }
+  });
+});"
+`;
+
+exports[`classes class-convert-view-basic.view.ts 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/JSView"], function (SAPView) {
+  "use strict";
+
+  const MyView = SAPView.extend("fixtures.classes.MyView", {});
+});"
+`;
+
+exports[`classes class-convert-view-basic.view.tsx 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/JSView", "sap/m/Button"], function (JSView, Button) {
+  "use strict";
+
+  const MyView = JSView.extend("fixtures.classes.MyView", {
+    getControllerName: function _getControllerName() {
+      return "fixtures.classes.MyView";
+    },
+    createContent: function _createContent(oController) {
+      return <Button text="Press me" press={oController.onPress} />;
+    }
+  });
+});"
+`;
+
 exports[`classes class-convert-with-existing-define-defer-return.js 1`] = `
 "sap.ui.define(["sap/SAPClass"], SAPClass => {
   const MyClass = SAPClass.extend("com.app.MyClass", {
@@ -687,6 +1342,36 @@ exports[`classes class-import-meta.js 1`] = `
     }
   });
   return MyClass;
+});"
+`;
+
+exports[`classes class-no-convert-controller-opt-out.controller.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  class AppPage extends Controller {
+    onInit() {}
+  }
+  return AppPage;
+});"
+`;
+
+exports[`classes class-no-convert-file-types-opt-out.controller.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/Controller"], function (Controller) {
+  "use strict";
+
+  class AppPage extends Controller {
+    onInit() {}
+  }
+  return AppPage;
+});"
+`;
+
+exports[`classes class-no-convert-view-opt-out.view.js 1`] = `
+"sap.ui.define(["sap/ui/core/mvc/JSView"], function (JSView) {
+  "use strict";
+
+  class MyView extends JSView {}
 });"
 `;
 
@@ -835,6 +1520,26 @@ exports[`comments preserve-for-class-members.js 1`] = `
    */
   MyClass.myOtherNumber = 42;
   return MyClass;
+});"
+`;
+
+exports[`decorators bare-value-tag-decorator.js 1`] = `
+"sap.ui.define(["sap/ui/core/Control"], function (Control) {
+  "use strict";
+
+  var _class;
+  let My = alias(_class = class My extends Control {}) || _class;
+  return My;
+});"
+`;
+
+exports[`decorators member-expression-decorator.js 1`] = `
+"sap.ui.define(["sap/ui/core/Control"], function (Control) {
+  "use strict";
+
+  var _dec, _class;
+  let My = (_dec = foo.bar(), _dec(_class = class My extends Control {}) || _class);
+  return My;
 });"
 `;
 
@@ -1099,6 +1804,8 @@ exports[`export-collapse object.assign-variable.js 1`] = `
 exports[`export-error error-assign-var.js 1`] = `"Unsafe mixing of conflicting default and named exports. The following named exports are conflicting: (foo)."`;
 
 exports[`export-error error-assign-var-recurs.js 1`] = `"Unsafe mixing of conflicting default and named exports. The following named exports are conflicting: (foo)."`;
+
+exports[`export-error error-noextend-mixed-exports.js 1`] = `"Unsafe mixing of conflicting default and named exports. The following named exports are conflicting: (b)."`;
 
 exports[`export-error error-obj-method.js 1`] = `"Unsafe mixing of conflicting default and named exports. The following named exports are conflicting: (a)."`;
 
@@ -1467,6 +2174,12 @@ exports[`imports import-multiple.js 1`] = `
 
 exports[`imports import-remove-fileext.js 1`] = `
 "sap.ui.define(["@dummy/chart.js", "chart.js", "comment-parser/es6/index.js", "./_private_/module_js", "./_private_/module_jsx", "./_private_/module_ts", "./_private_/module_tsx", "./_private_/unknown_module.js"], function (___dummy_chartjs, __chartjs, __comment_parser_es6_indexjs, ____private__module_jsjs, ____private__module_jsxjs, ____private__module_tsjs, ____private__module_tsxjs, ____private__unknown_modulejs) {
+  "use strict";
+});"
+`;
+
+exports[`imports import-remove-fileext-suppressed.js 1`] = `
+"sap.ui.define(["./_private_/module_js", "./_private_/module_jsx", "./_private_/module_ts", "./_private_/module_tsx", "./_private_/unknown_module.js"], function (____private__module_jsjs, ____private__module_jsxjs, ____private__module_tsjs, ____private__module_tsxjs, ____private__unknown_modulejs) {
   "use strict";
 });"
 `;

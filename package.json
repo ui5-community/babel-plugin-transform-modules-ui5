@@ -5,6 +5,7 @@
     "node": ">=20.19.0"
   },
   "devDependencies": {
+    "@babel/eslint-parser": "7.29.9",
     "@changesets/changelog-github": "0.7.0",
     "@changesets/cli": "2.31.0",
     "@commitlint/cli": "20.2.0",
