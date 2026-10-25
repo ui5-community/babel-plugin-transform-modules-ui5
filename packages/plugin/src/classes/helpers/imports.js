@@ -724,7 +724,7 @@ export function isLocalChainConvertible(
     const isControllerFile =
       opts.autoConvertUI5FileTypes !== false &&
       opts.autoConvertControllerClass !== false &&
-      /[.]controller[.](js|ts)$/.test(ancestorFile);
+      /[.]controller[.](js|ts)$/.test(Path.basename(ancestorFile));
 
     if (!ancestorNamespace && !isControllerFile) {
       return false;
