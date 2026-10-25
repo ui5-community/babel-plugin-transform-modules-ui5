@@ -139,8 +139,10 @@ export function getPropertiesOfObjectAssignOrExtendHelper(
         // Recursive, although props will be empty if arg is an imported object
         return getOtherPropertiesOfIdentifier(blockScopeNode, arg.name);
       }
+      return []; // e.g. Object.create(null) or other CallExpression args contribute no properties
     })
-    .flat(Infinity);
+    .flat(Infinity)
+    .filter(Boolean);
 }
 
 function getPropKeyName(key) {

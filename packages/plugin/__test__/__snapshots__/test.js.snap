@@ -1952,6 +1952,19 @@ exports[`exports export-default-named-function.js 1`] = `
 });"
 `;
 
+exports[`exports export-default-obj-assign-create-null.ts 1`] = `
+"sap.ui.define([], function () {
+  "use strict";
+
+  const test = Object.assign(Object.create(null), {
+    a: 1
+  });
+  const TEST_CONSTANT = "test";
+  test.TEST_CONSTANT = TEST_CONSTANT;
+  return test;
+});"
+`;
+
 exports[`exports export-multiple.js 1`] = `
 "sap.ui.define([], function () {
   "use strict";
