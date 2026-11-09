@@ -76,6 +76,7 @@ const addImport = (imports, imp, filename, first, opts = {}) => {
     }
     imports[first ? "unshift" : "push"](imp);
   }
+  return existingImport || imp;
 };
 const addModuleImport = (imports, name, filename) => {
   addImport(
@@ -176,6 +177,15 @@ export const ModuleTransformVisitor = {
               LOCAL: specifier.local,
             })
           );
+        } else if (specifier.local.name !== imp.tmpName) {
+          // A previous import or re-export may already have locked the factory
+          // parameter name. Preserve this default import's local alias too.
+          deconstructors.push(
+            th.buildConstDeclaration({
+              NAME: specifier.local,
+              VALUE: t.identifier(imp.tmpName),
+            })
+          );
         }
       } else if (t.isImportNamespaceSpecifier(specifier)) {
         if (specifiers.length === 1 && !imp.locked) {
@@ -249,23 +259,58 @@ export const ModuleTransformVisitor = {
     const { specifiers, declaration, source } = node;
 
     if (this.noWrap) return;
+    if (node.exportKind === "type") return; // TS or Flow-types
 
-    let fromSource = "";
+    let fromImport;
+    let shouldInterop = false;
     if (source) {
-      // e.g. export { one, two } from 'x'
+      // Reuse the actual factory parameter if this dependency was imported
+      // earlier. Lock new records because the export expressions reference it.
       const src = resolveSource(source.value, filename);
       const name = cleanImportSource(src);
       const tmpName = tempModuleName(name);
-      addImport(this.imports, { src, name, tmpName }, filename, false, opts);
-      fromSource = tmpName + ".";
+      fromImport = addImport(
+        this.imports,
+        { src, name, tmpName, deconstructors: [], locked: true },
+        filename,
+        false,
+        opts
+      );
+      fromImport.locked = true;
+      shouldInterop = !this.noImportInteropPrefixesRegexp.test(src);
     }
 
     if (specifiers && specifiers.length) {
       // e.g. export { one, two }
-      for (const specifier of path.node.specifiers) {
+      for (const specifier of specifiers) {
+        if (specifier.exportKind === "type") continue; // TS type-only specifier
+        let value = t.cloneNode(specifier.local);
+        if (fromImport) {
+          const importedName = t.isStringLiteral(specifier.local)
+            ? specifier.local.value
+            : specifier.local.name;
+          const module = t.identifier(fromImport.tmpName);
+          if (importedName === "default") {
+            // Transformed UI5 modules can return the default value directly.
+            // Use exactly the same interop as a normal default import, without
+            // changing the producer's export shape or named export semantics.
+            value = shouldInterop
+              ? t.callExpression(t.identifier("_interopRequireDefault"), [
+                  module,
+                ])
+              : module;
+            if (shouldInterop) fromImport.interop = true;
+          } else {
+            value = t.memberExpression(
+              module,
+              t.cloneNode(specifier.local),
+              t.isStringLiteral(specifier.local)
+            );
+          }
+        }
         this.namedExports.push({
           key: specifier.exported,
-          value: t.identifier(`${fromSource}${specifier.local.name}`),
+          value,
         });
       }
       path.remove();
@@ -352,13 +397,20 @@ export const ModuleTransformVisitor = {
     const name = cleanImportSource(src);
     const tmpName = tempModuleName(name);
 
-    addImport(this.imports, { src, name, tmpName }, filename, false, opts);
+    const imp = addImport(
+      this.imports,
+      { src, name, tmpName, deconstructors: [], locked: true },
+      filename,
+      false,
+      opts
+    );
+    imp.locked = true;
 
     this.exportAllHelper = true;
 
     this.namedExports.push({
       all: true,
-      value: t.identifier(tmpName),
+      value: t.identifier(imp.tmpName),
     });
 
     path.remove();
