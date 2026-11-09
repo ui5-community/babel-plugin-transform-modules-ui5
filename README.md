@@ -184,6 +184,20 @@ export { X as default };
 export let v; v = 'v'; // NOTE that the value here is currently not a live binding (http://2ality.com/2015/07/es6-module-exports.html)
 ```
 
+Default re-exports use the same import interop as default imports:
+
+```js
+export { default as Formatter } from "./Formatter";
+export { default } from "./Formatter";
+```
+
+Both forms work whether the dependency returns its default value directly (as
+transformed UI5 modules commonly do) or an ES module object with `__esModule` and
+`default` properties. Paths covered by `noImportInteropPrefixes` (by default,
+`sap/`) use the dependency value directly, just like a default import. Ordinary
+named re-exports still read the named property; no producer export shape changes
+are required.
+
 Export is a bit trickier if you want your exported module to be imported by code that does not include an import inter-op.
 If the importing code has an inter-op logic inserted by this plugin, then you don't need to worry and can disable the export inter-op features if desired.
 

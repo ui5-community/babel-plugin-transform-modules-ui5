@@ -1949,6 +1949,89 @@ exports[`exports export-default-arrow-function.js 1`] = `
 });"
 `;
 
+exports[`exports export-default-from.js 1`] = `
+"sap.ui.define(["./Formatter"], function (___Formatter) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  var __exports = {
+    __esModule: true
+  };
+  __exports.Formatter = _interopRequireDefault(___Formatter);
+  __exports.default = _interopRequireDefault(___Formatter);
+  return __exports;
+});"
+`;
+
+exports[`exports export-default-from-export-first.js 1`] = `
+"sap.ui.define(["./Formatter"], function (___Formatter) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const Formatter = _interopRequireDefault(___Formatter);
+  var __exports = {
+    __esModule: true
+  };
+  __exports.ReexportedFormatter = _interopRequireDefault(___Formatter);
+  __exports.currency = ___Formatter.currency;
+  __exports.Formatter = Formatter;
+  return __exports;
+});"
+`;
+
+exports[`exports export-default-from-import-first.js 1`] = `
+"sap.ui.define(["./Formatter"], function (__Formatter) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  const Formatter = _interopRequireDefault(__Formatter);
+  var __exports = {
+    __esModule: true
+  };
+  __exports.ReexportedFormatter = _interopRequireDefault(__Formatter);
+  __exports.currency = __Formatter.currency;
+  __exports.Formatter = Formatter;
+  return __exports;
+});"
+`;
+
+exports[`exports export-default-from-no-interop.js 1`] = `
+"sap.ui.define(["sap/m/Button"], function (__sap_m_Button) {
+  "use strict";
+
+  const LocalButton = __sap_m_Button;
+  var __exports = {
+    __esModule: true
+  };
+  __exports.Button = __sap_m_Button;
+  __exports.SecondButton = __sap_m_Button;
+  __exports.LocalButton = LocalButton;
+  return __exports;
+});"
+`;
+
+exports[`exports export-default-from-string-literal.js 1`] = `
+"sap.ui.define(["./Formatter"], function (___Formatter) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  var __exports = {
+    __esModule: true
+  };
+  __exports.Formatter = _interopRequireDefault(___Formatter);
+  __exports.currency = ___Formatter["format-currency"];
+  return __exports;
+});"
+`;
+
 exports[`exports export-default-identifier.js 1`] = `
 "sap.ui.define([], function () {
   "use strict";
@@ -2320,6 +2403,9 @@ exports[`mixed mixed-import-export.js 1`] = `
 "sap.ui.define(["1", "2", "3", "4", "5"], function (__1, __2, __3, __4, __5) {
   "use strict";
 
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
   var __exports = {
     __esModule: true
   };
@@ -2337,8 +2423,8 @@ exports[`mixed mixed-import-export.js 1`] = `
   extendExports(__exports, __1);
   __exports.a = __2.a;
   __exports.b2 = __2.b;
-  __exports.default = __3.default;
-  __exports.default2 = __4.default;
+  __exports.default = _interopRequireDefault(__3);
+  __exports.default2 = _interopRequireDefault(__4);
   __exports.x = __5.v;
   return __exports;
 });"
@@ -3085,6 +3171,22 @@ exports[`typescript ts-re-export.ts 1`] = `
   extendExports(__exports, __module);
   extendExports(__exports, ___having_a_dash);
   extendExports(__exports, __path_having_a_dash);
+  return __exports;
+});"
+`;
+
+exports[`typescript ts-re-export-default.ts 1`] = `
+"sap.ui.define(["./Formatter"], function (___Formatter) {
+  "use strict";
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule && typeof obj.default !== "undefined" ? obj.default : obj;
+  }
+  var __exports = {
+    __esModule: true
+  };
+  __exports.Formatter = _interopRequireDefault(___Formatter);
+  __exports.default = _interopRequireDefault(___Formatter);
   return __exports;
 });"
 `;
