@@ -1,5 +1,12 @@
 # Change Log
 
+## 7.11.1
+
+### Patch Changes
+
+- Updated dependencies [[`99f2963`](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/99f2963f1cbb4bef4e23f60e83620a8ce7610884)]:
+  - babel-plugin-transform-modules-ui5@7.11.1
+
 ## 7.11.0
 
 ### Minor Changes

@@ -1,5 +1,11 @@
 # Change Log
 
+## 7.11.1
+
+### Patch Changes
+
+- [#172](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/pull/172) [`99f2963`](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/commit/99f2963f1cbb4bef4e23f60e83620a8ce7610884) Thanks [@petermuessig](https://github.com/petermuessig)! - Fix default re-exports (`export { default as X } from "./Mod"` and `export { default } from "./Mod"`) to use the same import interop as default imports, including modules that return their default value directly. Preserve dependency aliases when imports and re-exports share a source, regardless of declaration order. Producer export shapes and interop opt-out behavior remain unchanged.
+
 ## 7.11.0
 
 ### Minor Changes
