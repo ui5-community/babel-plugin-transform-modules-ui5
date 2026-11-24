@@ -5,7 +5,7 @@ import plugin from "../src";
 
 function transform(input, options = {}, babelOptions = {}) {
   return transformSync(input, {
-    filename: join(__dirname, "reexport-runtime.js"),
+    filename: join(import.meta.dirname, "reexport-runtime.js"),
     plugins: [[plugin, options]],
     babelrc: false,
     configFile: false,
@@ -308,7 +308,7 @@ describe("default re-export runtime", () => {
       'export { type Formatter, default as Value } from "./Mod";',
       {},
       {
-        filename: join(__dirname, "reexport-runtime.ts"),
+        filename: join(import.meta.dirname, "reexport-runtime.ts"),
         presets: ["@babel/preset-typescript"],
       }
     );
