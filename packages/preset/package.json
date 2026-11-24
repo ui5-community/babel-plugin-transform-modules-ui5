@@ -1,10 +1,16 @@
 {
   "name": "babel-preset-transform-ui5",
   "version": "7.11.1",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./index.js"
+    }
+  },
   "main": "index.js",
   "license": "MIT",
   "engines": {
-    "node": ">=20.19.0"
+    "node": "^22.18.0 || >=24.11.0"
   },
   "repository": {
     "type": "git",
@@ -13,6 +19,9 @@
   },
   "dependencies": {
     "babel-plugin-transform-modules-ui5": "^7.11.1"
+  },
+  "peerDependencies": {
+    "@babel/core": "^8"
   },
   "devDependencies": {
     "prettier": "3.9.0"
@@ -26,7 +35,6 @@
     "sapui5",
     "openui5",
     "babel",
-    "babel7",
     "babeljs",
     "es6",
     "module",
