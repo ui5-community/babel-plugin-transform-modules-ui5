@@ -1,4 +1,4 @@
-import { saveImports } from "./helpers/imports";
+import { saveImports } from "./helpers/imports.js";
 
 // Must be a regular function (not arrow) so Babel's plugin lifecycle sets `this` to the
 // plugin state object, giving access to this.opts (the plugin options).

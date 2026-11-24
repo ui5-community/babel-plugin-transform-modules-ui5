@@ -1,8 +1,8 @@
 import { types as t } from "@babel/core";
 import * as Path from "path";
-import * as th from "../utils/templates";
-import * as ast from "../utils/ast";
-import * as classes from "./helpers/classes";
+import * as th from "../utils/templates.js";
+import * as ast from "../utils/ast.js";
+import * as classes from "./helpers/classes.js";
 import {
   getImportDeclaration,
   saveSuperclassImportSource,
@@ -10,7 +10,7 @@ import {
   recordAdditionalUI5ClassMatch,
   getEffectiveNamespacePrefix,
   isLocalChainConvertible,
-} from "./helpers/imports";
+} from "./helpers/imports.js";
 
 /**
  * Built-in list of UI5 base-class module paths used by autoConvertKnownUI5Classes.
@@ -217,19 +217,9 @@ export const ClassTransformVisitor = {
       if (t.isSuper(callee)) {
         replaceConstructorSuperCall(path, node, this.superClassName);
       } else if (t.isSuper(callee.object)) {
-        replaceObjectSuperCall(
-          path,
-          node,
-          this.superClassName,
-          path.isOptionalCallExpression()
-        );
+        replaceObjectSuperCall(path, node, this.superClassName, node.optional);
       } else if (isSuperApply(callee)) {
-        replaceSuperApplyCall(
-          path,
-          node,
-          this.superClassName,
-          path.isOptionalCallExpression()
-        );
+        replaceSuperApplyCall(path, node, this.superClassName);
       }
     }
   },
@@ -293,17 +283,75 @@ function replaceObjectSuperCall(path, node, superClassName, optional = false) {
 /**
  * Replace super.method.apply() call
  */
-function replaceSuperApplyCall(path, node, superClassName, optional = false) {
+function replaceSuperApplyCall(path, node, superClassName) {
   const methodName = node.callee.object.property.name;
-  const op = optional ? "?." : ".";
+  const optionalMethod =
+    t.isOptionalMemberExpression(node.callee) && node.callee.optional;
+
+  if (optionalMethod) {
+    path.replaceWith(
+      t.optionalCallExpression(
+        createSuperMethodCallee(superClassName, methodName, "apply", true),
+        node.arguments,
+        node.optional
+      )
+    );
+    return;
+  }
+
   path.replaceWith(
-    t.callExpression(
-      t.identifier(`${superClassName}.prototype.${methodName}${op}apply`),
+    createSuperMethodCall(
+      superClassName,
+      methodName,
+      "apply",
+      node.optional,
       node.arguments
     )
   );
 }
 
+function createSuperMethodCall(
+  superClassName,
+  methodName,
+  callMethodName,
+  optional,
+  args
+) {
+  const callee = createSuperMethodCallee(
+    superClassName,
+    methodName,
+    callMethodName
+  );
+  return optional
+    ? t.optionalCallExpression(callee, args, true)
+    : t.callExpression(callee, args);
+}
+
+function createSuperMethodCallee(
+  superClassName,
+  methodName,
+  callMethodName,
+  optionalMethod = false
+) {
+  const superMethod = t.memberExpression(
+    t.memberExpression(t.identifier(superClassName), t.identifier("prototype")),
+    t.identifier(methodName)
+  );
+
+  return optionalMethod
+    ? t.optionalMemberExpression(
+        superMethod,
+        t.identifier(callMethodName),
+        false,
+        true
+      )
+    : t.memberExpression(superMethod, t.identifier(callMethodName));
+}
+
+/*
+ * Replace super.method() and super.method.apply() calls with calls on the
+ * transformed superclass prototype.
+ */
 function replaceSuperNamedCall(
   path,
   node,
@@ -311,20 +359,29 @@ function replaceSuperNamedCall(
   methodName,
   optional = false
 ) {
-  // .call() is better for simple args (or not args) but doesn't work right for spread args
-  // if it gets further transpiled by babel spread args transform (will be .call.apply(...).
   const thisEx = t.thisExpression();
   const hasSpread = node.arguments.some(t.isSpreadElement);
   const caller = hasSpread ? "apply" : "call";
   const callArgs = hasSpread
     ? [thisEx, t.arrayExpression(node.arguments)]
     : [thisEx, ...node.arguments];
-  const op = optional ? "?." : ".";
+  const optionalMethod = optional && t.isSuper(node.callee.object);
+  const callee = createSuperMethodCallee(
+    superClassName,
+    methodName,
+    caller,
+    optionalMethod
+  );
   path.replaceWith(
-    t.callExpression(
-      t.identifier(`${superClassName}.prototype.${methodName}${op}${caller}`),
-      callArgs
-    )
+    optionalMethod
+      ? t.optionalCallExpression(callee, callArgs, false)
+      : createSuperMethodCall(
+          superClassName,
+          methodName,
+          caller,
+          optional,
+          callArgs
+        )
   );
 }
 

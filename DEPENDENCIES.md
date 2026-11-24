@@ -13,21 +13,19 @@ majors we can adopt).
 | --- | --- | --- |
 | `comment-parser` | Parses leading JSDoc blocks on classes to extract plugin markers (`@alias`, `@namespace`, `@nonUI5`, `@controller`, `@keepConstructor`, `@global`). | Replaced `doctrine` in 7.8.x (see [issue #150](https://github.com/ui5-community/babel-plugin-transform-modules-ui5/issues/150)). `doctrine` was unmaintained since 2018 and silently bailed on unknown tags. `comment-parser` is purely structural and never drops tags. |
 
-The plugin also has a `peerDependencies: { "@babel/core": "*" }` —
-consumers bring their own Babel.
+The plugin and preset require `@babel/core@^8.0.0` as a peer
+dependency. Consumers bring their own Babel installation.
 
-## Deliberately held-back majors
+## Babel 8 baseline
 
-These are dependencies whose latest major would force us to drop a
-supported Node.js line. We are pinned to the last release compatible
-with `engines.node: ">=20.19.0"` until we decide to raise the floor:
+Babel 8 requires Node `^22.18.0 || >=24.11.0`. Both public packages
+declare this engine range and the Babel 8 peer requirement, so the
+migration is released as a major version.
 
-| Package | Current | Latest | Why held back |
-| --- | --- | --- | --- |
-| `@commitlint/cli`, `@commitlint/config-conventional` | 20.x | 21.x | v21 requires Node `>=22.12.0`. |
-| `@babel/core` (and the rest of the `@babel/*` family) | 7.29.x | 8.0.x | Babel 8 requires Node `^22.18.0 \|\| >=24.11.0`. Babel 8 is also a meaningful API break for plugin authors; it deserves its own dedicated PR + plugin major even after we move the Node floor. |
-| `eslint`, `@eslint/js` | 9.39.x | 10.x | ESLint 10 calls `ScopeManager#addGlobals()` which `@babel/eslint-parser` 7 does not implement. Lifting requires `@babel/eslint-parser` 8, which requires Babel 8, which requires Node 22+. Linked to the Babel hold. |
-| `eslint-plugin-n` | 17.24.x | 18.x | v18 itself is Node-20-compatible, but only useful in combination with ESLint 10 — bumping it alone gives nothing today. Kept in step with the ESLint major. |
+The Babel migration does not include other toolchain major upgrades.
+ESLint 9 remains compatible with `@babel/eslint-parser` 8. ESLint 10 and
+Commitlint 21 can be considered separately now that the Node floor has
+moved.
 
 ## Upgrade-process learnings
 
@@ -68,28 +66,46 @@ avoid the same dead-ends.
 
 ### Wave 4 — npm-outdated review against the Node 20 floor
 
-- **ESLint 10 cannot ship while we are on Babel 7** — its scope-manager
-  contract (`ScopeManager#addGlobals()`) is not implemented by the
-  Babel 7 line of `@babel/eslint-parser`. Picking up ESLint 10
-  therefore transitively requires Babel 8, which requires Node 22+.
+- **ESLint 10 could not ship while we were on Babel 7** — its scope-manager
+  contract (`ScopeManager#addGlobals()`) was not implemented by the
+  Babel 7 line of `@babel/eslint-parser`. Babel 8 removes that constraint;
+  upgrading ESLint is now a separate tooling change.
   This is the largest hidden coupling we discovered.
 - `@commitlint/cli` 21 explicitly bumped its `engines.node` to
   `>=22.12.0`. The functional difference vs 20.x is small enough that
-  holding back is the right call until we move Node anyway.
+  this upgrade remains outside the Babel migration.
 - `globals` and `prettier` minors have so far been completely
   transparent — they can be picked up any time.
+
+### Wave 5 — Babel 8
+
+- Raised the Node engine range to Babel 8's supported range and aligned CI
+  with supported Node LTS lines.
+- Moved plugin and preset peer requirements to `@babel/core@^8.0.0` and
+  prepared the fixed package group for a major release.
+- Removed Babel 8-discontinued syntax and transform plugins, adopted the
+  decorators `version` option, and moved test polyfills to
+  `babel-plugin-polyfill-corejs3`.
+- Configured Babel-Jest to skip Jest's Babel 7 syntax preset; the current
+  test suite does not use Jest mock hoisting.
+- The Jest Node environment loads Babel 8 through Node's native ESM support
+  and shares it with the tests. This supports Node 22 without Jest's VM
+  module flags, which cannot synchronously load ESM on that Node line.
+- Kept the fixture suite's TypeScript import elision explicit with
+  `onlyRemoveTypeImports: false` and refreshed snapshots for Babel 8's
+  helpers, native getter/setter syntax, and core-js 3 polyfill imports.
 
 ## When you're considering a major bump
 
 1. Check the package's published `engines.node` against our current
    floor (`npm view <pkg>@<version> engines`).
 2. Check its peer dependencies — does it pull in a major of something
-   else we are deliberately holding back? (ESLint 10 ↔ Babel 8 is the
-   canonical trap.)
+   else we are deliberately holding back? (ESLint 10 previously required
+   upgrading Babel and its parser first.)
 3. Read the upstream changelog for changes to the contract we actually
    rely on (e.g. parser/scope-manager API for ESLint, comment-block
    shape for our JSDoc reader, Babel visitor signatures).
 4. If it's a tooling dep (lint, format, tests) the blast radius is the
    contributor experience. If it's a runtime dep or a Babel peer, it
    affects every consumer of this plugin and needs a major version
-   bump of the plugin itself.
+  bump of the plugin itself.

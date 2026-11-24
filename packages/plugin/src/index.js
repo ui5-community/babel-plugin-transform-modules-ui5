@@ -1,14 +1,14 @@
-import { ClassTransformVisitor } from "./classes/visitor";
-import { ClassPre } from "./classes/pre";
+import { ClassTransformVisitor } from "./classes/visitor.js";
+import { ClassPre } from "./classes/pre.js";
 import {
   getUnmatchedAdditionalUI5Classes,
   resetAllCaches,
   resetOnDemandEvictionCycle,
-} from "./classes/helpers/imports";
-import { ModuleTransformVisitor } from "./modules/visitor";
-import { escapeRegExp } from "./utils/ast";
+} from "./classes/helpers/imports.js";
+import { ModuleTransformVisitor } from "./modules/visitor.js";
+import { escapeRegExp } from "./utils/ast.js";
 
-import { wrap } from "./modules/helpers/wrapper";
+import { wrap } from "./modules/helpers/wrapper.js";
 
 /*
 References:
@@ -32,7 +32,7 @@ AST Explorer: https://astexplorer.net/
 let allConfiguredUI5ClassPaths = null;
 let exitHandlerRegistered = false;
 
-module.exports = () => {
+function plugin() {
   const UI5Visitor = {
     Program: {
       enter(path, { opts }) {
@@ -127,12 +127,17 @@ module.exports = () => {
     },
     visitor: UI5Visitor,
   };
-};
+}
 
-module.exports.resetPluginState = function resetPluginState() {
+function resetPluginState() {
   allConfiguredUI5ClassPaths = null;
   // Do NOT reset exitHandlerRegistered: the process.on('exit') handler is registered
   // once for the lifetime of the process. Re-registering it after resetPluginState()
   // would cause duplicate warnings (both handlers fire at exit).
   resetAllCaches();
-};
+}
+
+plugin.resetPluginState = resetPluginState;
+
+export { resetPluginState };
+export default plugin;

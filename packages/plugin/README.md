@@ -5,10 +5,12 @@
 
 There is also a preset which should be used rather than using the plugin directly.
 
+This package is ESM-only. Load the plugin through an ESM import; CommonJS `require()` is not supported.
+
 ## Requirements
 
-- **Node.js ≥ 20.19**. See the [Node.js support policy](../../CONTRIBUTING.md#nodejs-support-policy) for how we evolve this floor.
-- A Babel 7 toolchain (`@babel/core` 7.x) — the plugin is declared as a peer of `@babel/core`.
+- **Node.js `^22.18.0 || >=24.11.0`**. See the [Node.js support policy](../../CONTRIBUTING.md#nodejs-support-policy).
+- **Babel 8** (`@babel/core` 8.x), declared as a peer dependency.
 
 ## Install
 

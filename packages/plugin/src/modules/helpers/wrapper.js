@@ -1,7 +1,7 @@
 import { types as t, traverse } from "@babel/core";
-import * as eh from "./exports";
-import * as th from "../../utils/templates";
-import * as ast from "../../utils/ast";
+import * as eh from "./exports.js";
+import * as th from "../../utils/templates.js";
+import * as ast from "../../utils/ast.js";
 
 export function wrap(visitor, programNode, opts) {
   if (hasNoWrapPragma(visitor.parent?.comments ?? [])) {

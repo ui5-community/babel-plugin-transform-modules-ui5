@@ -433,6 +433,16 @@ export const ModuleTransformVisitor = {
     }
   },
 
+  ImportExpression(path) {
+    const { node } = path;
+    if (this.noWrap) return;
+    if (hasIgnoreImportPragma(path.getStatementParent().node)) return;
+    this.injectDynamicImportHelper = true;
+    path.replaceWith(
+      t.callExpression(t.identifier("__ui5_require_async"), [node.source])
+    );
+  },
+
   MemberExpression(path, { filename }) {
     const { node } = path;
     if (this.noWrap) return;

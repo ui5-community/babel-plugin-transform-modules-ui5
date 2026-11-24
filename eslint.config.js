@@ -1,9 +1,9 @@
-const js = require("@eslint/js");
-const globals = require("globals");
-const babelParser = require("@babel/eslint-parser");
-const prettierRecommended = require("eslint-plugin-prettier/recommended");
+import js from "@eslint/js";
+import globals from "globals";
+import babelParser from "@babel/eslint-parser";
+import prettierRecommended from "eslint-plugin-prettier/recommended";
 
-module.exports = [
+export default [
   {
     ignores: [
       "**/dist/**",
