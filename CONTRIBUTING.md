@@ -37,7 +37,7 @@ Other directories worth knowing about:
 
 ## Prerequisites
 
-- **Node.js ≥ 20.19** (CI runs against 20, 22, and 24 — see
+- **Node.js `^22.18.0 || >=24.11.0`** (CI runs against 22, 24, and 26 — see
   [.github/workflows/commit.yml](.github/workflows/commit.yml)).
 - **npm ≥ 9** (for workspaces support).
 - **git**.

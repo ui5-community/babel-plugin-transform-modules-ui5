@@ -1,4 +1,4 @@
-import { types as t, parse } from "@babel/core";
+import { types as t, parseSync } from "@babel/core";
 import * as Path from "path";
 import { readFileSync } from "fs";
 
@@ -385,7 +385,7 @@ function readAndRecordFile(absPath) {
     // Only enable JSX for .jsx/.tsx files where it is expected.
     const isTS = /\.tsx?$/.test(absPath);
     const isJSX = /\.[jt]sx$/.test(absPath);
-    const ast = parse(code, {
+    const ast = parseSync(code, {
       sourceType: "module",
       babelrc: false,
       configFile: false,
@@ -394,8 +394,7 @@ function readAndRecordFile(absPath) {
         plugins: [
           ...(isTS ? ["typescript"] : []),
           ...(isJSX ? ["jsx"] : []),
-          ["decorators", { legacy: true }],
-          "classProperties",
+          "decorators-legacy",
         ],
       },
     });

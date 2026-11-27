@@ -2,5 +2,5 @@ __test__
 node_modules/
 coverage/
 src/
-.babelrc
+babel.config.js
 .eslintignore

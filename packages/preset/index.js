@@ -1,5 +1,5 @@
-const transformUI5 = require("babel-plugin-transform-modules-ui5");
+import transformUI5 from "babel-plugin-transform-modules-ui5";
 
-module.exports = (context, opts = {}) => ({
+export default (context, opts = {}) => ({
   plugins: [[transformUI5, opts]],
 });

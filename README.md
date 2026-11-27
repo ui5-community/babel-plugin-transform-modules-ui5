@@ -14,6 +14,8 @@ The official [Easy UI5](https://github.com/ui5-community/generator-easy-ui5) Typ
 
 This repo contains both a preset and a plugin. It is recommended to use the preset since the plugin may get split into two in the future.
 
+The plugin and preset packages are ESM-only. Use them from an ECMAScript module; CommonJS `require()` is not supported.
+
 ```sh
 npm install babel-preset-transform-ui5 --save-dev
 ```
@@ -26,36 +28,39 @@ yarn add babel-preset-transform-ui5 --dev
 
 ## Configure
 
-### .babelrc
+### babel.config.mjs
 
 At a minimum, add `transform-ui5` to the `presets`.
 
 ```js
-{
+export default {
     "presets": ["transform-ui5"]
-}
+};
 ```
 
 Or if you want to supply plugin options, use the array syntax.
 
 ```js
-{
+export default {
     "presets": [
         ["transform-ui5", {
             ...pluginOpts
         }]
     ]
-}
+};
 ```
 
-Class property syntax (`static metadata = {}`) is supported natively by recent Babel versions. If you are on an older Babel 7 setup, add `@babel/plugin-proposal-class-properties` (Babel < 7.12) or rely on `@babel/preset-env` (Babel ≥ 7.12, where it is included automatically).
+Class property syntax (`static metadata = {}`) is supported by Babel 8 by default. Use `@babel/preset-env` to transform it for your chosen targets.
 
 It is also recommended to use [@babel/preset-env](https://babeljs.io/docs/babel-preset-env) to control which ES version the final code is transformed to.
+
+With Babel 8, put compilation `targets` at the top level of the config, beside `presets`.
 
 The order of presets is important and `@babel/preset-env` should be higher in the array than this one. Babel applies them in reverse order for legacy reasons, so this preset will be applied first.
 
 ```js
-{
+export default {
+    "targets": { "browsers": "defaults" },
     "presets": [
         ["@babel/preset-env", { // applied 3rd
             ...presetEnvOpts
@@ -65,7 +70,7 @@ The order of presets is important and `@babel/preset-env` should be higher in th
         }],
         "@babel/preset-typescript", // applied 1st
     ]
-}
+};
 ```
 
 ## Features
@@ -527,7 +532,7 @@ When none of the overrides below are used, the name comes from the ES class name
 
 The default behaviour if no JSDoc or Decorator overrides are given is to use the file path to determine the namespace to prefix the class name with.
 
-This is based on the relative path from either the babelrc `sourceRoot` property or the current working directory.
+This is based on the relative path from either the Babel config's `sourceRoot` property or the current working directory.
 
 **For library and app projects with a dedicated source folder** (e.g. `src/`, `test/`, `webapp/`), use the `sourceFolders` option to map each folder to its namespace prefix. The folder name is stripped from the namespace and replaced by the mapped prefix:
 

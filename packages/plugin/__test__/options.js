@@ -1,4 +1,6 @@
-import { parse, resolve } from "path";
+import { parse, resolve } from "node:path";
+
+const testDirectory = import.meta.dirname;
 
 /**
  * Provides the ability to set options per test file or directory.
@@ -58,13 +60,13 @@ const Options = {
     "class-no-convert-file-types-opt-out.controller": {
       autoConvertUI5FileTypes: false,
     },
-    "LocalMid": {
+    LocalMid: {
       // Middle ancestor in the N2 rejection chain — lives in "other/" which is not mapped
       // in sourceFolders, so it gets no namespace and should NOT be converted.
       autoConvertKnownUI5Classes: true,
       sourceFolders: { src: "my.app" },
     },
-    "MyApp": {
+    MyApp: {
       // Top of the N2 rejection chain — "src/" is mapped, giving it a namespace, but its
       // intermediate ancestor LocalMid has no namespace, so isLocalChainConvertible returns
       // false and MyApp must also NOT be converted.
@@ -97,14 +99,14 @@ const Options = {
     "class-convert-only-move-this-binding": {
       onlyMoveClassPropsUsingThis: true,
     },
-    "SiblingSourcerootApp": {
+    SiblingSourcerootApp: {
       autoConvertKnownUI5Classes: true,
     },
     "SourceFolderApp.controller": {
       autoConvertKnownUI5Classes: true,
       sourceFolders: { src: "my.app" },
     },
-    "UnmatchedFolderApp": {
+    UnmatchedFolderApp: {
       autoConvertKnownUI5Classes: true,
       sourceFolders: { src: "my.app" }, // "other" is not mapped → empty namespace → no auto-convert
     },
@@ -113,65 +115,65 @@ const Options = {
       dependencies: [
         {
           sourceRoot: resolve(
-            __dirname,
+            testDirectory,
             "fixtures/classes/class-convert-dependencies/dep-lib"
           ),
           sourceFolders: { src: "my.dep" },
         },
       ],
     },
-    "DepUnmappedApp": {
+    DepUnmappedApp: {
       autoConvertKnownUI5Classes: true,
       dependencies: [
         {
           sourceRoot: resolve(
-            __dirname,
+            testDirectory,
             "fixtures/classes/class-convert-dependencies/dep-lib"
           ),
           sourceFolders: { src: "my.dep" },
         },
       ],
     },
-    "PrimaryExtendsDepBase": {
-      autoConvertKnownUI5Classes: true,
-      sourceFolders: { src: "my.app" },
-      dependencies: [
-        {
-          sourceRoot: resolve(
-            __dirname,
-            "fixtures/classes/class-convert-dependencies/dep-lib"
-          ),
-          sourceFolders: { src: "my.dep" },
-        },
-      ],
-    },
-    "PrimaryExtendsDepBaseModulePath": {
+    PrimaryExtendsDepBase: {
       autoConvertKnownUI5Classes: true,
       sourceFolders: { src: "my.app" },
       dependencies: [
         {
           sourceRoot: resolve(
-            __dirname,
+            testDirectory,
             "fixtures/classes/class-convert-dependencies/dep-lib"
           ),
           sourceFolders: { src: "my.dep" },
         },
       ],
     },
-    "PrimaryExtendsDepBaseUnmapped": {
+    PrimaryExtendsDepBaseModulePath: {
       autoConvertKnownUI5Classes: true,
       sourceFolders: { src: "my.app" },
       dependencies: [
         {
           sourceRoot: resolve(
-            __dirname,
+            testDirectory,
+            "fixtures/classes/class-convert-dependencies/dep-lib"
+          ),
+          sourceFolders: { src: "my.dep" },
+        },
+      ],
+    },
+    PrimaryExtendsDepBaseUnmapped: {
+      autoConvertKnownUI5Classes: true,
+      sourceFolders: { src: "my.app" },
+      dependencies: [
+        {
+          sourceRoot: resolve(
+            testDirectory,
             "fixtures/classes/class-convert-dependencies/dep-lib"
           ),
           sourceFolders: { src: "my.dep" }, // "other" is not mapped → dep ancestor not found → no auto-convert
         },
       ],
     },
-    "DepBase": {
+    DepBase: {
       autoConvertKnownUI5Classes: true,
       sourceFolders: { src: "my.dep" },
     },
@@ -181,11 +183,11 @@ const Options = {
     "import-remove-fileext-suppressed": {
       suppressImportResolutionHints: true,
     },
-    "EmptyPrefixBase": {
+    EmptyPrefixBase: {
       autoConvertKnownUI5Classes: true,
       sourceFolders: { src: "" }, // empty-string mapping → "src" stripped, no prefix prepended
     },
-    "EmptyPrefixApp": {
+    EmptyPrefixApp: {
       autoConvertKnownUI5Classes: true,
       sourceFolders: { src: "" },
     },
@@ -260,25 +262,25 @@ const Options = {
     },
   },
   // Babel-level option overrides keyed by file/dir name.
-  // Use sparingly — only when the test needs a different sourceRoot than __dirname.
+  // Use sparingly — only when the test needs a different sourceRoot than testDirectory.
   babelOpts: {
     "class-convert-known-ui5-classes-no-namespace": {
       // Point sourceRoot to the fixture dir itself so the file's dir resolves to ""
       // and fileNamespace becomes "" — triggering the namespace guard, which prevents
       // autoConvertKnownUI5Classes from converting the class.
       sourceRoot: resolve(
-        __dirname,
+        testDirectory,
         "fixtures/classes/class-convert-known-ui5-classes-no-namespace"
       ),
     },
-    "SiblingSourcerootApp": {
+    SiblingSourcerootApp: {
       // Point sourceRoot at the fixture root so SiblingSourcerootApp.js (in app/) has a
       // non-empty namespace ("app") and reaches the transitive known-class branch, while
       // its ancestor Base.js lives in a SIBLING dir (".../-legacy") that shares sourceRoot
       // as a string prefix but is NOT contained in it. Exercises the Path.relative
       // containment check: the sibling must be treated as outside sourceRoot.
       sourceRoot: resolve(
-        __dirname,
+        testDirectory,
         "fixtures/classes/class-convert-transitive-sibling-sourceroot"
       ),
     },
@@ -286,15 +288,15 @@ const Options = {
       // Point sourceRoot at the fixture root so the file's leading folder is "src"
       // (matching the sourceFolders key) rather than "fixtures".
       sourceRoot: resolve(
-        __dirname,
+        testDirectory,
         "fixtures/classes/class-convert-source-folders"
       ),
     },
-    "UnmatchedFolderApp": {
+    UnmatchedFolderApp: {
       // Point sourceRoot at the fixture root so the file's leading folder is "other"
       // (NOT a key in sourceFolders: { src: "my.app" }) → empty namespace → no auto-convert.
       sourceRoot: resolve(
-        __dirname,
+        testDirectory,
         "fixtures/classes/class-convert-source-folders-unmatched"
       ),
     },
@@ -303,50 +305,50 @@ const Options = {
       // outside the primary root. The dependencies option points to dep-lib so the plugin
       // can derive the namespace "my.dep.controller" from there.
       sourceRoot: resolve(
-        __dirname,
+        testDirectory,
         "fixtures/classes/class-convert-dependencies/primary"
       ),
     },
-    "DepUnmappedApp": {
+    DepUnmappedApp: {
       // Same primary sourceRoot as DepMappedApp.controller, but the dep-lib sub-folder
       // "other" is not mapped in dep.sourceFolders → empty namespace → no auto-convert.
       sourceRoot: resolve(
-        __dirname,
+        testDirectory,
         "fixtures/classes/class-convert-dependencies/primary"
       ),
     },
-    "DepBase": {
+    DepBase: {
       // DepBase.js lives in dep-lib/src/base/. Point sourceRoot at dep-lib so the FQN
       // resolves to "my.dep.base.DepBase" via dep-level sourceFolders { src: "my.dep" }.
       sourceRoot: resolve(
-        __dirname,
+        testDirectory,
         "fixtures/classes/class-convert-dependencies/dep-lib"
       ),
     },
-    "PrimaryExtendsDepBase": {
+    PrimaryExtendsDepBase: {
       // Primary sourceRoot is <fixture-root>/primary; sourceFolders maps "src" → "my.app".
       // The dep ancestor (DepBase.js) lives in dep-lib, outside the primary root.
       // This exercises the N2 cross-root ancestor namespace check.
       sourceRoot: resolve(
-        __dirname,
+        testDirectory,
         "fixtures/classes/class-convert-dependencies/primary"
       ),
     },
-    "PrimaryExtendsDepBaseModulePath": {
+    PrimaryExtendsDepBaseModulePath: {
       // Same primary sourceRoot as PrimaryExtendsDepBase but the ancestor is imported
       // via UI5 module path "my/dep/base/DepBase" rather than a relative path.
       // Exercises the dep-sourceRoot loop added to resolveImportSourceToFilename.
       sourceRoot: resolve(
-        __dirname,
+        testDirectory,
         "fixtures/classes/class-convert-dependencies/primary"
       ),
     },
-    "PrimaryExtendsDepBaseUnmapped": {
+    PrimaryExtendsDepBaseUnmapped: {
       // Dep ancestor path "my/dep/other/DepBaseUnmapped" has "other" as its folder,
       // which is NOT in dep.sourceFolders { src: "my.dep" } → resolver can't find it
       // → no transitive match → class stays unconverted.
       sourceRoot: resolve(
-        __dirname,
+        testDirectory,
         "fixtures/classes/class-convert-dependencies/primary"
       ),
     },
@@ -356,19 +358,19 @@ const Options = {
       // MyApp.js (in src/) must NOT be converted: isLocalChainConvertible rejects the chain because
       // LocalMid (in other/) has no namespace and is not a .controller.js file.
       sourceRoot: resolve(
-        __dirname,
+        testDirectory,
         "fixtures/classes/class-convert-transitive-no-ns-mid"
       ),
     },
-    "LocalMid": {
+    LocalMid: {
       sourceRoot: resolve(
-        __dirname,
+        testDirectory,
         "fixtures/classes/class-convert-transitive-no-ns-mid"
       ),
     },
-    "MyApp": {
+    MyApp: {
       sourceRoot: resolve(
-        __dirname,
+        testDirectory,
         "fixtures/classes/class-convert-transitive-no-ns-mid"
       ),
     },
@@ -376,19 +378,19 @@ const Options = {
       // Point sourceRoot at the fixture root so the file's leading folder is "src"
       // (matched in sourceFolders: { src: "" }) rather than "fixtures".
       sourceRoot: resolve(
-        __dirname,
+        testDirectory,
         "fixtures/classes/class-convert-source-folders-empty-mapping"
       ),
     },
-    "EmptyPrefixBase": {
+    EmptyPrefixBase: {
       sourceRoot: resolve(
-        __dirname,
+        testDirectory,
         "fixtures/classes/class-convert-source-folders-empty-mapping"
       ),
     },
-    "EmptyPrefixApp": {
+    EmptyPrefixApp: {
       sourceRoot: resolve(
-        __dirname,
+        testDirectory,
         "fixtures/classes/class-convert-source-folders-empty-mapping"
       ),
     },

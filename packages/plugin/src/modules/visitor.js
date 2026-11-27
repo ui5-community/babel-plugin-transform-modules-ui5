@@ -1,11 +1,12 @@
 import { join, dirname, resolve } from "path";
 import { existsSync, statSync } from "fs";
+import { fileURLToPath } from "node:url";
 
 import { types as t, template } from "@babel/core";
-import * as th from "../utils/templates";
-import * as ast from "../utils/ast";
+import * as th from "../utils/templates.js";
+import * as ast from "../utils/ast.js";
 
-import { hasJsdocGlobalExportFlag } from "../classes/helpers/jsdoc";
+import { hasJsdocGlobalExportFlag } from "../classes/helpers/jsdoc.js";
 
 const resolveSource = (src, filename) => {
   src = src.replace(/\\/g, "/");
@@ -52,7 +53,7 @@ const addImport = (imports, imp, filename, first, opts = {}) => {
             }
           });
         } else {
-          modulePath = require.resolve(absModuleSrc);
+          modulePath = fileURLToPath(import.meta.resolve(absModuleSrc));
         }
         // detect removal of file extension and log a hint.
         // Guard on modulePath: for a relative import whose file doesn't exist it
@@ -431,6 +432,16 @@ export const ModuleTransformVisitor = {
         callee: t.identifier("__ui5_require_async"),
       });
     }
+  },
+
+  ImportExpression(path) {
+    const { node } = path;
+    if (this.noWrap) return;
+    if (hasIgnoreImportPragma(path.getStatementParent().node)) return;
+    this.injectDynamicImportHelper = true;
+    path.replaceWith(
+      t.callExpression(t.identifier("__ui5_require_async"), [node.source])
+    );
   },
 
   MemberExpression(path, { filename }) {

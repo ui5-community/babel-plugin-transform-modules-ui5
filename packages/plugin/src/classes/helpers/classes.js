@@ -2,12 +2,12 @@ import { types as t } from "@babel/core";
 
 import Path from "path";
 
-import * as th from "../../utils/templates";
-import * as ast from "../../utils/ast";
+import * as th from "../../utils/templates.js";
+import * as ast from "../../utils/ast.js";
 
-import { getJsDocClassInfo, getTags } from "./jsdoc";
-import { getDecoratorClassInfo } from "./decorators";
-import { getImportDeclaration, deriveNamespaceForFile } from "./imports";
+import { getJsDocClassInfo, getTags } from "./jsdoc.js";
+import { getDecoratorClassInfo } from "./decorators.js";
+import { getImportDeclaration, deriveNamespaceForFile } from "./imports.js";
 
 /**
  * Converts an ES6 class to a UI5 extend.
@@ -177,8 +177,7 @@ export function convertClassToUI5Extend(
           const typeName = getTypeName(typeAnnotation);
 
           // 1. transform the property from being typed as instance and un-initialized to a property where the controller extension *class* is assigned as value
-          const valueIdentifier = t.identifier(typeName);
-          member.value = valueIdentifier;
+          member.value = getTypeExpression(typeAnnotation);
           member.typeAnnotation = null;
           extendProps.unshift(buildObjectProperty(member)); // add it to the properties of the extend() config object
 
@@ -578,6 +577,19 @@ export const getTypeName = (typeAnnotation) => {
   }
   return null;
 };
+
+function getTypeExpression(typeAnnotation) {
+  if (t.isTSTypeReference(typeAnnotation)) {
+    return getTypeExpression(typeAnnotation.typeName);
+  }
+  if (t.isTSQualifiedName(typeAnnotation)) {
+    return t.memberExpression(
+      getTypeExpression(typeAnnotation.left),
+      t.identifier(typeAnnotation.right.name)
+    );
+  }
+  return t.identifier(typeAnnotation.name);
+}
 
 const buildObjectProperty = (member) => {
   const newObjectProperty = t.objectProperty(
