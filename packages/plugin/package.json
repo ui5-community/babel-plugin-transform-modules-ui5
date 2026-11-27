@@ -78,7 +78,6 @@
     "@babel/preset-env": "8.0.7",
     "@babel/preset-flow": "8.0.1",
     "@babel/preset-typescript": "8.0.7",
-    "babel-jest": "30.5.2",
     "babel-plugin-polyfill-corejs3": "1.0.0",
     "eslint": "9.39.4",
     "eslint-config-prettier": "10.1.8",
@@ -88,7 +87,6 @@
     "eslint-plugin-promise": "7.3.0",
     "globals": "17.7.0",
     "husky": "9.1.7",
-    "jest": "30.5.2",
     "lint-staged": "16.2.7",
     "prettier": "3.9.0",
     "rimraf": "6.1.3"
