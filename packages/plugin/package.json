@@ -54,14 +54,7 @@
   "homepage": "https://github.com/r-murphy/babel-plugin-transform-modules-ui5#readme",
   "jest": {
     "collectCoverage": true,
-    "transform": {
-      "\\.[jt]sx?$": [
-        "babel-jest",
-        {
-          "excludeJestPreset": true
-        }
-      ]
-    }
+    "transform": {}
   },
   "lint-staged": {
     "src/**/*.js": [
